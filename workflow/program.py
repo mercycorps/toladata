@@ -46,7 +46,7 @@ def get_gaitid_details(gaitid, complete_gaitid_details):
 
     params
         gaitid: idaa gaitid to get details for
-        complete_gaitid_deatils: The full gaitid list returned from utils.AccessMSR.gaitid_list
+        complete_gaitid_details: The full gaitid list returned from utils.AccessMSR.gaitid_list
 
     returns a dictionary of details for the given gaitid or None if the gaitid is not found in complete_gaitid_details
     """
@@ -593,6 +593,7 @@ class ProgramUpload(ProgramValidation):
             sectors = [item['LookupValue'] for item in program['Sector']]
             for sector in sectors:
                 idaa_sector, _ = models.IDAASector.objects.get_or_create(sector=sector)
+
                 new_tola_program.idaa_sector.add(idaa_sector)
 
         # Get outcome themes and add them to program
@@ -600,6 +601,7 @@ class ProgramUpload(ProgramValidation):
             outcome_themes = set(outcomeTheme.strip() for outcomeTheme in re.split(r',|;\n|;', program['_x0032_030OutcomeTheme']))
             for outcome_theme in outcome_themes:
                 idaa_outcome_theme, _ = IDAAOutcomeTheme.objects.get_or_create(name=outcome_theme)
+
                 new_tola_program.idaa_outcome_theme.add(idaa_outcome_theme)
 
         # Get IDAA country code from CountryCodes list
@@ -619,6 +621,7 @@ class ProgramUpload(ProgramValidation):
         idaa_gaitids = self.compressed_idaa_gaitids()
         # Get separate GaitIDs list to match GaitIDs with Fundcodes and Donors
         # gaitids_list = utils.AccessMSR().gaitid_list()
+
         # Save gaitIDs in GaitID table
         for gaitid in idaa_gaitids:
             gid, created = models.GaitID.objects.get_or_create(gaitid=int(gaitid), program=new_tola_program)
