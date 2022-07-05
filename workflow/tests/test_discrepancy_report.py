@@ -11,7 +11,7 @@ class TestDiscrepancyReport(test.TestCase):
     idaa_sample_data_path = 'workflow/tests/idaa_sample_data/idaa_invalid_sample.json'
     discrepancy_report_path = f'workflow/discrepancy_report_{date.today().isoformat()}.xlsx'
     idaa_json = None
-    
+
     def setUp(self):
         with open(self.idaa_sample_data_path) as file:
             self.idaa_json = json.load(file)
@@ -34,7 +34,7 @@ class TestDiscrepancyReport(test.TestCase):
         idaa_program_multiple_discrepancies_index = 3
         idaa_program_mulitple_discrepancies_json = self.idaa_json['value'][idaa_program_multiple_discrepancies_index]['fields']
         tola_program = models.Program(
-            start_date="2025-01-01", end_date="2027-01-01", name="Tola program test", 
+            start_date="2025-01-01", end_date="2027-01-01", name="Tola program test",
             funding_status=idaa_program_mulitple_discrepancies_json['ProgramStatus']
         )
         tola_program.save()
@@ -46,7 +46,7 @@ class TestDiscrepancyReport(test.TestCase):
         idaa_program_matches_multiple_json = self.idaa_json['value'][idaa_program_matches_multiple_index]['fields']
         for number in range(2):
             new_program = models.Program(
-                start_date=program.convert_date(idaa_program_matches_multiple_json['ProgramStartDate']), 
+                start_date=program.convert_date(idaa_program_matches_multiple_json['ProgramStartDate']),
                 end_date=program.convert_date(idaa_program_matches_multiple_json['ProgramEndDate']),
                 name=f"{idaa_program_matches_multiple_json['ProgramName']}-{number}", funding_status=idaa_program_matches_multiple_json['ProgramStatus']
             )
@@ -58,14 +58,14 @@ class TestDiscrepancyReport(test.TestCase):
         tola_program_mismatched_countries_index = 5
         tola_program_mismatched_countries_json = self.idaa_json['value'][tola_program_mismatched_countries_index]['fields']
         tola_program_mismatched_countries = models.Program(
-            start_date=program.convert_date(tola_program_mismatched_countries_json['ProgramStartDate']), 
+            start_date=program.convert_date(tola_program_mismatched_countries_json['ProgramStartDate']),
             end_date=program.convert_date(tola_program_mismatched_countries_json['ProgramEndDate']),
             name=tola_program_mismatched_countries_json['ProgramName'], funding_status=tola_program_mismatched_countries_json['ProgramStatus'],
         )
         tola_program_mismatched_countries.save()
         tola_program_mismatched_countries.country.add(haiti, colombia)
         tola_program_mismatched_countries_gaitid = models.GaitID(
-            gaitid=tola_program_mismatched_countries_json['GaitIDs'][0]['LookupValue'].rstrip('.0'), program_id=tola_program_mismatched_countries.id
+            gaitid=tola_program_mismatched_countries_json['GaitIDs'][0]['LookupValue'].split('.')[0], program_id=tola_program_mismatched_countries.id
         )
         tola_program_mismatched_countries_gaitid.save()
 
