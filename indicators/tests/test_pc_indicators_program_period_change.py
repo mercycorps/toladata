@@ -48,9 +48,14 @@ class TestReportingPeriodDatesChange(test.TestCase):
         self.assertEqual(pc_indicator.count(), 0)
 
         # Update reporting period
+        start_year = datetime.date.today().year if datetime.date.today().month < 7 else datetime.date.today().year + 1
+        end_year = start_year + 2
+        start_date = datetime.date(start_year, 1, 1)
+        end_date = datetime.date(end_year, 12, 31)
+        period_names = ['FY' + str(start_year), 'FY' + str(start_year + 1), 'FY' + str(end_year), 'FY' + str(end_year + 1)]
         self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2023-01-01',
-                          'reporting_period_end': '2025-12-31',
+                         {'reporting_period_start': start_date,
+                          'reporting_period_end': end_date,
                           'rationale': 'test'})
         pc_indicator = self.program.indicator_set.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT)
         self.assertEqual(pc_indicator.count(), 1)
@@ -59,59 +64,58 @@ class TestReportingPeriodDatesChange(test.TestCase):
         for pt in periodictargets:
             periods.append(pt.period)
         self.assertEqual(periodictargets.count(), 4)
-        self.assertEqual(periods, ['FY2023', 'FY2024', 'FY2025', 'FY2026'])
+        self.assertEqual(periods, period_names)
 
         # Add one fiscal year at the end
+        end_date_plus_one = datetime.date(end_year + 1, 12, 31)
         self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2023-01-01',
-                          'reporting_period_end': '2026-12-31',
+                         {'reporting_period_start': start_date,
+                          'reporting_period_end': end_date_plus_one,
                           'rationale': 'test'})
         periodictargets = pc_indicator.first().periodictargets.all()
         self.assertEqual(periodictargets.count(), 5)
 
         # Subtract one fiscal year from the end
         self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2023-01-01',
-                          'reporting_period_end': '2025-12-31',
+                         {'reporting_period_start': start_date,
+                          'reporting_period_end': end_date,
                           'rationale': 'test'})
         periodictargets = pc_indicator.first().periodictargets.all()
         self.assertEqual(periodictargets.count(), 4)
 
-        # Add one fiscal to the front
+        # Subtract one fiscal from the front
+        start_date_plus_one = datetime.date(start_year + 1, 1, 1)
         self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2022-01-01',
-                          'reporting_period_end': '2025-12-31',
+                         {'reporting_period_start': start_date_plus_one,
+                          'reporting_period_end': end_date,
                           'rationale': 'test'})
         periodictargets = pc_indicator.first().periodictargets.all()
-        self.assertEqual(periodictargets.count(), 5)
+        self.assertEqual(periodictargets.count(), 3)
 
-        # Subtract one fiscal from the front
+        # Add one fiscal to the front
         self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2023-01-01',
-                          'reporting_period_end': '2025-12-31',
+                         {'reporting_period_start': start_date,
+                          'reporting_period_end': end_date,
                           'rationale': 'test'})
         periodictargets = pc_indicator.first().periodictargets.all()
         self.assertEqual(periodictargets.count(), 4)
 
         # Subtract fiscal year from both ends
+        end_date_minus_one = datetime.date(end_year - 1, 12, 31)
         self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2024-01-01',
-                          'reporting_period_end': '2024-12-31',
+                         {'reporting_period_start': start_date_plus_one,
+                          'reporting_period_end': end_date_minus_one,
                           'rationale': 'test'})
         periodictargets = pc_indicator.first().periodictargets.all()
         self.assertEqual(periodictargets.count(), 2)
 
         # Add fiscal year to both ends
         self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2022-01-01',
-                          'reporting_period_end': '2025-12-31',
+                         {'reporting_period_start': start_date,
+                          'reporting_period_end': end_date,
                           'rationale': 'test'})
         periodictargets = pc_indicator.first().periodictargets.all()
-        periods = []
-        for pt in periodictargets:
-            periods.append(pt.period)
-        self.assertEqual(periodictargets.count(), 5)
-        self.assertEqual(periods, ['FY2022', 'FY2023', 'FY2024', 'FY2025', 'FY2026'])
+        self.assertEqual(periodictargets.count(), 4)
 
         # Add result to first pt
         self.result = i_factories.ResultFactory(
@@ -123,13 +127,13 @@ class TestReportingPeriodDatesChange(test.TestCase):
 
         # Confirm pt with added result cannot be deleted
         self.client.post(reverse('reportingperiod_update', kwargs={'pk': self.program.pk}),
-                         {'reporting_period_start': '2020-01-01',
-                          'reporting_period_end': '2020-12-31',
+                         {'reporting_period_start': start_date_plus_one,
+                          'reporting_period_end': end_date_minus_one,
                           'rationale': 'test'})
         periodictargets = pc_indicator.first().periodictargets.all()
         periods = []
         for pt in periodictargets:
             periods.append(pt.period)
-        self.assertEqual(periodictargets.count(), 1)
-        self.assertEqual(periods, ['FY2022'])
+        self.assertEqual(periodictargets.count(), 3)
+        self.assertEqual(periods, period_names[:3])
 
