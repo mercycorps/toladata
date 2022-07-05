@@ -73,13 +73,27 @@ class DiscrepancyReportTab:
         """
         idaa_json = program_discrepancy.idaa_json
         reasons = ','.join([ProgramDiscrepancy.DISCREPANCY_REASONS[discrepancy] for discrepancy in worksheet_discrepancies])
-        idaa_gaitids = [str(gaitid['LookupValue']).rstrip('.0') for gaitid in idaa_json['GaitIDs']]
+        idaa_gaitids = [str(gaitid['LookupValue']).split('.')[0] for gaitid in idaa_json['GaitIDs']]
 
-        return [
-            reasons, idaa_json['id'], idaa_json['ProgramName'], self.comma_separate_list(idaa_gaitids), 
-            idaa_json['Country'], convert_date(idaa_json['ProgramStartDate'], readable=True), convert_date(idaa_json['ProgramEndDate'], readable=True), 
-            idaa_json['ProgramStatus']
-        ]
+        if len(idaa_json['Country']) == 0:
+            country = ""
+        else:
+            country = idaa_json['Country']
+
+        try:
+            return [
+                reasons, idaa_json['id'], idaa_json['ProgramName'], self.comma_separate_list(idaa_gaitids), 
+                country, convert_date(idaa_json['ProgramStartDate'], readable=True), convert_date(idaa_json['ProgramEndDate'], readable=True), 
+                idaa_json['ProgramStatus']
+            ]
+        except KeyError:
+            # One of the fields to display on the tab is missing from the program
+            id = 0
+
+            if 'id' in idaa_json:
+                id = idaa_json['id']
+
+            return [f'Error adding program to the report. Discrepancy reasons: {reasons} discrepancy id {program_discrepancy.id}', id]
 
 
 class IDAAInvalidFieldsTab(DiscrepancyReportTab):

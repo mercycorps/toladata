@@ -1,12 +1,22 @@
 from workflow import discrepancy_report
 from factories import workflow_models
-from workflow import program, models
+from workflow import program, models, utils
 from datetime import date
 from django import test
+from unittest import skip
 import openpyxl
 import json
 
 
+# Prevents an exception when ran on github
+try:
+    msr_country_codes_list = utils.AccessMSR().countrycode_list()
+    msr_gaitid_list = utils.AccessMSR().gaitid_list()
+except AttributeError:
+    pass
+
+
+@skip('Tests will fail on GitHub without the secret_keys')
 class TestDiscrepancyReport(test.TestCase):
     idaa_sample_data_path = 'workflow/tests/idaa_sample_data/idaa_invalid_sample.json'
     discrepancy_report_path = f'workflow/discrepancy_report_{date.today().isoformat()}.xlsx'
@@ -17,8 +27,8 @@ class TestDiscrepancyReport(test.TestCase):
             self.idaa_json = json.load(file)
 
         # Need to create tola programs based on pre_create_idaa_programs
-        colombia = workflow_models.CountryFactory(country='Colombia')
-        haiti = workflow_models.CountryFactory(country='Haiti')
+        colombia = workflow_models.CountryFactory(country='Colombia', code='CO')
+        haiti = workflow_models.CountryFactory(country='Haiti', code='HT')
 
         invalid_tola_program_idaa_index = 2
         invalid_tola_program_idaa_json = self.idaa_json['value'][invalid_tola_program_idaa_index]['fields']
@@ -71,7 +81,9 @@ class TestDiscrepancyReport(test.TestCase):
 
     def test_discrepancy_report(self):
         for idaa_program in self.idaa_json['value']:
-            upload_program = program.ProgramUpload(idaa_program=idaa_program['fields'])
+            upload_program = program.ProgramUpload(idaa_program=idaa_program['fields'], 
+                msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            )
 
             self.assertFalse(upload_program.is_valid())
 
