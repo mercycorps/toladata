@@ -93,7 +93,7 @@ class Command(BaseCommand):
             f'IDAA program upload report {today}',
             message,
             settings.DEFAULT_FROM_EMAIL,
-            ['k8n9e4p6d5n5u1b6@mercycorps.slack.com'],
+            [settings.TOLA_DEVS_EMAIL],
             fail_silently=False,
         )
 
