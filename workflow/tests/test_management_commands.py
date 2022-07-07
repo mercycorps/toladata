@@ -1,17 +1,32 @@
 """Ensure reporting_period_start and reporting_period_end can only be set with first and last of the month dates
 respectively"""
 
-import datetime
+from io import StringIO
 from os import path
 from django import test
 from django.core.management import call_command
 from unittest import skip
 from factories import workflow_models as w_factories
-from workflow.models import Program
 from workflow.management.commands.upload_programs import process_file
-from pathlib import Path, PurePath
 
 
+@skip('Tests will fail on GitHub without the secret_keys')
+class TestUploadIDAAPrograms(test.TestCase):
+
+    def setUp(self):
+        w_factories.CountryFactory(country="HQ", code="HQ")
+        w_factories.CountryFactory(country="Mercy Corps NW", code="US")
+
+    def test_dry_run(self):
+        output = StringIO()
+        call_command(
+            'upload_IDAA_programs', upload=False, create_discrepancies=False, create_report=False,
+            supress_output=False, verbosity=0, stdout=output)
+        # Command should not output anything. Program upload class is tested separately.
+        self.assertEqual('', output.getvalue())
+
+
+@skip('This has been replaced by upload_IDAA_programs command')
 class TestProgramUpload(test.TestCase):
 
     # @classmethod
@@ -40,7 +55,6 @@ class TestProgramUpload(test.TestCase):
         program4s = w_factories.RFProgramFactory(gaitid=4, country=[syria])
         program4i = w_factories.RFProgramFactory(gaitid=4, country=[indonesia])
 
-    @skip
     def test_base_upload(self):
         events = process_file(
             path.join(path.dirname(path.abspath(__file__)), 'fixtures/program_upload_data.csv'), 'initial')
@@ -55,14 +69,11 @@ class TestProgramUpload(test.TestCase):
         self.assertEqual(len(events['no_change']), 0)
         self.assertEqual(len(events['country_mismatch']), 2)
 
-    @skip
     def test_extra_fund_code_generates_warning(self):
         pass
 
-    @skip
     def test_no_countries_prevents_upload(self):
         pass
 
-    @skip
     def test_validates_csv_file_structure(self):
         pass

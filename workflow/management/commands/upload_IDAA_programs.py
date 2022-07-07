@@ -1,6 +1,5 @@
-from datetime import date
-from distutils.command.upload import upload
-import requests
+from datetime import date, datetime
+from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from workflow.program import ProgramUpload
@@ -30,6 +29,10 @@ class Command(BaseCommand):
         API call to log into Microsoft account, generate access token.
         API call to MS Graph to access data stored in ProgramProjectID Sharepoint list
         """
+        start = datetime.now()
+        today = start.strftime("%m/%d/%Y")
+        start_time = start.strftime("%m/%d/%Y, %H:%M:%S")
+
         idaa_programs = AccessMSR().program_project_list()
         msr_country_codes_list = AccessMSR().countrycode_list()
         msr_gaitid_list = AccessMSR().gaitid_list()
@@ -60,7 +63,8 @@ class Command(BaseCommand):
         if self.report_date() or options['create_report']:
             report = GenerateDiscrepancyReport()
             report.generate()
-            # TODO trigger email?
+            end_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+            self.email_notifications(today, start_time, end_time, counts)
 
         if not options['supress_output']:
             print(f"Total IDAA Programs: {counts['total']}")
@@ -75,3 +79,21 @@ class Command(BaseCommand):
         if today.day == (1 or 15):
             report_day = True
         return report_day
+
+    @staticmethod
+    def email_notifications(today, start_time, end_time, counts):
+        message = (f"Start time: {start_time}\n"
+                   f"End time: {end_time}\n"
+                   f"Total IDAA programs: {counts['total']}\n"
+                   f"Programs created: {counts['created']}\n"
+                   f"Programs updated: {counts['updated']}\n"
+                   f"Invalid programs: {counts['invalid']}\n"
+                   )
+        send_mail(
+            f'IDAA program upload report {today}',
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            ['k8n9e4p6d5n5u1b6@mercycorps.slack.com'],
+            fail_silently=False,
+        )
+
