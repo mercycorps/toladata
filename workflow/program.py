@@ -300,11 +300,7 @@ class ProgramValidation(ProgramDiscrepancies):
         Checks if the IDAA and Tola programs have the same countries
         """
         tola_program_country_codes = []
-        try:
-            idaa_countries = set(country.strip() for country in re.split(r';\n|;', self.idaa_program['Country']))
-        except TypeError:
-            self.add_discrepancy('Country')
-            return False
+        idaa_countries = [country['LookupValue'] for country in self.idaa_program['Country']]
         discrepancy = 'countries' if self.tola_program_exists else 'Country'
         matching = True
 
@@ -451,7 +447,7 @@ class ProgramUpload(ProgramValidation):
             
             tola_value = getattr(self.tola_program, program_field['tola'])
 
-            if tola_value != idaa_value:
+            if str(tola_value) != str(idaa_value):
                 setattr(self.tola_program, program_field['tola'], idaa_value)
                 program_updated = True
 
@@ -494,7 +490,7 @@ class ProgramUpload(ProgramValidation):
                         tola_outcome_theme.delete()
                         program_updated = True
 
-        idaa_countries = set(country.strip() for country in re.split(r';\n|;', self.idaa_program['Country']))
+        idaa_countries = [country['LookupValue'] for country in self.idaa_program['Country']]
         # country_codes_list = utils.AccessMSR().countrycode_list()
 
         for idaa_country in idaa_countries:
@@ -606,7 +602,7 @@ class ProgramUpload(ProgramValidation):
 
         # Get IDAA country code from CountryCodes list
         # TODO Change Tola country codes so they match the IDAA list, make sure those also match OKTA country codes
-        idaa_countries = set(country.strip() for country in re.split(r';\n|;', self.idaa_program['Country']))
+        idaa_countries = [country['LookupValue'] for country in self.idaa_program['Country']]
         # countrycodes_list = utils.AccessMSR().countrycode_list()
         # Try and find country in Tola
         for idaa_country in idaa_countries:

@@ -78,7 +78,7 @@ class DiscrepancyReportTab:
         if len(idaa_json['Country']) == 0:
             country = ""
         else:
-            country = idaa_json['Country']
+            country = self.comma_separate_list([country['LookupValue'] for country in idaa_json['Country']])
 
         try:
             return [
