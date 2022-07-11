@@ -8,7 +8,9 @@
                     {"LookupValue": "10347.0000000000"}
                 ],
                 "ProgramStatus": "Rejected",
-                "Country": "Colombia",
+                "Country": [
+                    {"LookupValue": "Colombia"}
+                ],
                 "ProgramStartDate": "2022-07-29T07:00:00Z",
                 "ProgramEndDate": "2023-07-29T07:00:00Z"
             }
@@ -21,7 +23,9 @@
                     {"LookupValue": "10864.0000000000"}
                 ],
                 "ProgramStatus": "Funded",
-                "Country": "Palestine, State of",
+                "Country": [
+                    {"LookupValue": "Palestine, State of"}
+                ],
                 "Region": "Middle East",
                 "ProgramStartDate": "2022-07-29T07:00:00Z",
                 "ProgramEndDate": "2023-07-29T07:00:00Z"
@@ -35,7 +39,9 @@
                     {"LookupValue": "10476.0000000000"}
                 ],
                 "ProgramStatus": "Funded",
-                "Country": "Timor-Leste",
+                "Country": [
+                    {"LookupValue": "Timor-Leste"}
+                ],
                 "Region": "Asia",
                 "ProgramStartDate": "2022-07-29T07:00:00Z",
                 "ProgramEndDate": "2023-07-29T07:00:00Z",
@@ -50,7 +56,9 @@
                     {"LookupValue": "10521.0000000000"}
                 ],
                 "ProgramStatus": "Funded",
-                "Country": "HQ",
+                "Country": [
+                    {"LookupValue": "HQ"}
+                ],
                 "Region": "HQ Managed",
                 "ProgramStartDate": "2022-07-29T07:00:00Z",
                 "ProgramEndDate": "2023-07-29T07:00:00Z"
@@ -65,10 +73,30 @@
                     {"LookupValue": "10974.0000000000"}
                 ],
                 "ProgramStatus": "Funded",
-                "Country": "HQ",
+                "Country": [
+                    {"LookupValue": "HQ"}
+                ],
                 "Region": "HQ Managed",
                 "ProgramStartDate": "2022-07-29T07:00:00Z",
                 "ProgramEndDate": "2023-07-29T07:00:00Z"
+            }
+        },
+        {
+            "fields": {
+                "id": 1234,
+                "ProgramName": "Program Create Test ",
+                "GaitIDs": [
+                    {"LookupValue": "12345.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": [
+                    {"LookupValue": "HQ"}
+                ],
+                "Region": "HQ Managed",
+                "ProgramStartDate": "2023-04-29T07:00:00Z",
+                "ProgramEndDate": "2025-09-29T07:00:00Z",
+                "_x0032_030OutcomeTheme": "new, program",
+                "Sector": []
             }
         }
     ]

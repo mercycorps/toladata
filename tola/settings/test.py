@@ -1,7 +1,34 @@
 from tola.settings.base import *
 import sys
-from os import path
 import datetime
+import os
+import yaml
+
+
+def read_yaml(yaml_path):
+    with open(yaml_path) as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+    return data
+
+
+SETTINGS_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_DIR = os.path.abspath(os.path.join(SETTINGS_DIR, os.pardir, os.pardir, 'config'))
+
+# This works only on local when settings.secret.yml is present
+# Comment out @skip in test_program_upload_class and test_management_commands when testing on local
+
+try:
+    app_settings = read_yaml(os.path.join(CONFIG_DIR, 'settings.secret.yml'))
+    MS_TENANT_ID = app_settings['MS_TENANT_ID']
+    MS_TOLADATA_CLIENT_ID = app_settings['MS_TOLADATA_CLIENT_ID']
+    MS_TOLADATA_CLIENT_SECRET = app_settings['MS_TOLADATA_CLIENT_SECRET']
+    MSRCOMMS_ID = app_settings['MSRCOMMS_ID']
+    PROGRAM_PROJECT_LIST_ID = app_settings['PROGRAM_PROJECT_LIST_ID']
+    GAITID_LIST_ID = app_settings['GAITID_LIST_ID']
+    COUNTRYCODES_LIST_ID = app_settings['COUNTRYCODES_LIST_ID']
+except FileNotFoundError:
+    pass
+
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 

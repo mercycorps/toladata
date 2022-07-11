@@ -5,7 +5,6 @@ from django import test
 import json
 import copy
 
-
 # Prevents an exception when ran on github
 try:
     msr_country_codes_list = utils.AccessMSR().countrycode_list()
@@ -18,6 +17,7 @@ except AttributeError:
 class TestProgramUpload(test.TestCase):
     idaa_sample_data_path = 'workflow/tests/idaa_sample_data/idaa_sample.json'
     create_idaa_program_index = 2
+    new_idaa_program_index = 5
     idaa_json = None
 
     def setUp(self):
@@ -26,7 +26,7 @@ class TestProgramUpload(test.TestCase):
         """
         with open(self.idaa_sample_data_path) as file:
             self.idaa_json = json.load(file)
-        
+
         target_idaa_program = self.idaa_json['value'][self.create_idaa_program_index]['fields']
 
         new_program = self._create_tola_program(target_idaa_program, fields={
@@ -69,11 +69,11 @@ class TestProgramUpload(test.TestCase):
         Test validation when an IDAA program is not funded
         """
         idaa_not_funded_index = 0
-        
-        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_not_funded_index]['fields'], 
+
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_not_funded_index]['fields'],
             msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
         )
-        
+
         self.assertFalse(upload_program.is_valid())
 
     def test_validation_idaa_valid_and_exists(self):
@@ -164,7 +164,7 @@ class TestProgramUpload(test.TestCase):
         expected_discrepancies = 1
 
         idaa_program = self.idaa_json['value'][idaa_index]['fields']
-        
+
         idaa_program['GaitIDs'][0] = {'LookupValue': '1237a'}
 
         upload_program = program.ProgramUpload(idaa_program=idaa_program,
@@ -234,7 +234,7 @@ class TestProgramUpload(test.TestCase):
         Test that upload raises correctly when is_valid was not called
         """
         idaa_index = 3
-        
+
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
             msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
         )
@@ -297,3 +297,33 @@ class TestProgramUpload(test.TestCase):
 
         self.assertEquals(tola_program.gaitid.all().count(), 1)
         self.assertEquals(tola_program.idaa_outcome_theme.all().count(), 3)
+
+    def test_program_create(self):
+        """
+        Test that a new program is created if it does not exist in Tola
+        """
+        external_program_id = self.idaa_json['value'][self.new_idaa_program_index]['fields']['id']
+        expected_program_name = self.idaa_json['value'][self.new_idaa_program_index]['fields']['ProgramName']
+        gaitidvalue = self.idaa_json['value'][self.new_idaa_program_index]['fields']['GaitIDs'][0]['LookupValue']
+        expected_gaitid = int(str(gaitidvalue).split('.')[0])
+        expected_country = self.idaa_json['value'][self.new_idaa_program_index]['fields']['Country'][0]['LookupValue']
+
+        program_to_be_created = program.ProgramUpload(
+            idaa_program=self.idaa_json['value'][self.new_idaa_program_index]['fields'],
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            )
+
+        if program_to_be_created.is_valid():
+            program_to_be_created.upload()
+
+        self.assertTrue(program_to_be_created.new_upload)
+
+        tola_program = models.Program.objects.get(external_program_id=external_program_id)
+
+        self.assertEquals(tola_program.name, expected_program_name)
+        self.assertEquals(tola_program.gaitid.first().gaitid, expected_gaitid)
+        self.assertEquals(tola_program.funding_status, 'Funded')
+        self.assertEquals(tola_program.country.first().country, expected_country)
+        self.assertEquals(tola_program.idaa_outcome_theme.all().count(), 2)
+
+
