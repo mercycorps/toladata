@@ -642,8 +642,6 @@ class Program(models.Model):
 
     @property
     def fund_codes(self):
-        # return list(self.gaitid.values_list('fund_code', flat=True))
-        # return list(self.gaitid.fundcode.values_list('fund_code', flat=True))
         return list(self.gaitid.values_list('fundcode', flat=True))
 
     @property
