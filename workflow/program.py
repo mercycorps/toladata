@@ -3,7 +3,7 @@ from django.db import transaction
 from django.db.models.query import QuerySet
 from tola import util
 from workflow import models
-from tola_management.models import ProgramAuditLog
+from tola_management.models import ProgramAdminAuditLog
 from indicators.models import IDAAOutcomeTheme
 import datetime
 import re
@@ -423,6 +423,13 @@ class ProgramUpload(ProgramValidation):
                 return country_code_2, country_code_3
         return None, None
 
+    def get_idaa_user(self):
+        try:
+            return models.TolaUser.objects.get(name='IDAA')
+        except models.TolaUser.DoesNotExist:
+            logger.exception('Could not find IDAA TolaUser')
+            return None
+
     @transaction.atomic
     def update(self):
         """
@@ -437,6 +444,8 @@ class ProgramUpload(ProgramValidation):
             {'idaa': 'ProgramEndDate', 'tola': 'end_date'}
         ]
         idaa_gaitids = self.compressed_idaa_gaitids()
+        # complete_idaa_gaitids = utils.AccessMSR().gaitid_list()
+        program_before_update = self.tola_program.idaa_logged_fields
 
         for program_field in program_fields:
             idaa_value = self.idaa_program[program_field['idaa']]
@@ -540,6 +549,10 @@ class ProgramUpload(ProgramValidation):
         if program_discrepancies:
             program_discrepancies.delete()
 
+        if program_updated:
+            idaa_user = self.get_idaa_user()
+            ProgramAdminAuditLog.updated(self.tola_program, idaa_user, program_before_update, self.tola_program.idaa_logged_fields)
+
         self.program_updated = program_updated
 
     @transaction.atomic
@@ -634,6 +647,9 @@ class ProgramUpload(ProgramValidation):
                     if donor_dept:
                         gid.donor_dept = donor_dept
                     gid.save()
+
+        idaa_user = self.get_idaa_user()
+        ProgramAdminAuditLog.created(new_tola_program, idaa_user, new_tola_program.idaa_logged_fields)
 
     def upload(self):
         # TODO: Before creating or updating need to clean fields
