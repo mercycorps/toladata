@@ -1,5 +1,6 @@
 from factories import workflow_models
 from workflow import program, models, utils
+from tola_management.models import ProgramAdminAuditLog
 from unittest import skip
 from django import test
 import json
@@ -100,7 +101,7 @@ class TestProgramUpload(test.TestCase):
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
             msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
         )
-        print(upload_program.discrepancies)
+        
         self.assertTrue(upload_program.is_valid())
         self.assertFalse(upload_program.tola_program_exists)
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
@@ -265,6 +266,7 @@ class TestProgramUpload(test.TestCase):
         self.assertFalse(upload_program.new_upload)
 
         tola_program = models.Program.objects.get(gaitid__gaitid=gaitid)
+        audit_log_count = ProgramAdminAuditLog.objects.filter(program=tola_program).count()
 
         self.assertEquals(tola_program.country.all().count(), 1)
         self.assertEquals(tola_program.gaitid.all().count(), 1)
@@ -273,6 +275,7 @@ class TestProgramUpload(test.TestCase):
         self.assertEquals(tola_program.name, expected_name)
         self.assertEquals(tola_program.gaitid.first().donor, expected_donor)
         self.assertEquals(tola_program.gaitid.first().donor_dept, expected_donor_dept)
+        self.assertEquals(audit_log_count, 1)
 
     def test_program_update_delete_mismatched_gaitid(self):
         """
@@ -294,9 +297,11 @@ class TestProgramUpload(test.TestCase):
         self.assertFalse(upload_program.new_upload)
 
         tola_program = models.Program.objects.get(gaitid__gaitid=gaitid)
+        audit_log_count = ProgramAdminAuditLog.objects.filter(program=tola_program).count()
 
         self.assertEquals(tola_program.gaitid.all().count(), 1)
         self.assertEquals(tola_program.idaa_outcome_theme.all().count(), 3)
+        self.assertEquals(audit_log_count, 1)
 
     def test_program_create(self):
         """
@@ -319,11 +324,13 @@ class TestProgramUpload(test.TestCase):
         self.assertTrue(program_to_be_created.new_upload)
 
         tola_program = models.Program.objects.get(external_program_id=external_program_id)
+        audit_log_count = ProgramAdminAuditLog.objects.filter(program=tola_program).count()
 
         self.assertEquals(tola_program.name, expected_program_name)
         self.assertEquals(tola_program.gaitid.first().gaitid, expected_gaitid)
         self.assertEquals(tola_program.funding_status, 'Funded')
         self.assertEquals(tola_program.country.first().country, expected_country)
         self.assertEquals(tola_program.idaa_outcome_theme.all().count(), 2)
+        self.assertEquals(audit_log_count, 1)
 
 
