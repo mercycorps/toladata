@@ -2,9 +2,10 @@ from datetime import datetime, date
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Count
+from django.db.models import Q
 from indicators.models import Indicator
 from workflow.models import Program
-from indicators.utils import add_additional_periodic_targets
+from indicators.utils import add_additional_periodic_targets, add_FY2022_pt
 
 
 class Command(BaseCommand):
@@ -19,6 +20,9 @@ class Command(BaseCommand):
         parser.add_argument(
             '--change_customsort_to_fy', action='store_true', help='Changes customsort value of periodic targets to match the fiscal year')
         parser.add_argument(
+            '--add_pt_2022', action='store_true',
+            help='Adds pt FY2022 for relevant programs')
+        parser.add_argument(
             '--suppress_output', action='store_true',
             help="Suppresses the output so tests don't get too messy")
 
@@ -29,7 +33,7 @@ class Command(BaseCommand):
             for indicator in pc_indicators:
                 self.add_fy_customsort(indicator)
 
-        counts = {'eligible_programs': 0, 'ineligible_programs': 0, 'programs_pts_created': 0,}
+        counts = {'eligible_programs': 0, 'ineligible_programs': 0, 'programs_pts_created': 0, 'eligible_programs_2022': 0}
 
         today = datetime.utcnow().date()
         reporting_end_date = date(today.year, 6, 30)
@@ -46,6 +50,18 @@ class Command(BaseCommand):
             for program in eligible_programs:
                 add_additional_periodic_targets(program)
                 counts['programs_pts_created'] += 1
+
+        if options['add_pt_2022']:
+            eligible_programs_2022 = Program.objects.filter(indicator__admin_type=Indicator.ADMIN_PARTICIPANT_COUNT,
+                                                       reporting_period_start__lt=reporting_end_date)
+            pc_indicators_need_2022 = Indicator.objects.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT) \
+                .prefetch_related('periodictargets').filter(~Q(periodictargets__customsort=2022))
+            eligible_programs_2022 = eligible_programs_2022.filter(
+                indicator__id__in=[ind.pk for ind in pc_indicators_need_2022])
+            for program in eligible_programs_2022:
+                add_FY2022_pt(program)
+                counts['eligible_programs_2022'] += 1
+
 
         if not options['suppress_output']:
             print('')
