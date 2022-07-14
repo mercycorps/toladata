@@ -72,6 +72,17 @@ def create_periodic_target_range(program, indicator):
 
 # This just need to be run once in FY2022, thereafter all periodic targets for a programming period will be
 # created automatically.
+def add_FY2022_pt(program):
+    try:
+        indicator = Indicator.objects.get(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT, program__pk=program.pk)
+    except MultipleObjectsReturned:
+        print(f"Program '{program.name}' has more than one pc indicator.")
+        return
+    make_pt_targets(indicator, 2022, 1)
+
+
+# This just need to be run once in FY2022, thereafter all periodic targets for a programming period will be
+# created automatically.
 def add_additional_periodic_targets(program):
     first_fiscal_year, last_fiscal_year = get_first_last_fiscal_year(program)
     # FY2022 is the always first periodic target.
@@ -98,8 +109,7 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
                                  new_first_fiscal_year, new_last_fiscal_year, indicator):
     # Get existing periodic targets for pc indicator
     periodic_targets = PeriodicTarget.objects.filter(indicator=indicator)
-    # Get current fiscal year
-    current_fy_year = current_fiscal_year()
+    first_pci_year = 2022
 
     # If the new end date fiscal year is larger than the current one, add periodic targets
     if new_last_fiscal_year > current_last_fiscal_year:
@@ -109,8 +119,8 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
             current_last_pt = reversed_pts[0].customsort
         except IndexError:
             # There are no periodic targets, create them for the entire program period
-            # The first periodic target cannot be smaller than the current fiscal year
-            current_last_pt = max(new_first_fiscal_year, current_fy_year) - 1
+            # The first periodic target cannot be smaller than FY 2022
+            current_last_pt = max(new_first_fiscal_year, first_pci_year) - 1
         pts_to_add = new_last_fiscal_year - current_last_pt
         if pts_to_add > 0:
             fiscal_year_to_add = current_last_pt + 1
@@ -137,7 +147,7 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
     # If the new start date fiscal year is smaller than current one, add periodic targets
     if new_first_fiscal_year < current_first_fiscal_year:
         # The first new periodic target cannot be smaller than the current fiscal year
-        new_first_fiscal_year = max(new_first_fiscal_year, current_fy_year)
+        new_first_fiscal_year = max(new_first_fiscal_year, first_pci_year)
         try:
             first_pts = periodic_targets[0].customsort
         except IndexError:
@@ -169,12 +179,12 @@ def recalculate_periodic_targets(current_first_fiscal_year, current_last_fiscal_
 
 def get_first_last_fiscal_year(program):
     # Get program start and end dates
-    current_fy_year = current_fiscal_year()
+    first_pci_year = 2022
     program_start_date = program.reporting_period_start
     program_end_date = program.reporting_period_end
     if program_start_date and program_end_date:
-        # Find first applicable fiscal year
-        first_fiscal_year = max((program_start_date.year if program_start_date.month < 7 else program_start_date.year + 1), current_fy_year)
+        # Find first applicable pci year
+        first_fiscal_year = max((program_start_date.year if program_start_date.month < 7 else program_start_date.year + 1), first_pci_year)
         last_fiscal_year = program_end_date.year if program_end_date.month < 7 else program_end_date.year + 1
     else:
         # For test programs that have been created without dates
