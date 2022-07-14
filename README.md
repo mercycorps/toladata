@@ -50,7 +50,7 @@ $ brew install python@3
 $ brew install mysql@5.7
 ```
 
-Add these lines to ~/.bash_profile (you may need to create it)
+Add these lines to your shell profile `~/.bash_profile` or `~/.zshrc` (you may need to create it)
 ```text
 export PATH="/usr/local/opt/openssl/bin:$PATH"
 export LIBRARY_PATH="/usr/local/opt/openssl/lib/:$LIBRARY_PATH"
@@ -64,8 +64,9 @@ export CPPFLAGS="-I/usr/local/opt/mysql@5.7/include"
 
 Back at the command line:
 ```bash
-$ source ~/.bash_profile
-$ brew install mysql-utilities
+$ source ~/.bash_profile # if using bash, e.g on MacOS 10.14 or older
+$ source ~/.zshrc # if using zsh, e.g. on MacOS 10.15 or newer
+$ brew install mysql-client 
 $ brew install py2cairo pango
 $ pip3 install virtualenv
 ```
@@ -331,15 +332,36 @@ Tola uses Webpack and `npm` installed packages in `node_modules` to build javasc
 During development, you will need to run the webpack development server to have the latest JS
 bundles available, and to re-generate the bundles if you modify any JS handled by Webpack.
 
-Directions for installing `npm` can be found below. It can also be installed via homebrew on macOS
+Directions for installing `npm` can be found below. It can also be installed via homebrew on macOS.
 
 ```bash
 $ brew install npm (sudo apt install npm )
 ```
 
-### Install all `node_module` package dependencies using `npm`
+Our current front-end build harness uses `node-sass` [v4.12*](https://www.npmjs.com/package/node-sass) which requires node v12 (or possibly older). If you are working with more than one project, you may want to install [`nvm` (Node Version Manager)](https://github.com/nvm-sh/nvm). To install `nvm`:
 
 ```bash
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+```
+
+After installing `nvm`, add version 12:
+
+```bash
+$ nvm install 12
+```
+
+### Install all `node_module` package dependencies using `npm`
+
+*(optional)* Switch to Node 12:
+
+```bash
+$ nvm use 12
+```
+
+To install:
+
+```bash
+$ cd /path/to/tola_data
 $ npm run install:dev
 ```
 
