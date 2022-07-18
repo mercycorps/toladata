@@ -1432,7 +1432,7 @@ class ParticipantCountFiscalExport(APIView):
                    '20_24_f_without_double_counting', '20_24_unk_without_double_counting', '25_34_m_without_double_counting', '25_34_f_without_double_counting',
                    '25_34_unk_without_double_counting', '35_49_m_without_double_counting', '35_49_f_without_double_counting', '35_49_unk_without_double_counting',
                    '50+_m_without_double_counting', '50+_f_without_double_counting', '50+_unk_without_double_counting']
-    possible_outcome_themes = ['Economic Opportunities', 'Food Security', 'Peace and Stability', 'Resilience', 'Water Security']
+    possible_outcome_themes = ['Economic Opportunity', 'Food Security', 'Good Governance and Peace', 'Resilience approach (tick this box if the program used a resilience approach)', 'Water Security']
     actual_list = ['Direct', 'Indirect']
     actual_keys = ['Actual without double counting', 'Actual with double counting']
     sector_list = ['Agriculture', 'Cash and Voucher Assistance', 'Employment', 'Environment (DRR, Energy and Water)', 'Financial Services', 'Governance and Partnership',
@@ -1443,23 +1443,31 @@ class ParticipantCountFiscalExport(APIView):
                  '25-34 M', '25-34 F', '25-34 Sex Unknown', '35-49 M', '35-49 F', '35-49 Sex Unknown', '50+ M', '50+ F', '50+ Sex Unknown']
     sadd_keys = ['SADD (including unknown) with double counting', 'SADD (including unknown) without double counting']
     reporting_start_date = date.fromisoformat(settings.REPORTING_YEAR_START_DATE)
+    include_all_fy_string = 'fyall'
 
     def __init__(self, *args, **kwargs):
-        self.event_target_period = 'FY{}'.format(self.reporting_start_date.year + 1)
-
-        self.queryset = Indicator.objects.filter(
-            admin_type=Indicator.ADMIN_PARTICIPANT_COUNT,
-            program__reporting_period_end__gte=self.reporting_start_date,
-            periodictargets__period=self.event_target_period
-        ).prefetch_related('program')
-
-        # Exclude Tolaland in production
-        if not settings.DEBUG:
-            self.queryset = self.queryset.exclude(program__country__country='Tolaland')
-
         self.csv_row = []
 
         super().__init__(*args, **kwargs)
+
+    @property
+    def event_target_period(self):
+        return f"FY{self.request.query_params.get('FY', '2022')}"
+
+    def get_queryset(self):
+        queryset = Indicator.objects.filter(
+            admin_type=Indicator.ADMIN_PARTICIPANT_COUNT,
+            program__reporting_period_end__gte=self.reporting_start_date,
+        ).prefetch_related('program')
+
+        if self.event_target_period.lower() != self.include_all_fy_string:
+            queryset = queryset.filter(periodictargets__period=self.event_target_period)
+
+        # Exclude Tolaland in production
+        if not settings.DEBUG:
+            queryset = queryset.exclude(program__country__country='Tolaland')
+
+        return queryset
 
     @staticmethod
     def sum_counters(counters, start):
@@ -1690,10 +1698,11 @@ class ParticipantCountFiscalExport(APIView):
         }
 
         for result in indicator.result_set.all():
-            results_dict['outcome_themes'].update(self.get_outcome_themes(result))
-            results_dict['actual'].append(self.get_actuals(result))
-            results_dict['sector'].append(self.get_sector_data(result))
-            results_dict['sadd'].append(self.get_sadd_data(result))
+            if result.periodic_target.period == self.event_target_period or self.event_target_period.lower() == self.include_all_fy_string:
+                results_dict['outcome_themes'].update(self.get_outcome_themes(result))
+                results_dict['actual'].append(self.get_actuals(result))
+                results_dict['sector'].append(self.get_sector_data(result))
+                results_dict['sadd'].append(self.get_sadd_data(result))
 
         # All values sum the counters and add to the csv row
         for key in results_dict:
@@ -1727,9 +1736,15 @@ class ParticipantCountFiscalExport(APIView):
         """
         countries, regions = self.get_country_region_list(indicator)
 
+        if self.event_target_period.lower() == self.include_all_fy_string:
+            periodic_targets = indicator.periodictargets.all()
+            fiscal_year_range = f'{periodic_targets.first().period}-{periodic_targets.last().period}'
+        else:
+            fiscal_year_range = self.event_target_period
+
         for index, _ in enumerate(countries):
             self.csv_row.extend([
-                indicator.program.name, self.event_target_period, countries[index], regions[index], self.remove_new_lines(indicator.definition),
+                indicator.program.name, fiscal_year_range, countries[index], regions[index], self.remove_new_lines(indicator.definition),
                 indicator.program.gaitid, self.remove_new_lines(indicator.means_of_verification), self.remove_new_lines(indicator.data_collection_method),
                 self.remove_new_lines(indicator.method_of_analysis), self.remove_new_lines(indicator.comments)
             ])
@@ -1753,7 +1768,9 @@ class ParticipantCountFiscalExport(APIView):
         writer = csv.writer(response)
         writer.writerow(self.csv_headers)
 
-        for indicator in self.queryset:
+        queryset = self.get_queryset()
+
+        for indicator in queryset:
             self.populate_row(indicator, writer)
 
         return response
