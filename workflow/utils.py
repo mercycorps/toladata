@@ -36,3 +36,8 @@ class AccessMSR:
         cc_list_id = settings.COUNTRYCODES_LIST_ID
         values = self.get_MSR_list(cc_list_id)
         return values
+
+    def program_project_list(self):
+        program_project_list_id = settings.PROGRAM_PROJECT_LIST_ID
+        values = self.get_MSR_list(program_project_list_id)
+        return values

@@ -641,6 +641,10 @@ class Program(models.Model):
         return list(self.gaitid.values_list('gaitid', flat=True))
 
     @property
+    def fund_codes(self):
+        return list(self.gaitid.values_list('fundcode', flat=True))
+
+    @property
     def collected_record_count(self):
         return Program.objects.filter(pk=self.pk).annotate(num_data=Count('indicator__result')) \
                     .values('id', 'num_data')[0]['num_data']
@@ -721,6 +725,21 @@ class Program(models.Model):
         }
 
     @property
+    def idaa_logged_fields(self):
+        return {
+            "gaitid": self.gaitids,
+            "name": self.name,
+            "funding_status": self.funding_status,
+            "fund_codes": self.fund_codes,
+            "external_program_id": self.external_program_id,
+            "start_date": str(self.start_date),
+            "end_date": str(self.end_date),
+            "sectors": ','.join([s.sector for s in self.idaa_sector.all()]),
+            'countries': ','.join([c.country for c in self.country.all()]),
+            'outcome_themes': ','.join([ot.name for ot in self.idaa_outcome_theme.all()])
+        }
+
+    @property
     def dates_for_logging(self):
         start_date = None
         if self.reporting_period_start is not None:
@@ -783,7 +802,7 @@ class ProgramDiscrepancy(models.Model):
         "ProgramStartDate": "IDAA program is missing ProgramStartDate",
         "ProgramEndDate": "IDAA program is missing ProgramEndDate",
         "ProgramStatus": "IDAA program is missing ProgramStatus",
-        "Country": "IDAA program is missing Country"
+        "Country": "IDAA program is missing Country or has an Invalid Country"
     }
 
     # Example idaa_json can be seen from workflow/tests/idaa_sample_data/idaa_sample.json
@@ -808,6 +827,9 @@ class GaitID(models.Model):
 
     class Meta:
         unique_together = ['gaitid', 'program']
+
+    def fund_codes(self):
+        return list(self.fund_code.values_list('fund_code', flat=True))
 
     def __str__(self):
         return str(self.gaitid)
