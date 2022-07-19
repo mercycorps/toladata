@@ -81,7 +81,7 @@ module.exports = {
     optimization: {
         // split manifest out
         runtimeChunk: 'single',
-        moduleIds: 'hashed',
+        moduleIds: 'deterministic',
         splitChunks: {
             cacheGroups: {
                 vendors: {
