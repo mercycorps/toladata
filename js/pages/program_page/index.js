@@ -92,8 +92,6 @@ ReactDOM.render(<ProgramMetrics rootStore={rootStore} uiStore={uiStore} />,
 
 ReactDOM.render(<SitesList rootStore={rootStore} />,
     document.querySelector('#sites-sidebar'));
-ReactDOM.render(<ProgramPeriod programPk={rootStore.program.pk} readOnly={rootStore.readOnly}/>,
-    document.querySelector('.programperiodlink'));
 
 /*
  * Copied and modified JS from indicator_list_modals.js to allow modals to work

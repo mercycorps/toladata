@@ -2,7 +2,19 @@
 import '@babel/polyfill'
 import '../scss/tola.scss';
 import 'react-virtualized/styles.css'
+import React from 'react';
+import ReactDOM from 'react-dom';
 
+/*
+ * Allows the Django templated Country Page to render the React Program Period modals with 
+ * unique classnames that include the Program IDs.
+ */
+import { ProgramPeriod } from './pages/program_page/components/program_period';
+let programList = document.querySelectorAll('[class^="programperiodlink"');
+programList.forEach(program => {
+    let programID = program.getAttribute('class').split("_")[1];
+    ReactDOM.render(<ProgramPeriod programPk={programID}/>, document.querySelector(`.programperiodlink_${programID}`))
+})
 
 /*
  * Moved legacy app.js code here - Contains global functions called by template code

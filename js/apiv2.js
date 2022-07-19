@@ -83,18 +83,30 @@ const api = {
     },
     async getProgramPeriodData(programPk) {
         console.log("FROM API", programPk)
-        // return await this.apiInstance.get(`/program_page/${programPk}/`)
+        // return await this.apiInstance.get(`/program_period_update/${programPk}/`)
         // .then(response => response.data)
         // .catch(this.logFailure);
         return await {
-            id: 983,
-            start_date: "2020-09-01",
-            end_date: "2023-04-30",
-            // start_date: "unavailable",
-            // end_date: "unavailable",
-            reporting_period_start: "2020-09-01", 
-            reporting_period_end: "2023-04-30",
+            has_regular_target_frequencies: false,
+            readOnly: false,
+            idaa_start_date: "2020-09-16",
+            idaa_end_date: "2025-09-15",
+            // idaa_start_date: null,
+            // idaa_end_date: null,
+            // reporting_period_start: "", 
+            reporting_period_start: "2020-01-01", 
+            reporting_period_end: "2024-01-15",
         }
+    },
+    async updateProgramPeriodData(programPk, data) {
+        return await this.apiInstance.put(`/program_period_update/${programPk}`, data)
+        .then(response => response.data)
+        .catch(() => {
+            this.logFailure
+            // return {status: 400, failmsg: "Did not save."}
+            return {status: 400}
+        });
+        // return await {"Updated Dates": data}
     },
     ipttFilterData(programPk) {
         return this.apiInstance.get(`/iptt/${programPk}/filter_data/`)
