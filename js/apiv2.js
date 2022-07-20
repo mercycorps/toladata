@@ -82,7 +82,6 @@ const api = {
         .catch(this.logFailure);
     },
     async getProgramPeriodData(programPk) {
-        console.log("FROM API", programPk)
         // return await this.apiInstance.get(`/program_period_update/${programPk}/`)
         // .then(response => response.data)
         // .catch(this.logFailure);
@@ -95,7 +94,7 @@ const api = {
             // idaa_end_date: null,
             // reporting_period_start: "", 
             reporting_period_start: "2020-01-01", 
-            reporting_period_end: "2024-01-15",
+            reporting_period_end: "2027-01-31",
         }
     },
     async updateProgramPeriodData(programPk, data) {

@@ -22,18 +22,29 @@ const ProgramPeriod = ({programPk}) => {
         return defaultDate;
     }
 
+    const INDICATOR_TRACKING_DESCRIPTION = {
+        en: `Some programs may wish to customize the date range for time-based target periods to better correspond to the program’s implementation phase or the phase in which indicators are measured, tracked, and reported. In these cases, programs may adjust the indicator tracking start and end dates below. Indicator tracking dates must begin on the first day of the month and end on the last day of the month, and they may not fall outside of the official program start and end dates. Please note that the indicator tracking dates should be adjusted <span class="color-red">before indicator periodic targets are set up and the program begins submitting indicator results.</span> To adjust the indicator tracking start date or to move the end date earlier after targets are set up and results submitted, please refer to the
+        <a href="https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide"> TolaData User Guide.</a>`,
+        es: `Algunos programas pueden desear personalizar el rango de fechas para los periodos objetivo basados en el tiempo para que se correspondan mejor con la fase de implementación del programa o con la fase en la que se miden, rastrean y reportan los indicadores. En estos casos, los programas pueden ajustar las fechas de inicio y fin del seguimiento de los indicadores que se indican a continuación. Las fechas de seguimiento de los indicadores deben comenzar el primer día del mes y terminar el último día del mes, y no pueden quedar fuera de las fechas oficiales de inicio y fin del programa. Tenga en cuenta que las fechas de seguimiento de los indicadores deben ajustarse <span class="color-red">antes de que se establezcan las metas periódicas de los indicadores y el programa comience a presentar los resultados de los indicadores.</span> Para ajustar la fecha de inicio del seguimiento de los indicadores o para adelantar la fecha de finalización después de que se hayan establecido los objetivos y se hayan presentado los resultados, consulte la
+        <a href="https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide"> Guía del Usuario de TolaData.</a>`,
+        fr: `Certains programmes peuvent souhaiter personnaliser la plage de dates pour les périodes cibles temporelles afin de mieux correspondre à la phase de mise en œuvre du programme ou à la phase dans laquelle les indicateurs sont mesurés, suivis et rapportés. Dans ces cas, les programmes peuvent ajuster les dates de début et de fin de suivi des indicateurs ci-dessous. Les dates de suivi des indicateurs doivent commencer le premier jour du mois et se terminer le dernier jour du mois, et elles ne peuvent pas tomber en dehors des dates officielles de début et de fin du programme. Veuillez noter que les dates de suivi des indicateurs doivent être ajustées <span class="color-red">avant que les cibles périodiques des indicateurs soient établies et que le programme commence à soumettre les résultats des indicateurs.</span> Pour ajuster la date de début du suivi des indicateurs ou pour avancer la date de fin après la mise en place des cibles et la soumission des résultats, veuillez vous référer au
+        <a href="https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide"> Guide de l'Utilisateur de TolaData.</a>`,
+    };
+
     // Component States
     const [idaaDates, setIdaaDates] = useState({});
     const [programPeriodInputs, setProgramPeriodInputs] = useState({});
     const [origData, setOrigData] = useState({});
-    const [errorMessage, setErrorMessage] = useState("");
     const start_date_id = `#indicator-tracking__date--start-${programPk}`;
     const end_date_id = `#indicator-tracking__date--end-${programPk}`;
 
     // On component mount
     useEffect(() => {
-
+        
         $(`#program-period__modal--${programPk}`).on('show.bs.modal', () => {
+            
+            $(".indicator-tracking__description").append(INDICATOR_TRACKING_DESCRIPTION[window.userLang]); // Adds the description text based on users language
+
             // Get data on mount with API Call
             api.getProgramPeriodData(programPk)
                 .then(response => {
@@ -44,19 +55,18 @@ const ProgramPeriod = ({programPk}) => {
                         has_regular_target_frequencies: response.has_regular_target_frequencies,
                         start_date: response.reporting_period_start || null,
                         end_date: response.reporting_period_end || null,
-                    })
+                    });
                     setIdaaDates({...idaaDates,
                         start_date: response.idaa_start_date || null,
                         end_date: response.idaa_end_date || null,
-                    })
+                    });
                     setProgramPeriodInputs({...programPeriodInputs,
                         indicator_tracking_start_date: response.reporting_period_start || null,
                         indicator_tracking_end_date: response.reporting_period_end || null,
-                    })
+                    });
 
-    
                     // Setting the datepicker values for the editable Indicator Tracking Start Date
-                    $(start_date_id).datepicker("setDate", response.reporting_period_start)
+                    $(start_date_id).datepicker("setDate", response.reporting_period_start);
                     // Setting the Min Start Date. If the existing program has a start date that is earlier than the IDAA start date, 
                     // allow it to keep it but restrict the date from being any earlier. Otherwise, set the min date to the IDAA Start Date.
                     let selectedStartDate;
@@ -71,7 +81,7 @@ const ProgramPeriod = ({programPk}) => {
     
     
                     // Setting the datepicker values for the editable Indicator Tracking End Date
-                    $(end_date_id).datepicker("setDate", response.reporting_period_end)
+                    $(end_date_id).datepicker("setDate", response.reporting_period_end);
                     // Setting the Max End Date. If the existing program has a end date that is later than the IDAA end date, 
                     // allow it to keep it but restrict the date from being any later. Otherwise, set the max date to the IDAA End Date.
                     let selectedEndDate;
@@ -85,7 +95,12 @@ const ProgramPeriod = ({programPk}) => {
                     $(`#indicator-tracking__date--end-${programPk}`).datepicker("option", "maxDate", new Date(endYear, endMonth, 0));
                 })
                 .catch(() => {
-                    setErrorMessage(gettext("Error. Could not retrieve data from server. Please report this to the Tola team."))
+                    createAlert(
+                        "danger",
+                        gettext("Error. Could not retrieve data from server. Please report this to the Tola team."),
+                        false,
+                        "#div-id-reportingperiod-alert"
+                    );
                 })
         })
 
@@ -95,11 +110,6 @@ const ProgramPeriod = ({programPk}) => {
             changeYear: true,
             showButtonPanel: true,
             dateFormat: 'yy-mm-dd',
-            onClose: function (dateText, inst) {
-                // Without blurring, when the Done button is pressed, the cursor stays in the date input field
-                // and the user can put whatever they want, without the controls implemented by the datepicker.
-                $(this).trigger("blur");
-            },
         };
 
         // Editable Indicator Tracking Start Date
@@ -132,6 +142,7 @@ const ProgramPeriod = ({programPk}) => {
             })
         ).focus(function(){
             const field = $(this);
+            field.trigger("blur"); // Prevents users from clicking in and typing into the text field
             setTimeout(() => {
             // hide the days part of the calendar
             $(".ui-datepicker-calendar").hide();
@@ -152,7 +163,7 @@ const ProgramPeriod = ({programPk}) => {
                 let newDate = new Date(year, month, 1);
                 field.datepicker('setDate', newDate);
                 field.trigger('change');
-                setProgramPeriodInputs( prevState => ({...prevState, indicator_tracking_start_date: field.val()}))
+                setProgramPeriodInputs( prevState => ({...prevState, indicator_tracking_start_date: field.val()}));
             });
         });
         
@@ -186,6 +197,7 @@ const ProgramPeriod = ({programPk}) => {
             })
         ).focus(function(){
             const field = $(this);
+            field.trigger("blur"); // Prevents users from clicking in and typing into the text field
             setTimeout(() => {
             // hide the days part of the calendar
             $(".ui-datepicker-calendar").hide();
@@ -206,22 +218,25 @@ const ProgramPeriod = ({programPk}) => {
                 let newDate = new Date(year, parseInt(month) + 1, 0);
                 field.datepicker('setDate', newDate);
                 field.trigger('change');
-                setProgramPeriodInputs( prevState => ({...prevState, indicator_tracking_end_date: field.val()}))
+                setProgramPeriodInputs( prevState => ({...prevState, indicator_tracking_end_date: field.val()}));
             });
         });
-
-
-        
     }, [])
 
     $(`#program-period__modal--${programPk}`).on('hide.bs.modal', function () {
         // Need to remove the month-only class from the date-picker so it doesn't interfere with other datepickers
         // on the page.  Can't do it in the picker because it results in a calendar flash before picker is closed.
         $("#ui-datepicker-div").removeClass("month-only");
+        $(".indicator-tracking__description").empty(); // Removes the description text when modal is closed
+
     })
 
     // Send updated data with API Call
     const handleUpdateData = () => {
+        $(".dynamic-alert").remove() // Removes all alert boxes
+        $(start_date_id).removeClass("is-invalid")
+        $(end_date_id).removeClass("is-invalid")
+
         // Text to display in the rationale popup.
         const INDICATOR_TRACKING_CHANGE_TEXT = gettext( 'This action may result in changes to your periodic targets. If you have already set up periodic targets for your indicators, you may need to enter additional target values to cover the entire indicator tracking period. For future reference, please provide a reason for modifying the indicator tracking period.' )
 
@@ -257,7 +272,12 @@ const ProgramPeriod = ({programPk}) => {
                 } else {
                     let msg = res.failmsg || gettext('There was a problem saving your changes.');
                     window.unified_error_message( gettext('Saving Failed'));
-                    setErrorMessage(msg)
+                    createAlert(
+                        "danger",
+                        msg,
+                        false,
+                        "#div-id-reportingperiod-alert"
+                    )
                 }
             })
         }
@@ -266,22 +286,54 @@ const ProgramPeriod = ({programPk}) => {
     // Handle validation of the editable start and end dates before sending them to the backend.
     const handleValidation = () => {
         let valid = true;
-        if (programPeriodInputs.indicator_tracking_start_date === "" || programPeriodInputs.indicator_tracking_start_date === "") {
-            setErrorMessage(
-                gettext("You must enter values for the reporting start and end dates before saving.")
+        if (programPeriodInputs.indicator_tracking_start_date === "") {
+            createAlert(
+                "danger",
+                gettext("You must enter values for the indicator tracking period start date before saving."),
+                false,
+                "#div-id-reportingperiod-alert"
             )
+            $(start_date_id).addClass('is-invalid')
+            valid = false;
+        } else if (programPeriodInputs.indicator_tracking_end_date === "") {
+            createAlert(
+                "danger",
+                gettext("You must enter values for the indicator tracking period end date before saving."),
+                false,
+                "#div-id-reportingperiod-alert"
+            )
+            $(end_date_id).addClass('is-invalid')
             valid = false;
         } else {
             if (programPeriodInputs.indicator_tracking_start_date > programPeriodInputs.indicator_tracking_end_date) {
-                setErrorMessage(
-                    gettext("The end date must come after the start date.")
+                createAlert(
+                    "danger",
+                    gettext("The end date must come after the start date."),
+                    false,
+                    "#div-id-reportingperiod-alert"
                 )
+                $(start_date_id).addClass('is-invalid')
+                $(end_date_id).addClass('is-invalid')
                 valid = false;
             }
-            if (programPeriodInputs.indicator_tracking_start_date < idaaDates.start_date || programPeriodInputs.indicator_tracking_end_date > idaaDates.end_date) {
-                setErrorMessage(
-                    gettext("The indicator tracking start and end dates must be between the IDAA start and end dates.")
+            if (programPeriodInputs.indicator_tracking_start_date < idaaDates.start_date) {
+                createAlert(
+                    "danger",
+                    gettext("The indicator tracking start must be later than the IDAA start date."),
+                    false,
+                    "#div-id-reportingperiod-alert"
                 )
+                $(start_date_id).addClass('is-invalid')
+                valid = false;
+            }
+            if (programPeriodInputs.indicator_tracking_end_date > idaaDates.end_date) {
+                createAlert(
+                    "danger",
+                    gettext("The indicator tracking end dates must be earlier the IDAA end date."),
+                    false,
+                    "#div-id-reportingperiod-alert"
+                )
+                $(end_date_id).addClass('is-invalid')
                 valid = false;
             }
         }
@@ -326,12 +378,8 @@ const ProgramPeriod = ({programPk}) => {
 
                             <div id="program-period__section--heading" className="mb-4">
                                 <div className="pt-3" style={{display: "inline-block", width: "90%"}}>
-
                                     <div className="mb-4"><h2>{ gettext("Program period")}</h2></div>
-                                    <div id="div-id-reportingperiod-alert" className="text-danger">{errorMessage}</div>
-
-                                    <br/>
-
+                                    <div id="div-id-reportingperiod-alert" className="text-danger"></div>
                                     <div>
                                         { gettext("The program period is used as the default for the initial setup of time-based target periods (e.g., annually, quarterly, etc.) and in the Indicator Performance Tracking Tables (IPTTs). The Program Period is based on the program’s official start and end dates as recorded in the Identification Assignment Assistant (IDAA) system and cannot be adjusted in TolaData.") }
                                     </div>
@@ -364,17 +412,12 @@ const ProgramPeriod = ({programPk}) => {
                                 <div className="card inputs-in-a-box">
                                     <div className="card-body px-4 py-3">
 
-                                        <div className="indicator-tracking__description">
-                                            { gettext("Some programs may wish to customize the date range for time-based target periods to better correspond to the program’s implementation phase or the phase in which indicators are measured, tracked, and reported. In these cases, programs may adjust the indicator tracking start and end dates below. Indicator tracking dates must begin on the first day of the month and end on the last day of the month, and they may not fall outside of the official program start and end dates. Please note that the indicator tracking dates should be adjusted before indicator periodic targets are set up and the program begins submitting indicator results. To adjust the indicator tracking start date or to move the end date earlier after targets are set up and results submitted, please refer to the TolaData User Guide.") }
-                                            <a href={"https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide"}>{ gettext('TolaData User Guide.')}</a>
-                                        </div>
-
+                                        <div className="indicator-tracking__description"></div>
                                         <br/>
-
                                         <h3 className="mb-3">{ gettext('Indicator tracking period') }</h3>
 
                                         <div className="mb-3" style={{display: "flex"}}>
-                                            <div className="mr-4" style={{display: "flex", flexDirection: "column"}}>
+                                            <div className="mr-4">
                                                 <label htmlFor={`indicator-tracking__date--start-${programPk}`} className="text-uppercase"><h4 className="mb-1">{ gettext("Start date") }</h4></label>
                                                 <input 
                                                     type="text"
@@ -385,7 +428,7 @@ const ProgramPeriod = ({programPk}) => {
                                                     disabled={origData.readOnly || origData.has_regular_target_frequencies}
                                                     />
                                             </div>
-                                            <div style={{display: "flex", flexDirection: "column"}}>
+                                            <div>
                                                 <label htmlFor={`indicator-tracking__date--end-${programPk}`} className="text-uppercase"><h4 className="mb-1">{ gettext("End date") }</h4></label>
                                                 <input 
                                                     type="text"
@@ -416,7 +459,6 @@ const ProgramPeriod = ({programPk}) => {
                             }
 
                         </div>
-
                     </div>
                 </div>
             </div>
