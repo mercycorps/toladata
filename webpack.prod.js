@@ -2,8 +2,8 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const BundleTracker = require('webpack-bundle-tracker');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 
 module.exports = merge(common, {
@@ -26,10 +26,11 @@ module.exports = merge(common, {
     ],
 
     optimization: {
+        minimize: true,
         minimizer: [
-            new UglifyJSPlugin({
-                uglifyOptions: {
-                    ecma: 5,
+            new TerserPlugin({
+                minify: TerserPlugin.terserMinify,
+                terserOptions: {
                     output: {
                         comments: false
                     },
@@ -37,10 +38,9 @@ module.exports = merge(common, {
                         dead_code: true,
                         drop_console: true
                     }
-                },
-                sourceMap: false,
+                }
             })
-        ],
-    },
+        ]
+    }
 
 });
