@@ -4,6 +4,7 @@ Workflow views - TODO: cut out intercision-invalidated views
 """
 
 import logging
+import json
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil import parser
@@ -31,6 +32,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Q, Max
 
 from tola.util import getCountry, group_excluded
@@ -48,6 +50,8 @@ from tola_management.permissions import (
     verify_program_access_level,
     verify_program_access_level_of_any_program
 )
+
+import workflow.serializers_new.program_period_serializer as pp_serializer
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -283,6 +287,33 @@ class SiteProfileDelete(DeleteView):
         return self.render_to_response(self.get_context_data(form=form))
 
     form_class = SiteProfileForm
+
+
+@login_required
+@api_view(['GET', 'PUT'])
+@transaction.atomic
+def program_period_update(request, pk):
+    # pk is program pk
+    program = Program.objects.get(pk=pk)
+    verify_program_access_level(request, program.pk, 'low')
+    old_dates = program.dates_for_logging
+    if request.method == 'PUT':
+        verify_program_access_level(request, pk, 'high')
+        result_data = request.data
+        result_serializer = pp_serializer.ProgramPeriodSerializerUpdate(program, data=result_data)
+        if result_serializer.is_valid():
+            result_serializer.save()
+            ProgramAuditLog.log_program_dates_updated(
+                request.user, program, old_dates, program.dates_for_logging, request.POST.get('rationale')
+            )
+
+        else:
+            return JsonResponse(result_serializer.errors, status=422)
+
+        return JsonResponse({'message': 'success'}, status=200)
+    role = request.user.tola_user.program_role(program.pk)
+    read_only = False if role == 'high' else True
+    return JsonResponse(pp_serializer.ProgramPeriodSerializerRead(program, read_only=read_only).data)
 
 
 @login_required
