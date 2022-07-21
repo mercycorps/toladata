@@ -694,6 +694,11 @@ class Program(models.Model):
             ).exists()
 
     @property
+    def has_indicators(self):
+        """returns true if this program has any indicators - used in program reporting period date validation"""
+        return self.indicator_set.all().exists()
+
+    @property
     def last_time_aware_indicator_start_date(self):
         """returns None if no time aware indicators, otherwise returns the most recent start date of all targets for
         indicators with a time-aware frequency - used in program reporting period date validation"""
