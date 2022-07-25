@@ -37,9 +37,6 @@ export const updateProgramFundingStatusBulk = (ids, funding_status) => {
 
 export const fetchProgramHistory = (id) => api.get(`/tola_management/program/${id}/history/`)
 
-export const syncGAITDates = (id) => api.put(`/tola_management/program/${id}/sync_gait_dates/`)
-
-
 export default {
     fetchPrograms,
     fetchProgramsForFilter,
@@ -47,6 +44,5 @@ export default {
     createProgram,
     updateProgram,
     updateProgramFundingStatusBulk,
-    validateGaitId,
-    syncGAITDates
+    validateGaitId
 }

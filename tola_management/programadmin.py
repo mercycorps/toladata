@@ -697,16 +697,3 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                                          '&q=&kw=&GrantNumber=&CostCenter=&GrantID={0}&GrantMin=&SSD=&USD=&'
                                          'SED=&UED=&Emergency=').format(gaitid)
         return JsonResponse(response)
-
-    @action(detail=True, methods=['put'], url_path='sync_gait_dates')
-    def sync_gait_dates(self, request, pk):
-        program = Program.objects.get(pk=pk)
-
-        # TODO: do something better than strings here...
-        gait_error = append_GAIT_dates(program)
-
-        program.save()
-
-        return JsonResponse({
-            'gait_error': gait_error,
-        })
