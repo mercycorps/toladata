@@ -248,6 +248,7 @@ class GaitIDSerializer(ModelSerializer):
         return {
             'gaitid': instance.gaitid,
             'donor': instance.donor,
+            'donor_dept': instance.donor_dept,
             'fund_code': [fc.fund_code for fc in instance.fundcode_set.all()]
         }
 
