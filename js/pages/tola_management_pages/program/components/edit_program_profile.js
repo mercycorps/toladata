@@ -63,9 +63,11 @@ export default class EditProgramProfile extends React.Component {
     }
 
     createDisplayList(listArray) {
+        if (!listArray) return "null";        
         return listArray.reduce((list, item, i) => {
             let separator = i === 0 ? "" : ", ";
-            return list + separator + item.label;
+            item = item.label || item;
+            return list + separator + item;
         }, "");
     }
 
@@ -73,9 +75,9 @@ export default class EditProgramProfile extends React.Component {
         const formdata = this.state.managed_data;
         const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
         const selectedSectors = formdata.sector.map(x=>this.props.sectorOptions.find(y=>y.value==x));
-        let countryList = this.createDisplayList(selectedCountries);
-        let sectorList = this.createDisplayList(selectedSectors);
-        console.log(this.props)
+        let gaitFundDonor = formdata.gaitid.length > 0 ? formdata.gaitid : [{gaitid: null, fund_code: null, donor: null}];
+        console.log('gaitFundDonor', gaitFundDonor)
+        console.log('formdata', formdata);
         return (
             <div className="tab-pane--react">
                 <h2 className="no-bold">{this.props.program_data.name ? this.props.program_data.name+': ' : ''}{gettext("Profile")}
@@ -118,7 +120,7 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-start-date">{gettext("Program start date")}</label>
                         <input
                             type="text"
-                            value={"2014-06-05"}
+                            value={formdata.start_date}
                             onChange={(e) => this.updateFormField('start-date', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('start-date') })}
                             id="program-start-date"
@@ -130,7 +132,7 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-end-date">{gettext("Program end date")}</label>
                         <input
                             type="text"
-                            value={"2023-10-01"}
+                            value={formdata.end_date}
                             onChange={(e) => this.updateFormField('end-date', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('end-date') })}
                             id="program-end-date"
@@ -154,44 +156,43 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-county-input" >{gettext("Countries")}</label>
                         <input
                             type="text"                      
-                            value={countryList || ""}
+                            value={this.createDisplayList(selectedCountries) || ""}
                             className={classNames('form-control', { 'is-invalid': this.formErrors('country') })}
                             id="program-country-input"
                             readOnly
                             />
-                        <CheckboxedMultiSelect
+                        {/* <CheckboxedMultiSelect
                             value={selectedCountries}
                             options={this.props.countryOptions}
                             onChange={(e) => this.updateFormField('country', e.map(x=>x.value)) }
                             className={classNames('react-select', {'is-invalid': this.formErrors('country')})}
                             id="program-country-input"
-                            />
+                            /> */}
                         <ErrorFeedback errorMessages={this.formErrors('country')} />
                     </div>
                     <div className="form-group react-multiselect-checkbox">
                         <label htmlFor="program-sectors-input">{gettext("Sectors")}</label>
                         <input
                             type="text"                      
-                            value={sectorList || ""}
+                            value={this.createDisplayList(selectedSectors)}
                             className={classNames('form-control', { 'is-invalid': this.formErrors('sector') })}
                             id="program-sector-input"
                             readOnly
                             />
-                        <CheckboxedMultiSelect
+                        {/* <CheckboxedMultiSelect
                             value={selectedSectors}
                             options={this.props.sectorOptions}
                             onChange={(e) => this.updateFormField('sector', e.map(x=>x.value)) }
                             className={classNames('react-select', {'is-invalid': this.formErrors('sector')})}
                             id="program-sectors-input"
-                            />
+                            /> */}
                         <ErrorFeedback errorMessages={this.formErrors('sector')} />
                     </div>
                     <div className="form-group">
                         <label htmlFor="program-outcome_themes-input">{gettext("Outcome themes")}</label>
                         <input
                             type="text"
-                            // value={formdata.outcome_themes}
-                            value={"Economic Opportunities, Resilience"}
+                            value={this.createDisplayList(formdata.idaa_outcome_theme)}
                             onChange={(e) => this.updateFormField('outcome_themes', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('outcome_themes') })}
                             id="program-outcome_themes-input"
@@ -200,25 +201,26 @@ export default class EditProgramProfile extends React.Component {
                         <ErrorFeedback errorMessages={this.formErrors('outcome_themes')} />
                     </div>
                     <div className="profile__table">
-                        <div className="profile-table__column--left">
+                        <div className="profile-table__column--left header">
                             <label htmlFor="program-gait-input">{gettext("GAIT IDs")}</label>
                         </div>
-                        <div className="profile-table__column--middle">
+                        <div className="profile-table__column--middle header">
                             <label htmlFor="program-fund-code-input">{gettext("Fund codes")}</label>
                         </div>
-                        <div className="profile-table__column--right">
+                        <div className="profile-table__column--right header">
                             <label htmlFor="program-donor-input">{gettext("Donors")}</label>
                         </div>
                     </div>
-                    {[1,2,3,4,5].map((item, index) => {
+                    {gaitFundDonor.map((gaitRow, index) => {
+                        console.log('gaitRow', gaitRow, this.createDisplayList(gaitRow.fund_code));
+                        let donorText = gaitRow.donor;
                         return(
                             <div key={index} className="profile__table">
                                     <div className="profile-table__column--left">
                                         <div className="form-group">
                                             <input
                                                 type="text"
-                                                // value={formdata.gaitid || "null"}
-                                                value={"8263"}
+                                                value={gaitRow.gaitid || "null"}
                                                 onChange={(e) => this.updateFormField('gaitid', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('gaitid') })}
                                                 id="program-gait-input"
@@ -231,8 +233,7 @@ export default class EditProgramProfile extends React.Component {
                                         <div className="form-group">
                                             <input
                                                 type="text"
-                                                // value={formdata.fundCode || "null"}
-                                                value={"71058"}
+                                                value={this.createDisplayList(gaitRow.fund_code) || "null"}
                                                 onChange={(e) => this.updateFormField('fundCode', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
                                                 id="program-fund-code-input"
@@ -245,8 +246,8 @@ export default class EditProgramProfile extends React.Component {
                                         <div className="form-group">
                                             <input
                                                 type="text"
-                                                // value={formdata.donors || "null"}
-                                                value="Corporation for National and Community Servie (CNCS), Corporation for National and Community Servie (CNCS)"
+                                                value={donorText}
+                                                // value="Corporation for National and Community Servie (CNCS), Corporation for National and Community Servie (CNCS)"
                                                 onChange={(e) => this.updateFormField('fundCode', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
                                                 id="program-donor-input"
