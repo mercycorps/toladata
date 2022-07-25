@@ -18,6 +18,7 @@ from rest_framework.serializers import (
     IntegerField,
     ValidationError,
     BooleanField,
+    DateField,
     DateTimeField,
     SerializerMethodField,
     JSONField
@@ -42,6 +43,7 @@ from workflow.models import (
 from indicators.models import (
     Indicator,
     Level,
+    IDAAOutcomeTheme
 )
 
 from tola_management.models import (
@@ -254,6 +256,16 @@ class GaitIDSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class IDAAOutcomeThemeSerializer(ModelSerializer):
+
+    def to_representation(self, instance):
+        return instance.name
+
+    class Meta:
+        model = IDAAOutcomeTheme
+        fields = ('name',)
+
+
 class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
     name = CharField(required=True, max_length=255)
@@ -271,6 +283,9 @@ class ProgramAdminSerializer(ModelSerializer):
     program_users = SerializerMethodField()
     onlyOrganizationId = SerializerMethodField()
     _using_results_framework = IntegerField(required=False, allow_null=True)
+    start_date = DateField(required=True)
+    end_date = DateField(required=True)
+    idaa_outcome_theme = IDAAOutcomeThemeSerializer(many=True)
 
     def __init__(self, instance=None, data=..., **kwargs):
         super().__init__(instance, data, **kwargs)
@@ -302,7 +317,10 @@ class ProgramAdminSerializer(ModelSerializer):
             'program_users',
             'onlyOrganizationId',
             'auto_number_indicators',
-            '_using_results_framework'
+            '_using_results_framework',
+            'start_date',
+            'end_date',
+            'idaa_outcome_theme'
         )
 
     @staticmethod
@@ -552,7 +570,8 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 ),
                 to_attr='country_with_users'
             ),
-            'gaitid'
+            'gaitid',
+            'idaa_outcome_theme'
         )
         return queryset
 
