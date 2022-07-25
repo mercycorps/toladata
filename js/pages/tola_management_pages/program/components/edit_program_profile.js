@@ -3,6 +3,7 @@ import Select from 'react-select'
 import { observer } from "mobx-react"
 import CheckboxedMultiSelect from 'components/checkboxed-multi-select'
 import classNames from 'classnames'
+import HelpPopover from '../../../../components/helpPopover.js'
 
 
 const ErrorFeedback = observer(({errorMessages}) => {
@@ -61,61 +62,103 @@ export default class EditProgramProfile extends React.Component {
         return this.props.errors[fieldKey]
     }
 
+    createDisplayList(listArray) {
+        return listArray.reduce((list, item, i) => {
+            let separator = i === 0 ? "" : ", ";
+            return list + separator + item.label;
+        }, "");
+    }
+
     render() {
-        const formdata = this.state.managed_data
-        const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x))
-        const selectedSectors = formdata.sector.map(x=>this.props.sectorOptions.find(y=>y.value==x))
+        const formdata = this.state.managed_data;
+        const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
+        const selectedSectors = formdata.sector.map(x=>this.props.sectorOptions.find(y=>y.value==x));
+        let countryList = this.createDisplayList(selectedCountries);
+        let sectorList = this.createDisplayList(selectedSectors);
+        console.log(this.props)
         return (
             <div className="tab-pane--react">
-                <h2 className="no-bold">{this.props.program_data.name ? this.props.program_data.name+': ' : ''}{gettext("Profile")}</h2>
+                <h2 className="no-bold">{this.props.program_data.name ? this.props.program_data.name+': ' : ''}{gettext("Profile")}
+                    <span className="ml-1">
+                        <HelpPopover
+                            className="popover-icon"
+                            content={
+                                gettext("The fields on this tab are auto-populated with data from Identification Assignment Assistant (IDAA). These fields cannot be edited in TolaData. If changes to this program information are required, then these changes must be reflected in IDAA first.")
+                            }
+
+                        />
+                    </span>
+                </h2>
                 <form className="form">
                     <div className="form-group">
-                        <label className="label--required" htmlFor="program-name-input">{gettext("Program name")}</label>
+                        <label htmlFor="program-name-input">{gettext("Program name")}</label>
                         <input
                             type="text"
                             value={formdata.name}
                             onChange={(e) => this.updateFormField('name', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('name') })}
                             id="program-name-input"
-                            required />
+                            disabled
+                            />
                         <ErrorFeedback errorMessages={this.formErrors('name')} />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="program-gait-input">{gettext("GAIT ID")}</label>
+                        <label htmlFor="program-id-input">{gettext("Program ID")}</label>
                         <input
-                            type="tel"
-                            value={formdata.gaitid}
-                            onChange={(e) => this.updateFormField('gaitid', e.target.value) }
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('gaitid') })}
-                            id="program-gait-input"
-                            disabled={!this.props.new}
+                            type="text"
+                            value={formdata.id}
+                            onChange={(e) => this.updateFormField('id', e.target.value) }
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('id') })}
+                            id="program-id-input"
+                            disabled
                             />
-                        <ErrorFeedback errorMessages={this.formErrors('gaitid')} />
+                        <ErrorFeedback errorMessages={this.formErrors('id')} />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="program-fund-code-input">{gettext("Fund Code")}</label>
+                        <label htmlFor="program-start-date">{gettext("Program start date")}</label>
                         <input
-                            type="tel"
-                            value={formdata.fundCode}
-                            onChange={(e) => this.updateFormField('fundCode', e.target.value) }
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('fundCode') })}
-                            id="program-fund-code-input"
-                            disabled={!this.props.new}
+                            type="text"
+                            value={"2014-06-05"}
+                            onChange={(e) => this.updateFormField('start-date', e.target.value) }
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('start-date') })}
+                            id="program-start-date"
+                            disabled
                             />
-                        <ErrorFeedback errorMessages={this.formErrors('fundCode')} />
+                        <ErrorFeedback errorMessages={this.formErrors('start-date')} />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="program-description-input">{gettext("Description")}</label>
-                        <textarea
-                            value={formdata.description || ''}
-                            onChange={(e) => this.updateFormField('description', e.target.value) }
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('description') })}
-                            id="program-description-input"
+                        <label htmlFor="program-end-date">{gettext("Program end date")}</label>
+                        <input
+                            type="text"
+                            value={"2023-10-01"}
+                            onChange={(e) => this.updateFormField('end-date', e.target.value) }
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('end-date') })}
+                            id="program-end-date"
+                            disabled
                             />
-                        <ErrorFeedback errorMessages={this.formErrors('description')} />
+                        <ErrorFeedback errorMessages={this.formErrors('end-date')} />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="program-funding_status-input">{gettext("Program funding status")}</label>
+                        <input
+                            type="text"
+                            value={formdata.funding_status}
+                            onChange={(e) => this.updateFormField('funding_status', e.target.value) }
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('funding_status') })}
+                            id="program-funding_status-input"
+                            disabled
+                            />
+                        <ErrorFeedback errorMessages={this.formErrors('funding_status')} />
                     </div>
                     <div className="form-group react-multiselect-checkbox">
-                        <label htmlFor="program-county-input" className="label--required">{gettext("Countries")}</label>
+                        <label htmlFor="program-county-input" >{gettext("Countries")}</label>
+                        <input
+                            type="text"                      
+                            value={countryList || ""}
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('country') })}
+                            id="program-country-input"
+                            readOnly
+                            />
                         <CheckboxedMultiSelect
                             value={selectedCountries}
                             options={this.props.countryOptions}
@@ -127,6 +170,13 @@ export default class EditProgramProfile extends React.Component {
                     </div>
                     <div className="form-group react-multiselect-checkbox">
                         <label htmlFor="program-sectors-input">{gettext("Sectors")}</label>
+                        <input
+                            type="text"                      
+                            value={sectorList || ""}
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('sector') })}
+                            id="program-sector-input"
+                            readOnly
+                            />
                         <CheckboxedMultiSelect
                             value={selectedSectors}
                             options={this.props.sectorOptions}
@@ -136,19 +186,79 @@ export default class EditProgramProfile extends React.Component {
                             />
                         <ErrorFeedback errorMessages={this.formErrors('sector')} />
                     </div>
-                    {this.props.new &&
-                    <div className="form-group btn-row">
-                        <button className="btn btn-primary" type="button" onClick={(e) => this.saveNew(e)}>{gettext("Save Changes")}</button>
-                        {/* <button className="btn btn-primary" onClick={(e) => this.saveNewAndAddAnother(e)}>Save And Add Another</button> */}
-                        <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}>{gettext("Reset")}</button>
+                    <div className="form-group">
+                        <label htmlFor="program-outcome_themes-input">{gettext("Outcome themes")}</label>
+                        <input
+                            type="text"
+                            // value={formdata.outcome_themes}
+                            value={"Economic Opportunities, Resilience"}
+                            onChange={(e) => this.updateFormField('outcome_themes', e.target.value) }
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('outcome_themes') })}
+                            id="program-outcome_themes-input"
+                            disabled
+                            />
+                        <ErrorFeedback errorMessages={this.formErrors('outcome_themes')} />
                     </div>
-                    }
-                    {!this.props.new &&
-                    <div className="form-group btn-row">
-                        <button className="btn btn-primary" type="button" onClick={(e) => this.save(e)}>{gettext("Save Changes")}</button>
-                        <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}>{gettext("Reset")}</button>
+                    <div className="profile__table">
+                        <div className="profile-table__column--left">
+                            <label htmlFor="program-gait-input">{gettext("GAIT IDs")}</label>
+                        </div>
+                        <div className="profile-table__column--middle">
+                            <label htmlFor="program-fund-code-input">{gettext("Fund codes")}</label>
+                        </div>
+                        <div className="profile-table__column--right">
+                            <label htmlFor="program-donor-input">{gettext("Donors")}</label>
+                        </div>
                     </div>
-                    }
+                    {[1,2,3,4,5].map((item, index) => {
+                        return(
+                            <div key={index} className="profile__table">
+                                    <div className="profile-table__column--left">
+                                        <div className="form-group">
+                                            <input
+                                                type="text"
+                                                // value={formdata.gaitid || "null"}
+                                                value={"8263"}
+                                                onChange={(e) => this.updateFormField('gaitid', e.target.value) }
+                                                className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('gaitid') })}
+                                                id="program-gait-input"
+                                                disabled
+                                                />
+                                            <ErrorFeedback errorMessages={this.formErrors('gaitid')} />
+                                        </div>
+                                    </div>
+                                    <div className="profile-table__column--middle">
+                                        <div className="form-group">
+                                            <input
+                                                type="text"
+                                                // value={formdata.fundCode || "null"}
+                                                value={"71058"}
+                                                onChange={(e) => this.updateFormField('fundCode', e.target.value) }
+                                                className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
+                                                id="program-fund-code-input"
+                                                disabled
+                                                />
+                                            <ErrorFeedback errorMessages={this.formErrors('fundCode')} />
+                                        </div>
+                                    </div>
+                                    <div className="profile-table__column--right">
+                                        <div className="form-group">
+                                            <input
+                                                type="text"
+                                                // value={formdata.donors || "null"}
+                                                value="Corporation for National and Community Servie (CNCS), Corporation for National and Community Servie (CNCS)"
+                                                onChange={(e) => this.updateFormField('fundCode', e.target.value) }
+                                                className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
+                                                id="program-donor-input"
+                                                disabled
+                                                />
+                                            <ErrorFeedback errorMessages={this.formErrors('fundCode')} />
+                                        </div>
+                                    </div>
+                            </div>
+                        )
+                    })}
+
                 </form>
             </div>
         )
