@@ -253,6 +253,8 @@
     }
 }
 
-.profile__text-input {
-    text-overflow: ellipsis;
+#id_admin_program_profile-tab {
+    .form-control {
+        text-overflow: ellipsis;
+    }
 }
