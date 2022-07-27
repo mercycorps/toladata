@@ -45,7 +45,7 @@
                 "Region": "Asia",
                 "ProgramStartDate": "2022-07-29T07:00:00Z",
                 "ProgramEndDate": "2023-07-29T07:00:00Z",
-                "_x0032_030OutcomeTheme": "test,outcome,theme"
+                "_x0032_030OutcomeTheme": ["test", "outcome", "theme"]
             }
         },
         {
@@ -95,7 +95,7 @@
                 "Region": "HQ Managed",
                 "ProgramStartDate": "2023-04-29T07:00:00Z",
                 "ProgramEndDate": "2025-09-29T07:00:00Z",
-                "_x0032_030OutcomeTheme": "new, program",
+                "_x0032_030OutcomeTheme": ["new", "program"],
                 "Sector": []
             }
         }
