@@ -40,7 +40,7 @@ class TestProgramBaseFields(test.TestCase):
         data = ProgramAdminSerializer(queryset, many=True).data[0]
         self.assertEqual(data['name'], SPECIAL_CHARS)
         self.assertEqual(data['funding_status'], 'funded')
-        self.assertEqual(data['gaitid'][0], '123456')
+        self.assertEqual(data['gaitid'].first().gaitid, 123456)
         self.assertEqual(data['description'], 'A description')
         self.assertEqual(data['id'], program.pk)
 
@@ -207,7 +207,7 @@ class TestProgramFieldsStressTest(test.TestCase):
 
     def get_data(self, program_qs):
         # 3 queries: program with annotations, prefetched sectors, prefetched countries
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(8):
             return ProgramAdminSerializer(program_qs, many=True).data[0]
 
     def get_users_filtered_data(self, program_pk):
@@ -276,7 +276,7 @@ class TestProgramFieldsStressTest(test.TestCase):
         self.assertEqual(users_data['count'], 14)
 
     def test_query_count_on_multiple(self):
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(9):
             program_qs = ProgramAdminViewSet.base_queryset().all()
             data = ProgramAdminSerializer(program_qs, many=True).data
             self.assertEqual(len(data), 25)

@@ -4,10 +4,15 @@ from workflow.views import (
     SiteProfileUpdate,
     SiteProfileDelete,
     IndicatorDataBySite,
-    reportingperiod_update
+    reportingperiod_update,
+    program_period_update
 )
 
-from django.urls import path
+from django.urls import path, include
+
+apipatterns = [
+    path('program_period_update/<int:pk>/', program_period_update, name='program_period_update')
+]
 
 urlpatterns = [
     path('siteprofile_list/<int:program_id>/<int:activity_id>/', SiteProfileList.as_view(), name='siteprofile_list'),
@@ -19,4 +24,7 @@ urlpatterns = [
 
     #ajax calls
     path('reportingperiod_update/<int:pk>/', reportingperiod_update, name='reportingperiod_update'),
+
+    # API (serializer-based) calls
+    path('api/', include(apipatterns)),
 ]

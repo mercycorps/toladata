@@ -297,28 +297,6 @@ export class ProgramStore {
         }
     }
 
-    /*
-     * Returns a promise that requests that GAIT start/end dates are synced to the
-     * existing program with the given program id
-     */
-
-    syncGAITDates(program_id) {
-        // get GAIT dates into the program model on the server
-        return this.api.syncGAITDates(program_id).then((gaitSyncResponse) => {
-            let gait_error = gaitSyncResponse.data.gait_error;
-            if (! gait_error) {
-                this.onGAITDatesSyncSuccess();
-            } else {
-                this.onGAITDatesSyncFailure(gait_error, program_id);
-            }
-        }).catch(error => {
-            // # Translators: error message when trying to connect to the server
-            this.onGAITDatesSyncFailure(gettext('There was a network or server connection error.'), program_id)
-
-            return Promise.reject('Request error to sync GAIT dates')
-        })
-    }
-
     @action
     saveNewProgram(program_data) {
         program_data.id = null
@@ -361,8 +339,6 @@ export class ProgramStore {
             if (! response.data.gaitid) {
                 return Promise.reject('No GAIT id on program')
             }
-
-            return this.syncGAITDates(response.data.id);
         }).finally(() => {
             runInAction(() => {
                 this.saving = false

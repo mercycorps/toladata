@@ -18,9 +18,10 @@ from rest_framework.serializers import (
     IntegerField,
     ValidationError,
     BooleanField,
+    DateField,
     DateTimeField,
     SerializerMethodField,
-    StringRelatedField
+    JSONField
 )
 
 from openpyxl import Workbook, utils
@@ -35,11 +36,14 @@ from workflow.models import (
     Sector,
     ProgramAccess,
     CountryAccess,
+    GaitID,
+    FundCode
 )
 
 from indicators.models import (
     Indicator,
     Level,
+    IDAAOutcomeTheme
 )
 
 from tola_management.models import (
@@ -238,11 +242,36 @@ class NestedCountrySerializer(Serializer):
         return country
 
 
+class GaitIDSerializer(ModelSerializer):
+
+    def to_representation(self, instance):
+        return {
+            'gaitid': instance.gaitid,
+            'donor': instance.donor,
+            'donor_dept': instance.donor_dept,
+            'fund_code': [fc.fund_code for fc in instance.fundcode_set.all()]
+        }
+
+    class Meta:
+        model = GaitID
+        fields = '__all__'
+
+
+class IDAAOutcomeThemeSerializer(ModelSerializer):
+
+    def to_representation(self, instance):
+        return instance.name
+
+    class Meta:
+        model = IDAAOutcomeTheme
+        fields = ('name',)
+
+
 class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
     name = CharField(required=True, max_length=255)
     funding_status = CharField(required=True)
-    gaitid = StringRelatedField(many=True)
+    gaitid = GaitIDSerializer(many=True)
     fundCode = CharField(required=False, allow_blank=True, allow_null=True, source='cost_center')
     description = CharField(allow_null=True, allow_blank=True)
     sector = NestedSectorSerializer(required=True, many=True)
@@ -255,6 +284,19 @@ class ProgramAdminSerializer(ModelSerializer):
     program_users = SerializerMethodField()
     onlyOrganizationId = SerializerMethodField()
     _using_results_framework = IntegerField(required=False, allow_null=True)
+    start_date = DateField(required=True)
+    end_date = DateField(required=True)
+    idaa_outcome_theme = IDAAOutcomeThemeSerializer(many=True)
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance, data, **kwargs)
+
+        try:
+            if self.context['request'].method in ['POST', 'PUT']:
+                self.fields['gaitid'] = JSONField()
+        # When called from a test 'request' is not in context
+        except KeyError:
+            self.fields['gaitid'] = JSONField()
 
     def validate_country(self, values):
         if not values:
@@ -276,7 +318,10 @@ class ProgramAdminSerializer(ModelSerializer):
             'program_users',
             'onlyOrganizationId',
             'auto_number_indicators',
-            '_using_results_framework'
+            '_using_results_framework',
+            'start_date',
+            'end_date',
+            'idaa_outcome_theme'
         )
 
     @staticmethod
@@ -316,6 +361,22 @@ class ProgramAdminSerializer(ModelSerializer):
             ret.pop('_using_results_framework')
         return ret
 
+    def to_internal_value(self, data):
+        # TODO: This can be removed with ticket #2770
+        if type(data['gaitid']) is str:
+            if data['gaitid'] == '':
+                data['gaitid'] = []
+            else:
+                data['gaitid'] = [
+                    {
+                        'gaitid': data['gaitid'],
+                        'fund_code': [data['fundCode'] if 'fundCode' in data else None],
+                        'donor': ''
+                    }
+                ]
+
+        return super().to_internal_value(data)
+
     @transaction.atomic
     def create(self, validated_data):
         if '_using_results_framework' in validated_data and \
@@ -323,17 +384,28 @@ class ProgramAdminSerializer(ModelSerializer):
             validated_data.pop('_using_results_framework')
         country = validated_data.pop('country')
         sector = validated_data.pop('sector')
-        if not validated_data['gaitid']:
-            validated_data.pop('gaitid')
+        gaitid_data = validated_data.pop('gaitid')
         program = super(ProgramAdminSerializer, self).create(validated_data)
         program.country.add(*country)
         program.sector.add(*sector)
         program.save()
+
+        for gid in gaitid_data:
+            gaitid = GaitID(gaitid=gid['gaitid'], donor=gid['donor'], program=program)
+            gaitid.save()
+
+            for fund_code in gid['fund_code']:
+                new_fund_code = FundCode(fund_code=fund_code, gaitid=gaitid)
+                new_fund_code.save()
+
         ProgramAdminAuditLog.created(
             program=program,
             created_by=self.context.get('request').user.tola_user,
             entry=program.admin_logged_fields,
         )
+
+        self.fields['gaitid'] = GaitIDSerializer(many=True)
+
         return program
 
     @transaction.atomic
@@ -499,7 +571,8 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 ),
                 to_attr='country_with_users'
             ),
-            'gaitid'
+            'gaitid',
+            'idaa_outcome_theme'
         )
         return queryset
 
@@ -644,16 +717,3 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                                          '&q=&kw=&GrantNumber=&CostCenter=&GrantID={0}&GrantMin=&SSD=&USD=&'
                                          'SED=&UED=&Emergency=').format(gaitid)
         return JsonResponse(response)
-
-    @action(detail=True, methods=['put'], url_path='sync_gait_dates')
-    def sync_gait_dates(self, request, pk):
-        program = Program.objects.get(pk=pk)
-
-        # TODO: do something better than strings here...
-        gait_error = append_GAIT_dates(program)
-
-        program.save()
-
-        return JsonResponse({
-            'gait_error': gait_error,
-        })

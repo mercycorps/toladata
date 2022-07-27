@@ -480,7 +480,7 @@ class ProgramUpload(ProgramValidation):
                         program_updated = True
 
         if '_x0032_030OutcomeTheme' in self.idaa_program:
-            idaa_outcome_themes = set(outcome_theme.strip() for outcome_theme in re.split(r',|;\n|;', self.idaa_program['_x0032_030OutcomeTheme']))
+            idaa_outcome_themes = self.idaa_program['_x0032_030OutcomeTheme']
 
             for outcome_theme in idaa_outcome_themes:
                 outcome_theme_obj, _ = IDAAOutcomeTheme.objects.get_or_create(name=outcome_theme)
@@ -605,7 +605,7 @@ class ProgramUpload(ProgramValidation):
 
         # Get outcome themes and add them to program
         if '_x0032_030OutcomeTheme' in program:
-            outcome_themes = set(outcomeTheme.strip() for outcomeTheme in re.split(r',|;\n|;', program['_x0032_030OutcomeTheme']))
+            outcome_themes = program['_x0032_030OutcomeTheme']
             for outcome_theme in outcome_themes:
                 idaa_outcome_theme, _ = IDAAOutcomeTheme.objects.get_or_create(name=outcome_theme)
 
