@@ -797,10 +797,9 @@ class Program(models.Model):
 
 class ProgramDiscrepancy(models.Model):
     DISCREPANCY_REASONS = {
-        "start_date": "Tola start date does not match IDAA ProgramStartDate",
-        "end_date": "Tola end date does not match IDAA ProgramEndDate",
-        "countries": "Tola program countries does not match IDAA Country",
-        "multiple_programs": "Multiple Tola programs retrieved from IDAA program",
+        "out_of_bounds_tracking_dates": "TolaData start and or end dates were updated. Please verify the indicator tracking dates.",
+        "countries": "TolaData program countries does not match IDAA Country",
+        "multiple_programs": "Multiple TolaData programs retrieved from IDAA program",
         "gaitid": "IDAA program has invalid Gait ID",
         "ProgramName": "IDAA program is missing ProgramName",
         "id": "IDAA program is missing ID",
