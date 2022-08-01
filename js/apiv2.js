@@ -82,23 +82,23 @@ const api = {
         .catch(this.logFailure);
     },
     async getProgramPeriodData(programPk) {
-        // return await this.apiInstance.get(`/program_period_update/${programPk}/`)
-        // .then(response => response.data)
-        // .catch(this.logFailure);
-        return await {
-            has_regular_target_frequencies: false,
-            readOnly: false,
-            idaa_start_date: "2020-09-16",
-            idaa_end_date: "2025-09-15",
-            // idaa_start_date: null,
-            // idaa_end_date: null,
-            // reporting_period_start: "", 
-            reporting_period_start: "2020-01-01", 
-            reporting_period_end: "2027-01-31",
-        }
+        return await this.apiSession.get(`/workflow/api/program_period_update/${programPk}/`)
+        .then(response => ({...response.data, status: response.status}))
+        .catch(this.logFailure);
+        // return await {
+        //     has_regular_target_frequencies: false,
+        //     readOnly: false,
+        //     idaa_start_date: "2020-09-16",
+        //     idaa_end_date: "2025-09-15",
+        //     // idaa_start_date: null,
+        //     // idaa_end_date: null,
+        //     // reporting_period_start: "", 
+        //     reporting_period_start: "2020-01-01", 
+        //     reporting_period_end: "2027-01-31",
+        // }
     },
     async updateProgramPeriodData(programPk, data) {
-        return await this.apiInstance.put(`/program_period_update/${programPk}`, data)
+        return await this.apiSession.put(`/workflow/api/program_period_update/${programPk}`, data)
         .then(response => response.data)
         .catch(() => {
             this.logFailure
