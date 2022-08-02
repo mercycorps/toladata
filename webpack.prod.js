@@ -8,6 +8,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = merge(common, {
 
+    output: {
+        publicPath: ''
+    },
+
     plugins: [
         // Todo: Update plugin when deprecation is updated
         new BundleTracker({path: __dirname, filename: 'webpack-stats.json'}),
