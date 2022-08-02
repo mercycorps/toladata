@@ -8,7 +8,7 @@ django-multiselectfield     # used in indicator model for multiselect string opt
 django-safedelete           # provides a soft delete model (used for historical records throughout)
 django-simple-history       # provides historical records attached to user from request (used only on SiteProfile)
 django-widget-tweaks        # used in many templates to provide render_field and other shortcuts
-django-webpack-loader       # used to inject webpack bundle into django templates
+django-webpack-loader~=1.6.0       # used to inject webpack bundle into django templates
 djangorestframework~=3.11   # DRF - base for our RESTful API serializers/routers
 django-import-export        # used in legacy Django admin code to export indicators data (deprecated)
 django-mysql~=3.7           # used explicitly in indicators.models (LevelTierTemplate) - provides other helpers
