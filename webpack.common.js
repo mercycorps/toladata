@@ -47,6 +47,12 @@ module.exports = {
                 ],
             },
             {
+                test: /\.m?js/,
+                resolve: {
+                    fullySpecified: false,
+                },
+            },
+            {
                 test: /\.(eot|woff|woff2|ttf|svg|png|jpg|gif)$/,
                 use: [{
                     loader: 'file-loader',
@@ -67,8 +73,6 @@ module.exports = {
     },
 
     plugins: [
-        // helps avoid chunkhash changing on bundles w/ no mods
-        new webpack.HashedModuleIdsPlugin(),
 
         // css to their own files
         new MiniCssExtractPlugin({filename: '[name]-[contenthash].css'}),
@@ -78,6 +82,7 @@ module.exports = {
     optimization: {
         // split manifest out
         runtimeChunk: 'single',
+        moduleIds: 'deterministic',
         splitChunks: {
             cacheGroups: {
                 vendors: {
