@@ -49,6 +49,7 @@ const ProgramPeriod = ({programPk}) => {
             // Get data on mount with API Call
             api.getProgramPeriodData(programPk)
                 .then(response => {
+                    console.log("API response:", response)
                     let {
                         start_date: idaa_start_date,
                         end_date: idaa_end_date,
@@ -283,7 +284,7 @@ const ProgramPeriod = ({programPk}) => {
                     message_text: INDICATOR_TRACKING_CHANGE_TEXT,
                     include_rationale: true,
                     rationale_required: true,
-                    context: document.getElementById('program-period__content'),
+                    context: document.getElementById(`program-period__content--${programPk}`),
                     on_submit: (rationale) => sendData(rationale)
                 })
             }
@@ -294,7 +295,11 @@ const ProgramPeriod = ({programPk}) => {
 
         // API calls function that sends the editable indicator tracking start and end dates along with the rationale for the update.
         let sendData = (rationale) => {
-            let data = {...programPeriodInputs, rationale: rationale};
+            let data = {
+                reporting_period_start: programPeriodInputs.indicator_tracking_start_date,
+                reporting_period_end: programPeriodInputs.indicator_tracking_end_date,
+                rationale: rationale
+            };
             api.updateProgramPeriodData(programPk, data)
             .then(res => {
                 if (res.status === 200) {
@@ -336,7 +341,7 @@ const ProgramPeriod = ({programPk}) => {
                 false,
                 "#div-id-reportingperiod-alert"
             )
-            $(end_date_id).addClass('is-invalid')
+            $(end_date_id).addClass('is-invalid');
             valid = false;
         } else {
             if (programPeriodInputs.indicator_tracking_start_date > programPeriodInputs.indicator_tracking_end_date) {
@@ -346,28 +351,28 @@ const ProgramPeriod = ({programPk}) => {
                     false,
                     "#div-id-reportingperiod-alert"
                 )
-                $(start_date_id).addClass('is-invalid')
-                $(end_date_id).addClass('is-invalid')
+                $(start_date_id).addClass('is-invalid');
+                $(end_date_id).addClass('is-invalid');
                 valid = false;
             }
-            if (programPeriodInputs.indicator_tracking_start_date < idaaDates.start_date) {
+            if (idaaDates.start_date && programPeriodInputs.indicator_tracking_start_date < idaaDates.start_date) {
                 createAlert(
                     "danger",
                     gettext("The indicator tracking start must be later than the IDAA start date."),
                     false,
                     "#div-id-reportingperiod-alert"
                 )
-                $(start_date_id).addClass('is-invalid')
+                $(start_date_id).addClass('is-invalid');
                 valid = false;
             }
-            if (programPeriodInputs.indicator_tracking_end_date > idaaDates.end_date) {
+            if (idaaDates.end_date && programPeriodInputs.indicator_tracking_end_date > idaaDates.end_date) {
                 createAlert(
                     "danger",
                     gettext("The indicator tracking end dates must be earlier the IDAA end date."),
                     false,
                     "#div-id-reportingperiod-alert"
                 )
-                $(end_date_id).addClass('is-invalid')
+                $(end_date_id).addClass('is-invalid');
                 valid = false;
             }
         }
@@ -398,7 +403,7 @@ const ProgramPeriod = ({programPk}) => {
 
             <div id={`program-period__modal--${programPk}`} className="modal fade" role="dialog" aria-hidden="true">
                 <div className="modal-dialog modal-lg" role="document">
-                    <div id="program-period__content" className="modal-content">
+                    <div id={`program-period__content--${programPk}`} className="modal-content">
 
                         <div className="modal-body">
 
