@@ -1,5 +1,9 @@
 import requests
 from django.conf import settings
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class AccessMSR:
@@ -41,3 +45,26 @@ class AccessMSR:
         program_project_list_id = settings.PROGRAM_PROJECT_LIST_ID
         values = self.get_MSR_list(program_project_list_id)
         return values
+
+
+def check_IDAA_duplicates(idaa_programs):
+    base_url = "https://mercycorpsemea.sharepoint.com/sites/MSRCommsSite/Lists/ProgramProjectID/AllItems.aspx?FilterFields1=GaitIDs&FilterTypes1=LookupMulti&FilterValues1="
+    checked_gaitids = set()
+    duplicated_gaitids = set()
+
+    for idaa_program in idaa_programs:
+        idaa_fields = idaa_program['fields']
+        program_status = idaa_fields.get('ProgramStatus', None)
+        if program_status == 'Funded':
+            gaitids = [gaitid['LookupValue'] for gaitid in idaa_fields['GaitIDs']]
+
+            for gaitid in gaitids:
+                if gaitid in checked_gaitids:
+                    gaitid = gaitid.replace('.', '%2E')
+                    duplicated_gaitids.add(gaitid)
+                else:
+                    checked_gaitids.add(gaitid)
+
+    if len(duplicated_gaitids):
+        filter_values = "%3B%23".join(duplicated_gaitids)
+        logger.exception(f"Found {len(duplicated_gaitids)} duplicated gaitids\nSharePoint URL for duplicated GaitIDs: {base_url + filter_values}")
