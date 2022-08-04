@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../apiv2';
 
-const ProgramPeriod = ({programPk}) => {
+const ProgramPeriod = ({programPk, heading, headingClass}) => {
     // Helper Functions
     function processDateString(datestr) {
         if (!datestr) return null;
@@ -325,7 +325,10 @@ const ProgramPeriod = ({programPk}) => {
     // Handle validation of the editable start and end dates before sending them to the backend.
     const handleValidation = () => {
         let valid = true;
-        if (programPeriodInputs.indicator_tracking_start_date === "") {
+        let hasStartChanged = origData.start_date === programPeriodInputs.indicator_tracking_start_date;
+        let hasEndChanged = origData.end_date === programPeriodInputs.indicator_tracking_end_date;
+
+        if (hasStartChanged && programPeriodInputs.indicator_tracking_start_date === "") {
             createAlert(
                 "danger",
                 gettext("You must enter values for the indicator tracking period start date before saving."),
@@ -334,7 +337,8 @@ const ProgramPeriod = ({programPk}) => {
             )
             $(start_date_id).addClass('is-invalid')
             valid = false;
-        } else if (programPeriodInputs.indicator_tracking_end_date === "") {
+        }
+        if (hasEndChanged && programPeriodInputs.indicator_tracking_end_date === "") {
             createAlert(
                 "danger",
                 gettext("You must enter values for the indicator tracking period end date before saving."),
@@ -343,38 +347,37 @@ const ProgramPeriod = ({programPk}) => {
             )
             $(end_date_id).addClass('is-invalid');
             valid = false;
-        } else {
-            if (programPeriodInputs.indicator_tracking_start_date > programPeriodInputs.indicator_tracking_end_date) {
-                createAlert(
-                    "danger",
-                    gettext("The end date must come after the start date."),
-                    false,
-                    "#div-id-reportingperiod-alert"
-                )
-                $(start_date_id).addClass('is-invalid');
-                $(end_date_id).addClass('is-invalid');
-                valid = false;
-            }
-            if (idaaDates.start_date && programPeriodInputs.indicator_tracking_start_date < idaaDates.start_date) {
-                createAlert(
-                    "danger",
-                    gettext("The indicator tracking start must be later than the IDAA start date."),
-                    false,
-                    "#div-id-reportingperiod-alert"
-                )
-                $(start_date_id).addClass('is-invalid');
-                valid = false;
-            }
-            if (idaaDates.end_date && programPeriodInputs.indicator_tracking_end_date > idaaDates.end_date) {
-                createAlert(
-                    "danger",
-                    gettext("The indicator tracking end dates must be earlier the IDAA end date."),
-                    false,
-                    "#div-id-reportingperiod-alert"
-                )
-                $(end_date_id).addClass('is-invalid');
-                valid = false;
-            }
+        }
+        if (programPeriodInputs.indicator_tracking_start_date > programPeriodInputs.indicator_tracking_end_date) {
+            createAlert(
+                "danger",
+                gettext("The end date must come after the start date."),
+                false,
+                "#div-id-reportingperiod-alert"
+            )
+            $(start_date_id).addClass('is-invalid');
+            $(end_date_id).addClass('is-invalid');
+            valid = false;
+        }
+        if (hasStartChanged && idaaDates.start_date && programPeriodInputs.indicator_tracking_start_date < idaaDates.start_date) {
+            createAlert(
+                "danger",
+                gettext("The indicator tracking start must be later than the IDAA start date."),
+                false,
+                "#div-id-reportingperiod-alert"
+            )
+            $(start_date_id).addClass('is-invalid');
+            valid = false;
+        }
+        if (hasEndChanged && idaaDates.end_date && programPeriodInputs.indicator_tracking_end_date > idaaDates.end_date) {
+            createAlert(
+                "danger",
+                gettext("The indicator tracking end dates must be earlier the IDAA end date."),
+                false,
+                "#div-id-reportingperiod-alert"
+            )
+            $(end_date_id).addClass('is-invalid');
+            valid = false;
         }
         return valid;
     }
@@ -392,13 +395,11 @@ const ProgramPeriod = ({programPk}) => {
     return (
         <React.Fragment>
             <a
+                className={headingClass}
                 href="#"
                 data-toggle="modal"
                 data-target={`#program-period__modal--${programPk}`}
-            >
-                {
-                    gettext("<Program Period>")
-                }
+            >{heading}
             </a>
 
             <div id={`program-period__modal--${programPk}`} className="modal fade" role="dialog" aria-hidden="true">

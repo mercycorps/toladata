@@ -10,10 +10,17 @@ import ReactDOM from 'react-dom';
  * unique classnames that include the Program IDs.
  */
 import { ProgramPeriod } from './pages/program_page/components/program_period';
-let programList = document.querySelectorAll('[class^="programperiodlink"');
-programList.forEach(program => {
-    let programID = program.getAttribute('class').split("_")[1];
-    ReactDOM.render(<ProgramPeriod programPk={programID}/>, document.querySelector(`.programperiodlink_${programID}`))
+// Find all the program period modals buttons and render the program period modal compenent
+let programModalList = document.querySelectorAll('[class^="program-period__modal--"');
+programModalList.forEach(program => {
+    let programID = program.getAttribute('class').split("--")[1];
+    ReactDOM.render(<ProgramPeriod programPk={programID} heading={gettext("Program period")}/>, document.querySelector(`.program-period__modal--${programID}`))
+})
+// Find all the program period modals links and render the program period modal compenent
+let programLinkList = document.querySelectorAll('[class^="program-period__link"');
+programLinkList.forEach(program => {
+    let programID = program.getAttribute('class').split("--")[1];
+    ReactDOM.render(<ProgramPeriod programPk={programID} heading={gettext("Set the indicator tracking start and end dates.")} headingClass="text-success"/>, document.querySelector(`.program-period__link--${programID}`))
 })
 
 /*
