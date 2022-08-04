@@ -2,7 +2,6 @@
 from collections import OrderedDict
 import pytz
 from django.db import transaction
-#from django.db.models import Q, Count, Subquery, OuterRef
 from django.db import models
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
@@ -257,14 +256,14 @@ class GaitIDSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class IDAAOutcomeThemeSerializer(ModelSerializer):
+class NestedIDAAOutcomeThemeSerializer(Serializer):
 
-    def to_representation(self, instance):
-        return instance.name
+    def to_representation(self, outcome_theme):
+        return [outcome_theme.id, outcome_theme.name]
 
-    class Meta:
-        model = IDAAOutcomeTheme
-        fields = ('name',)
+    def to_internal_value(self, data):
+        idaa_outcome_theme = IDAAOutcomeTheme.objects.get(pk=data)
+        return idaa_outcome_theme
 
 
 class ProgramAdminSerializer(ModelSerializer):
@@ -284,9 +283,10 @@ class ProgramAdminSerializer(ModelSerializer):
     program_users = SerializerMethodField()
     onlyOrganizationId = SerializerMethodField()
     _using_results_framework = IntegerField(required=False, allow_null=True)
-    start_date = DateField(required=True)
-    end_date = DateField(required=True)
-    idaa_outcome_theme = IDAAOutcomeThemeSerializer(many=True)
+    # TODO read-only=True needs to be removed when 'Add Program' functionality is updated
+    start_date = DateField(read_only=True)
+    end_date = DateField(read_only=True)
+    idaa_outcome_theme = NestedIDAAOutcomeThemeSerializer(required=True, many=True)
 
     def __init__(self, instance=None, data=..., **kwargs):
         super().__init__(instance, data, **kwargs)
@@ -385,9 +385,11 @@ class ProgramAdminSerializer(ModelSerializer):
         country = validated_data.pop('country')
         sector = validated_data.pop('sector')
         gaitid_data = validated_data.pop('gaitid')
+        idaa_outcome_theme = validated_data.pop('idaa_outcome_theme')
         program = super(ProgramAdminSerializer, self).create(validated_data)
         program.country.add(*country)
         program.sector.add(*sector)
+        program.idaa_outcome_theme.add(*idaa_outcome_theme)
         program.save()
 
         for gid in gaitid_data:
@@ -395,8 +397,9 @@ class ProgramAdminSerializer(ModelSerializer):
             gaitid.save()
 
             for fund_code in gid['fund_code']:
-                new_fund_code = FundCode(fund_code=fund_code, gaitid=gaitid)
-                new_fund_code.save()
+                if fund_code:
+                    new_fund_code = FundCode(fund_code=fund_code, gaitid=gaitid)
+                    new_fund_code.save()
 
         ProgramAdminAuditLog.created(
             program=program,
@@ -431,10 +434,17 @@ class ProgramAdminSerializer(ModelSerializer):
         added_sectors = [x for x in incoming_sectors if x not in original_sectors]
         removed_sectors = [x for x in original_sectors if x not in incoming_sectors]
 
+        original_outcome_theme = instance.idaa_outcome_theme.all()
+        incoming_outcome_theme = validated_data.pop('idaa_outcome_theme')
+        added_outcome_theme = [x for x in incoming_outcome_theme if x not in original_outcome_theme]
+        removed_outcome_theme = [x for x in original_outcome_theme if x not in incoming_outcome_theme]
+
         instance.country.remove(*removed_countries)
         instance.country.add(*added_countries)
         instance.sector.remove(*removed_sectors)
         instance.sector.add(*added_sectors)
+        instance.idaa_outcome_theme.remove(*removed_outcome_theme)
+        instance.idaa_outcome_theme.add(*added_outcome_theme)
 
         ProgramAccess.objects.filter(program=instance, country__in=removed_countries).delete()
 
@@ -548,6 +558,10 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 queryset=Sector.objects.select_related(None).order_by().only('id')
             ),
             models.Prefetch(
+                'idaa_outcome_theme',
+                queryset=IDAAOutcomeTheme.objects.select_related(None).order_by().only('id', 'name')
+            ),
+            models.Prefetch(
                 'country',
                 queryset=Country.objects.select_related(None).order_by().only('id')
             ),
@@ -571,8 +585,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 ),
                 to_attr='country_with_users'
             ),
-            'gaitid',
-            'idaa_outcome_theme'
+            'gaitid'
         )
         return queryset
 
