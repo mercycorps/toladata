@@ -276,7 +276,7 @@ class TestProgramFieldsStressTest(test.TestCase):
         self.assertEqual(users_data['count'], 14)
 
     def test_query_count_on_multiple(self):
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(10):
             program_qs = ProgramAdminViewSet.base_queryset().all()
             data = ProgramAdminSerializer(program_qs, many=True).data
             self.assertEqual(len(data), 25)
