@@ -87,7 +87,6 @@ export default class EditProgramProfile extends React.Component {
         const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
         const selectedSectors = formdata.sector.map(x=>this.props.sectorOptions.find(y=>y.value==x));
         let sectionGaitFundDonor = formdata.gaitid.length > 0 ? formdata.gaitid : [{gaitid: null, fund_code: null, donor: null, donor_dept: null}];
-        console.log("Is it editable?", this.state.formEditable)
         console.log('sectionGaitFundDonor', sectionGaitFundDonor)
         console.log('formdata', formdata);
         return (
@@ -112,7 +111,7 @@ export default class EditProgramProfile extends React.Component {
                             onChange={(e) => this.updateFormField('name', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('name') })}
                             id="program-name-input"
-                            disabled
+                            disabled={this.state.formEditable}
                             />
                         <ErrorFeedback errorMessages={this.formErrors('name')} />
                     </div>
@@ -124,7 +123,7 @@ export default class EditProgramProfile extends React.Component {
                             onChange={(e) => this.updateFormField('id', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('id') })}
                             id="program-id-input"
-                            disabled
+                            disabled={this.state.formEditable}
                             />
                         <ErrorFeedback errorMessages={this.formErrors('id')} />
                     </div>
@@ -136,7 +135,7 @@ export default class EditProgramProfile extends React.Component {
                             onChange={(e) => this.updateFormField('start-date', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('start-date') })}
                             id="program-start-date"
-                            disabled
+                            disabled={this.state.formEditable}
                             />
                         <ErrorFeedback errorMessages={this.formErrors('start-date')} />
                     </div>
@@ -148,7 +147,7 @@ export default class EditProgramProfile extends React.Component {
                             onChange={(e) => this.updateFormField('end-date', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('end-date') })}
                             id="program-end-date"
-                            disabled
+                            disabled={this.state.formEditable}
                             />
                         <ErrorFeedback errorMessages={this.formErrors('end-date')} />
                     </div>
@@ -156,59 +155,68 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-funding_status-input">{gettext("Program funding status")}</label>
                         <input
                             type="text"
-                            value={formdata.funding_status}
+                            value={formdata.funding_status || "None"}
                             onChange={(e) => this.updateFormField('funding_status', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('funding_status') })}
                             id="program-funding_status-input"
-                            disabled
+                            disabled={this.state.formEditable}
                             />
                         <ErrorFeedback errorMessages={this.formErrors('funding_status')} />
                     </div>
                     <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedCountries)} trigger="hover focus click">
-                        <label htmlFor="program-county-input" >{gettext("Countries")}</label>
-                        <input
-                            type="text"                      
-                            value={this.createDisplayList(selectedCountries) || "null"}
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('country') })}
-                            id="program-country-input"
-                            disabled
+                        <label htmlFor="program-country-input" >{gettext("Countries")}</label>
+                        {this.state.formEditable ?
+                            <input
+                                type="text"                      
+                                value={this.createDisplayList(selectedCountries) || "None"}
+                                className={classNames('form-control', { 'is-invalid': this.formErrors('country') })}
+                                id="program-country-input"
+                                readOnly
+                                disabled={this.state.formEditable}
                             />
-                        {/* <CheckboxedMultiSelect
-                            value={selectedCountries}
-                            options={this.props.countryOptions}
-                            onChange={(e) => this.updateFormField('country', e.map(x=>x.value)) }
-                            className={classNames('react-select', {'is-invalid': this.formErrors('country')})}
-                            id="program-country-input"
-                            /> */}
+                        :
+                            <CheckboxedMultiSelect
+                                value={selectedCountries}
+                                options={this.props.countryOptions}
+                                onChange={(e) => this.updateFormField('country', e.map(x=>x.value)) }
+                                className={classNames('react-select', {'is-invalid': this.formErrors('country')})}
+                                id="program-country-input"
+                            />
+                        }
                         <ErrorFeedback errorMessages={this.formErrors('country')} />
                     </div>
                     <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedSectors)} trigger="hover focus click">
                         <label htmlFor="program-sectors-input">{gettext("Sectors")}</label>
-                        <input
-                            type="text"                      
-                            value={this.createDisplayList(selectedSectors) || "null"}
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('sector') })}
-                            id="program-sector-input"
-                            disabled
+                        {this.state.formEditable ? 
+                            <input
+                                type="text"                      
+                                value={this.createDisplayList(selectedSectors) || "None Selected"}
+                                className={classNames('form-control', { 'is-invalid': this.formErrors('sector') })}
+                                id="program-sector-input"
+                                readOnly
+                                disabled={this.state.formEditable}
                             />
-                        {/* <CheckboxedMultiSelect
-                            value={selectedSectors}
-                            options={this.props.sectorOptions}
-                            onChange={(e) => this.updateFormField('sector', e.map(x=>x.value)) }
-                            className={classNames('react-select', {'is-invalid': this.formErrors('sector')})}
-                            id="program-sectors-input"
-                            /> */}
+                        :
+                            <CheckboxedMultiSelect
+                                value={selectedSectors}
+                                options={this.props.sectorOptions}
+                                onChange={(e) => this.updateFormField('sector', e.map(x=>x.value)) }
+                                className={classNames('react-select', {'is-invalid': this.formErrors('sector')})}
+                                id="program-sectors-input"
+                            />
+                        }
                         <ErrorFeedback errorMessages={this.formErrors('sector')} />
                     </div>
                     <div className="form-group" data-toggle="tooltip" title={this.createDisplayList(formdata.idaa_outcome_theme)} trigger="hover focus click">
                         <label htmlFor="program-outcome_themes-input">{gettext("Outcome themes")}</label>
-                        <input
-                            type="text"
-                            value={this.createDisplayList(formdata.idaa_outcome_theme) || "null"}
-                            onChange={(e) => this.updateFormField('outcome_themes', e.target.value) }
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('outcome_themes') })}
-                            id="program-outcome_themes-input"
-                            disabled
+                            <input
+                                type="text"
+                                value={this.createDisplayList(formdata.idaa_outcome_theme) || "None Selected"}
+                                onChange={(e) => this.updateFormField('outcome_themes', e.target.value) }
+                                className={classNames('form-control', { 'is-invalid': this.formErrors('outcome_themes') })}
+                                id="program-outcome_themes-input"
+                                readOnly
+                                disabled={this.state.formEditable}
                             />
                         <ErrorFeedback errorMessages={this.formErrors('outcome_themes')} />
                     </div>
@@ -231,38 +239,38 @@ export default class EditProgramProfile extends React.Component {
                                         <div className="form-group">
                                             <input
                                                 type="text"
-                                                value={gaitRow.gaitid || "null"}
+                                                value={gaitRow.gaitid || "None"}
                                                 onChange={(e) => this.updateFormField('gaitid', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('gaitid') })}
                                                 id="program-gait-input"
-                                                disabled
+                                                disabled={this.state.formEditable}
                                                 />
                                             <ErrorFeedback errorMessages={this.formErrors('gaitid')} />
                                         </div>
                                     </div>
                                     <div className="profile-table__column--middle">
-                                        <div data-toggle="tooltip" title={this.createDisplayList(gaitRow.fund_code) || "null"} className="form-group">
+                                        <div data-toggle="tooltip" title={this.createDisplayList(gaitRow.fund_code) || "None"} className="form-group">
                                             <input
                                                 type="text"
-                                                value={this.createDisplayList(gaitRow.fund_code) || "null"}
+                                                value={this.createDisplayList(gaitRow.fund_code) || "None"}
                                                 onChange={(e) => this.updateFormField('fundCode', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
                                                 id="program-fund-code-input"
-                                                disabled
+                                                disabled={this.state.formEditable}
                                                 />
                                             <ErrorFeedback errorMessages={this.formErrors('fundCode')} />
                                         </div>
                                     </div>
                                     <div className="profile-table__column--right">
-                                        <div className="form-group" data-toggle="tooltip" title={donorText || "null"} trigger="hover focus click">
+                                        <div className="form-group" data-toggle="tooltip" title={donorText || "None"} trigger="hover focus click">
                                             <input
                                                 type="text"
-                                                value={donorText || "null"}
+                                                value={donorText || "None"}
                                                 // value="Corporation for National and Community Servie (CNCS), Corporation for National and Community Servie (CNCS)"
                                                 onChange={(e) => this.updateFormField('fundCode', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
                                                 id="program-donor-input"
-                                                disabled
+                                                disabled={this.state.formEditable}
                                                 />
                                             <ErrorFeedback errorMessages={this.formErrors('fundCode')} />
                                         </div>
