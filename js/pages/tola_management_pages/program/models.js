@@ -254,6 +254,7 @@ export class ProgramStore {
                 description: "",
                 country: [],
                 sector: [],
+                idaa_outcome_theme: [],
             }
             this.programs.unshift(new_program_data)
             this.editing_target = 'new'
