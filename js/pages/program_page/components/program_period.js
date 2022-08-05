@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../../../apiv2';
 
 const ProgramPeriod = ({programPk, heading, headingClass}) => {
+
     // Helper Functions
     function processDateString(datestr) {
         if (!datestr) return null;
@@ -32,113 +33,8 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
         <a href="https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide"> Guide de l'Utilisateur de TolaData.</a>`,
     };
 
-    // Component States
-    const [idaaDates, setIdaaDates] = useState({});
-    const [programPeriodInputs, setProgramPeriodInputs] = useState({});
-    const [origData, setOrigData] = useState({});
-    const start_date_id = `#indicator-tracking__date--start-${programPk}`;
-    const end_date_id = `#indicator-tracking__date--end-${programPk}`;
 
-    // On component mount
-    useEffect(() => {
-        
-        $(`#program-period__modal--${programPk}`).on('show.bs.modal', () => {
-            
-            $(".indicator-tracking__description").append(INDICATOR_TRACKING_DESCRIPTION[window.userLang]); // Adds the description text based on users language
-
-            // Get data on mount with API Call
-            api.getProgramPeriodData(programPk)
-                .then(response => {
-                    console.log("API response:", response)
-                    let {
-                        start_date: idaa_start_date,
-                        end_date: idaa_end_date,
-                        reporting_period_start: indicator_tracking_start_date,
-                        reporting_period_end: indicator_tracking_end_date
-                    } = response;
-                    // Update the state variables
-                    setOrigData({
-                        readOnly: response.readonly,
-                        has_time_aware_targets: response.has_time_aware_targets,
-                        indicator_tracking_start_date: indicator_tracking_start_date || null,
-                        indicator_tracking_end_date: indicator_tracking_end_date || null,
-                    });
-                    setIdaaDates({...idaaDates,
-                        start_date: idaa_start_date || null,
-                        end_date: idaa_end_date || null,
-                    });
-                    setProgramPeriodInputs({...programPeriodInputs,
-                        indicator_tracking_start_date: indicator_tracking_start_date || null,
-                        indicator_tracking_end_date: indicator_tracking_end_date || null,
-                    });
-
-                    // Setting the datepicker values for the editable Indicator Tracking Start Date
-                    $(start_date_id).datepicker("setDate", indicator_tracking_start_date);
-
-                    // Setting the Min Start Date:
-                    let startMinDate;
-                    if (idaa_start_date) {
-                        // If IDAA start date exist and the Indicator Tracking start date does not exist or is later than IDAA start date, then set min date to the IDAA start date
-                        if (!indicator_tracking_start_date || idaa_start_date < indicator_tracking_start_date) {
-                        startMinDate = processDateString(idaa_start_date);
-                        // If IDAA start date exist and is later than Indicator Tracking start date, then set min date to the Indicator Tracking start date
-                        } else {
-                            startMinDate = processDateString(indicator_tracking_start_date);
-                        }
-                    } else {
-                        // If IDAA start date does not exist but the Indicator Tracking start date does exist, set min date to the Indicator Tracking end date
-                        if (indicator_tracking_start_date) {
-                            startMinDate = processDateString(indicator_tracking_start_date);
-                        // If the IDAA start date and the Indicator Tracking start date both do not exist, set min date to null.
-                        } else {
-                            startMinDate = null;
-                        }
-                    }
-                    // If theres no selected min start date, set it to 10 years back from the current date.
-                    if (!startMinDate) {
-                        startMinDate = new Date()
-                        startMinDate.setFullYear(startMinDate.getFullYear() - 10)
-                    };
-                    $(`#indicator-tracking__date--start-${programPk}`).datepicker("option", "minDate", new Date(startMinDate.getFullYear(), startMinDate.getMonth(), 1));
-
-                    // Setting the datepicker values for the editable Indicator Tracking End Date
-                    $(end_date_id).datepicker("setDate", indicator_tracking_end_date);
-                    // Setting the Max End Date:
-                    let endMaxDate;
-                    if (idaa_end_date) {
-                        // If IDAA end date exist and the Indicator Tracking end date does not exist or is earlier than IDAA end date, then set max date to the IDAA end date
-                        if (!indicator_tracking_end_date || idaa_end_date > indicator_tracking_end_date) {
-                        endMaxDate = processDateString(idaa_end_date);
-                        // If IDAA end date exist and is earlier than Indicator Tracking end date, then set max date to the Indicator Tracking end date
-                        } else {
-                            endMaxDate = processDateString(indicator_tracking_end_date);
-                        }
-                    } else {
-                        // If IDAA end date does not exist but the Indicator Tracking end date does exist, set max date to the Indicator Tracking end date
-                        if (indicator_tracking_end_date) {
-                            endMaxDate = processDateString(indicator_tracking_end_date);
-                        // If the IDAA end date and the Indicator Tracking end date both do not exist, set max date to null.
-                        } else {
-                            endMaxDate = null;
-                        }
-                    }
-                    // If theres no selected max start date, set it to 10 years up from the current date.
-                    if (!endMaxDate) {
-                        endMaxDate = new Date()
-                        endMaxDate.setFullYear(endMaxDate.getFullYear() + 10)
-                    };
-                    $(`#indicator-tracking__date--end-${programPk}`).datepicker("option", "maxDate", new Date(endMaxDate.getFullYear(), endMaxDate.getMonth() + 1, 0));
-                })
-                .catch(() => {
-                    createAlert(
-                        "danger",
-                        gettext("Error. Could not retrieve data from server. Please report this to the Tola team."),
-                        false,
-                        "#div-id-reportingperiod-alert"
-                    );
-                })
-        })
-
+    const setupDatePickers = () => {
         // Setup Date pickers
         const commonOpts = {
             changeMonth: true,
@@ -256,70 +152,6 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                 setProgramPeriodInputs( prevState => ({...prevState, indicator_tracking_end_date: field.val()}));
             });
         });
-    }, [])
-
-    $(`#program-period__modal--${programPk}`).on('hide.bs.modal', function () {
-        // Need to remove the month-only class from the date-picker so it doesn't interfere with other datepickers
-        // on the page.  Can't do it in the picker because it results in a calendar flash before picker is closed.
-        $("#ui-datepicker-div").removeClass("month-only");
-        $(".indicator-tracking__description").empty(); // Removes the description text when modal is closed
-
-    })
-
-    // Send updated data with API Call
-    const handleUpdateData = () => {
-        $(".dynamic-alert").remove() // Removes all alert boxes
-        $(start_date_id).removeClass("is-invalid")
-        $(end_date_id).removeClass("is-invalid")
-
-        // Text to display in the rationale popup.
-        const INDICATOR_TRACKING_CHANGE_TEXT = gettext( 'This action may result in changes to your periodic targets. If you have already set up periodic targets for your indicators, you may need to enter additional target values to cover the entire indicator tracking period. For future reference, please provide a reason for modifying the indicator tracking period.' )
-
-        // Only update if there has been a change in the editable dates.
-        if (origData.indicator_tracking_start_date !== programPeriodInputs.indicator_tracking_start_date || origData.indicator_tracking_end_date !== programPeriodInputs.indicator_tracking_end_date) {
-            if (handleValidation()) {
-                window.create_unified_changeset_notice({
-                    header: gettext("Reason for change"),
-                    show_icon: true,
-                    message_text: INDICATOR_TRACKING_CHANGE_TEXT,
-                    include_rationale: true,
-                    rationale_required: true,
-                    context: document.getElementById(`program-period__content--${programPk}`),
-                    on_submit: (rationale) => sendData(rationale)
-                })
-            }
-        } else {
-            // If there has not been a change in the editable dates, just close the modal when the save changes button is clicked.
-            $(`#program-period__modal--${programPk}`).modal('hide');
-        }
-
-        // API calls function that sends the editable indicator tracking start and end dates along with the rationale for the update.
-        let sendData = (rationale) => {
-            let data = {
-                reporting_period_start: programPeriodInputs.indicator_tracking_start_date,
-                reporting_period_end: programPeriodInputs.indicator_tracking_end_date,
-                rationale: rationale
-            };
-            api.updateProgramPeriodData(programPk, data)
-            .then(res => {
-                if (res.status === 200) {
-                    window.unified_success_message( 
-                        // # Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period
-                        gettext('Indicator tracking period updated')
-                    );
-                    window.location.reload();
-                } else {
-                    let msg = res.failmsg || gettext('There was a problem saving your changes.');
-                    window.unified_error_message( gettext('Saving Failed'));
-                    createAlert(
-                        "danger",
-                        msg,
-                        false,
-                        "#div-id-reportingperiod-alert"
-                    )
-                }
-            })
-        }
     }
 
     // Handle validation of the editable start and end dates before sending them to the backend.
@@ -380,6 +212,180 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
             valid = false;
         }
         return valid;
+    }
+
+    // Component States
+    const [idaaDates, setIdaaDates] = useState({});
+    const [programPeriodInputs, setProgramPeriodInputs] = useState({});
+    const [origData, setOrigData] = useState({});
+    const start_date_id = `#indicator-tracking__date--start-${programPk}`;
+    const end_date_id = `#indicator-tracking__date--end-${programPk}`;
+
+    // On component mount
+    useEffect(() => {
+        
+        $(`#program-period__modal--${programPk}`).on('show.bs.modal', () => {
+            
+            $(".indicator-tracking__description").append(INDICATOR_TRACKING_DESCRIPTION[window.userLang]); // Adds the description text based on users language
+
+            // Get data on mount with API Call
+            api.getProgramPeriodData(programPk)
+                .then(response => {
+                    let {
+                        start_date: idaa_start_date,
+                        end_date: idaa_end_date,
+                        reporting_period_start: indicator_tracking_start_date,
+                        reporting_period_end: indicator_tracking_end_date
+                    } = response;
+                    // Update the state variables
+                    setOrigData({
+                        readOnly: response.readonly,
+                        has_time_aware_targets: response.has_time_aware_targets,
+                        indicator_tracking_start_date: indicator_tracking_start_date || null,
+                        indicator_tracking_end_date: indicator_tracking_end_date || null,
+                    });
+                    setIdaaDates({...idaaDates,
+                        start_date: idaa_start_date || null,
+                        end_date: idaa_end_date || null,
+                    });
+                    setProgramPeriodInputs({...programPeriodInputs,
+                        indicator_tracking_start_date: indicator_tracking_start_date || null,
+                        indicator_tracking_end_date: indicator_tracking_end_date || null,
+                    });
+
+                    // Setting the datepicker values for the editable Indicator Tracking Start Date
+                    $(start_date_id).datepicker("setDate", indicator_tracking_start_date);
+
+                    // Setting the Min Start Date:
+                    let startMinDate;
+                    if (idaa_start_date) {
+                        // If IDAA start date exist and the Indicator Tracking start date does not exist or is later than IDAA start date, then set min date to the IDAA start date
+                        if (!indicator_tracking_start_date || idaa_start_date < indicator_tracking_start_date) {
+                        startMinDate = processDateString(idaa_start_date);
+                        // If IDAA start date exist and is later than Indicator Tracking start date, then set min date to the Indicator Tracking start date
+                        } else {
+                            startMinDate = processDateString(indicator_tracking_start_date);
+                        }
+                    } else {
+                        // If IDAA start date does not exist but the Indicator Tracking start date does exist, set min date to the Indicator Tracking end date
+                        if (indicator_tracking_start_date) {
+                            startMinDate = processDateString(indicator_tracking_start_date);
+                        // If the IDAA start date and the Indicator Tracking start date both do not exist, set min date to null.
+                        } else {
+                            startMinDate = null;
+                        }
+                    }
+                    // If theres no selected min start date, set it to 10 years back from the current date.
+                    if (!startMinDate) {
+                        startMinDate = new Date()
+                        startMinDate.setFullYear(startMinDate.getFullYear() - 10)
+                    };
+                    $(`#indicator-tracking__date--start-${programPk}`).datepicker("option", "minDate", new Date(startMinDate.getFullYear(), startMinDate.getMonth(), 1));
+
+                    // Setting the datepicker values for the editable Indicator Tracking End Date
+                    $(end_date_id).datepicker("setDate", indicator_tracking_end_date);
+                    // Setting the Max End Date:
+                    let endMaxDate;
+                    if (idaa_end_date) {
+                        // If IDAA end date exist and the Indicator Tracking end date does not exist or is earlier than IDAA end date, then set max date to the IDAA end date
+                        if (!indicator_tracking_end_date || idaa_end_date > indicator_tracking_end_date) {
+                        endMaxDate = processDateString(idaa_end_date);
+                        // If IDAA end date exist and is earlier than Indicator Tracking end date, then set max date to the Indicator Tracking end date
+                        } else {
+                            endMaxDate = processDateString(indicator_tracking_end_date);
+                        }
+                    } else {
+                        // If IDAA end date does not exist but the Indicator Tracking end date does exist, set max date to the Indicator Tracking end date
+                        if (indicator_tracking_end_date) {
+                            endMaxDate = processDateString(indicator_tracking_end_date);
+                        // If the IDAA end date and the Indicator Tracking end date both do not exist, set max date to null.
+                        } else {
+                            endMaxDate = null;
+                        }
+                    }
+                    // If theres no selected max start date, set it to 10 years up from the current date.
+                    if (!endMaxDate) {
+                        endMaxDate = new Date()
+                        endMaxDate.setFullYear(endMaxDate.getFullYear() + 10)
+                    };
+                    $(`#indicator-tracking__date--end-${programPk}`).datepicker("option", "maxDate", new Date(endMaxDate.getFullYear(), endMaxDate.getMonth() + 1, 0));
+                })
+                .catch(() => {
+                    createAlert(
+                        "danger",
+                        gettext("Error. Could not retrieve data from server. Please report this to the Tola team."),
+                        false,
+                        "#div-id-reportingperiod-alert"
+                    );
+                })
+        })
+
+        // Setup the Indicator tracking start and end dates datepicker
+        setupDatePickers();
+    }, [])
+
+    $(`#program-period__modal--${programPk}`).on('hide.bs.modal', function () {
+        // Need to remove the month-only class from the date-picker so it doesn't interfere with other datepickers
+        // on the page.  Can't do it in the picker because it results in a calendar flash before picker is closed.
+        $("#ui-datepicker-div").removeClass("month-only");
+        $(".indicator-tracking__description").empty(); // Removes the description text when modal is closed
+
+    })
+
+    // Send updated data with API Call
+    const handleUpdateData = () => {
+        $(".dynamic-alert").remove() // Removes all alert boxes
+        $(start_date_id).removeClass("is-invalid")
+        $(end_date_id).removeClass("is-invalid")
+
+        // Text to display in the rationale popup.
+        const INDICATOR_TRACKING_CHANGE_TEXT = gettext( 'This action may result in changes to your periodic targets. If you have already set up periodic targets for your indicators, you may need to enter additional target values to cover the entire indicator tracking period. For future reference, please provide a reason for modifying the indicator tracking period.' )
+
+        // Only update if there has been a change in the editable dates.
+        if (origData.indicator_tracking_start_date !== programPeriodInputs.indicator_tracking_start_date || origData.indicator_tracking_end_date !== programPeriodInputs.indicator_tracking_end_date) {
+            if (handleValidation()) {
+                window.create_unified_changeset_notice({
+                    header: gettext("Reason for change"),
+                    show_icon: true,
+                    message_text: INDICATOR_TRACKING_CHANGE_TEXT,
+                    include_rationale: true,
+                    rationale_required: true,
+                    context: document.getElementById(`program-period__content--${programPk}`),
+                    on_submit: (rationale) => sendData(rationale)
+                })
+            }
+        } else {
+            // If there has not been a change in the editable dates, just close the modal when the save changes button is clicked.
+            $(`#program-period__modal--${programPk}`).modal('hide');
+        }
+
+        // API calls function that sends the editable indicator tracking start and end dates along with the rationale for the update.
+        let sendData = (rationale) => {
+            let data = {
+                reporting_period_start: programPeriodInputs.indicator_tracking_start_date,
+                reporting_period_end: programPeriodInputs.indicator_tracking_end_date,
+                rationale: rationale,
+            };
+            api.updateProgramPeriodData(programPk, data)
+            .then(res => {
+                if (res.status === 200) {
+                    window.unified_success_message( 
+                        // # Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period
+                        gettext('Indicator tracking period updated')
+                    );
+                    window.location.reload();
+                } else {
+                    let msg = res.failmsg || gettext('There was a problem saving your changes.');
+                    window.unified_error_message( gettext('Saving Failed'));
+                    createAlert(
+                        "danger",
+                        msg,
+                        false,
+                        "#div-id-reportingperiod-alert"
+                    )
+                }
+            })
+        }
     }
 
     // Handle Cancel changes button click to restore indicator tracking start and end dates to original database dates
