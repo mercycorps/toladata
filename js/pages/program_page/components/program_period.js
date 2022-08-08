@@ -215,6 +215,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
     }
 
     // Component States
+    const [lockForm, setLockForm] = useState(false);
     const [idaaDates, setIdaaDates] = useState({});
     const [programPeriodInputs, setProgramPeriodInputs] = useState({});
     const [origData, setOrigData] = useState({});
@@ -334,6 +335,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
 
     // Send updated data with API Call
     const handleUpdateData = () => {
+        // setLockForm(true);
         $(".dynamic-alert").remove() // Removes all alert boxes
         $(start_date_id).removeClass("is-invalid")
         $(end_date_id).removeClass("is-invalid")
@@ -367,24 +369,27 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                 rationale: rationale,
             };
             api.updateProgramPeriodData(programPk, data)
-            .then(res => {
-                if (res.status === 200) {
-                    window.unified_success_message( 
-                        // # Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period
-                        gettext('Indicator tracking period updated')
-                    );
-                    window.location.reload();
-                } else {
-                    let msg = res.failmsg || gettext('There was a problem saving your changes.');
-                    window.unified_error_message( gettext('Saving Failed'));
-                    createAlert(
-                        "danger",
-                        msg,
-                        false,
-                        "#div-id-reportingperiod-alert"
-                    )
-                }
-            })
+                .then(res => {
+                    if (res.status === 200) {
+                        window.unified_success_message( 
+                            // # Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period
+                            gettext('Indicator tracking period updated')
+                        );
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        setLockForm(false);
+                        let msg = res.failmsg || gettext('There was a problem saving your changes.');
+                        window.unified_error_message( gettext('Saving Failed'));
+                        createAlert(
+                            "danger",
+                            msg,
+                            false,
+                            "#div-id-reportingperiod-alert"
+                        )
+                    }
+                })
         }
     }
 
@@ -412,7 +417,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                 <div className="modal-dialog modal-lg" role="document">
                     <div id={`program-period__content--${programPk}`} className="modal-content">
 
-                        <div className="modal-body">
+                        <div className="modal-body" style={{pointerEvents: lockForm ? "none" : "all"}}>
 
                             <button
                                 type="button"
