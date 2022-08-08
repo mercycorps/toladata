@@ -232,12 +232,10 @@
 .profile__table {
     display: flex;
     justify-content: space-between;
-
     .header {
         font-size: 85%;
     }
 }
-
 .profile-table__column {
     &--left {
         width: 13%;
@@ -247,12 +245,10 @@
         width: 22%;
         margin-right: 1rem;
     }
-
     &--right {
         width: 65%;
     }
 }
-
 #id_admin_program_profile-tab {
     .form-control {
         text-overflow: ellipsis;

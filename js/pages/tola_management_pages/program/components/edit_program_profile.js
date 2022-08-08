@@ -87,18 +87,14 @@ export default class EditProgramProfile extends React.Component {
         const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
         const selectedSectors = formdata.sector.map(x=>this.props.sectorOptions.find(y=>y.value==x));
         let sectionGaitFundDonor = formdata.gaitid.length > 0 ? formdata.gaitid : [{gaitid: null, fund_code: null, donor: null, donor_dept: null}];
-        console.log('sectionGaitFundDonor', sectionGaitFundDonor)
-        console.log('formdata', formdata);
+
         return (
             <div className="tab-pane--react">
                 <h2 className="no-bold">{this.props.program_data.name ? this.props.program_data.name+': ' : ''}{gettext("Profile")}
                     <span className="ml-1">
                         <HelpPopover
                             className="popover-icon"
-                            content={
-                                gettext("The fields on this tab are auto-populated with data from Identification Assignment Assistant (IDAA). These fields cannot be edited in TolaData. If changes to this program information are required, then these changes must be reflected in IDAA first.")
-                            }
-
+                            content={ gettext("The fields on this tab are auto-populated with data from Identification Assignment Assistant (IDAA). These fields cannot be edited in TolaData. If changes to this program information are required, then these changes must be reflected in IDAA first.") }
                         />
                     </span>
                 </h2>
@@ -163,7 +159,7 @@ export default class EditProgramProfile extends React.Component {
                             />
                         <ErrorFeedback errorMessages={this.formErrors('funding_status')} />
                     </div>
-                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedCountries)} trigger="hover focus click">
+                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedCountries)}>
                         <label htmlFor="program-country-input" >{gettext("Countries")}</label>
                         {this.state.formEditable ?
                             <input
@@ -185,7 +181,7 @@ export default class EditProgramProfile extends React.Component {
                         }
                         <ErrorFeedback errorMessages={this.formErrors('country')} />
                     </div>
-                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedSectors)} trigger="hover focus click">
+                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedSectors)}>
                         <label htmlFor="program-sectors-input">{gettext("Sectors")}</label>
                         {this.state.formEditable ? 
                             <input
@@ -207,7 +203,7 @@ export default class EditProgramProfile extends React.Component {
                         }
                         <ErrorFeedback errorMessages={this.formErrors('sector')} />
                     </div>
-                    <div className="form-group" data-toggle="tooltip" title={this.createDisplayList(formdata.idaa_outcome_theme)} trigger="hover focus click">
+                    <div className="form-group" data-toggle="tooltip" title={this.createDisplayList(formdata.idaa_outcome_theme)}>
                         <label htmlFor="program-outcome_themes-input">{gettext("Outcome themes")}</label>
                             <input
                                 type="text"
@@ -262,11 +258,10 @@ export default class EditProgramProfile extends React.Component {
                                         </div>
                                     </div>
                                     <div className="profile-table__column--right">
-                                        <div className="form-group" data-toggle="tooltip" title={donorText || "None"} trigger="hover focus click">
+                                        <div className="form-group" data-toggle="tooltip" title={donorText || "None"} >
                                             <input
                                                 type="text"
                                                 value={donorText || "None"}
-                                                // value="Corporation for National and Community Servie (CNCS), Corporation for National and Community Servie (CNCS)"
                                                 onChange={(e) => this.updateFormField('fundCode', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
                                                 id="program-donor-input"
@@ -278,7 +273,10 @@ export default class EditProgramProfile extends React.Component {
                             </div>
                         )
                     })}
-
+                    {/* <div className="form-group btn-row">
+                        <button className="btn btn-primary" type="button" onClick={(e) => this.saveNew(e)}>{gettext("Save Changes")}</button>
+                        <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}>{gettext("Reset")}</button>
+                    </div> */}
                 </form>
             </div>
         )
