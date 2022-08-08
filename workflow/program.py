@@ -275,26 +275,6 @@ class ProgramValidation(ProgramDiscrepancies):
 
         return not missing_fields and valid_gaitids and matching_countries
 
-    def matching_dates(self):
-        """
-        Checks that the values between required fields are the same between Tola and IDAA
-        """
-        fields = [
-            {'idaa': 'ProgramStartDate', 'tola': 'start_date'},
-            {'idaa': 'ProgramEndDate', 'tola': 'end_date'}
-        ]
-        matching = True
-
-        for field in fields:
-            tola_value = getattr(self.tola_program, field['tola'])
-            idaa_value = convert_date(self.idaa_program[field['idaa']])
-
-            if not str(tola_value) == idaa_value:
-                self.add_discrepancy(field['tola'])
-                matching = False
-
-        return matching
-
     def matching_countries(self):
         """
         Checks if the IDAA and Tola programs have the same countries
@@ -338,13 +318,27 @@ class ProgramValidation(ProgramDiscrepancies):
     def valid_tola_program(self):
         """
         Validation for tola programs
-        - program fields match
         - countires match
         """
-        matching_fields = self.matching_dates()
-        matching_countries = self.matching_countries()
+        return self.matching_countries()
 
-        return matching_fields and matching_countries
+    def valid_tracking_dates(self):
+        """
+        Called from update in the case of a Tola program updating the start and or end dates.
+        Checks if the programs editable dates (reporting_period_) falls in the range of the uneditable dates
+        """
+        valid = False
+
+        if (self.tola_program.start_date <= self.tola_program.reporting_period_start <= self.tola_program.end_date) \
+            and (self.tola_program.start_date <= self.tola_program.reporting_period_end <= self.tola_program.end_date):
+
+            valid = True
+        
+        if not valid:
+            self.add_discrepancy('out_of_bounds_tracking_dates')
+            self.create_discrepancies()
+
+        return valid
 
     def is_valid(self):
         """
@@ -444,14 +438,15 @@ class ProgramUpload(ProgramValidation):
             {'idaa': 'ProgramEndDate', 'tola': 'end_date'}
         ]
         idaa_gaitids = self.compressed_idaa_gaitids()
-        # complete_idaa_gaitids = utils.AccessMSR().gaitid_list()
         program_before_update = self.tola_program.idaa_logged_fields
+        # Boolean to track if the program in TolaData had updates to either the start_date or end_date
+        updated_dates = False
 
         for program_field in program_fields:
             idaa_value = self.idaa_program[program_field['idaa']]
 
             if program_field['idaa'] == 'ProgramStartDate' or program_field['idaa'] == 'ProgramEndDate':
-                idaa_value = convert_date(idaa_value)
+                idaa_value = datetime.datetime.strptime(idaa_value, '%Y-%m-%dT%H:%M:%SZ').date()
 
             tola_value = getattr(self.tola_program, program_field['tola'])
 
@@ -460,6 +455,12 @@ class ProgramUpload(ProgramValidation):
                 program_updated = True
 
                 self.tola_program.save()
+
+                if isinstance(tola_value, datetime.date):
+                    updated_dates = True
+
+        if updated_dates:
+            self.valid_tracking_dates()
 
         if 'Sector' in self.idaa_program:
             idaa_sectors = [sector['LookupValue'] for sector in self.idaa_program['Sector']]
@@ -546,7 +547,8 @@ class ProgramUpload(ProgramValidation):
 
         program_discrepancies = self.get_program_discrepancies()
 
-        if program_discrepancies:
+        # Check valid_tracking_dates for cases where the program has the discrepancy, but the tracking dates were manually updated
+        if program_discrepancies and self.valid_tracking_dates():
             program_discrepancies.delete()
 
         if program_updated:
