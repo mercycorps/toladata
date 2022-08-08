@@ -29,15 +29,24 @@ class DiscrepancyReportTab:
 
         return ','.join(separate_list)
 
+    def get_idaa_gaitids(self, idaa_json):
+        return self.comma_separate_list([str(gaitid['LookupValue']).split('.')[0] for gaitid in idaa_json['GaitIDs']])
+
+    def get_idaa_countries(self, idaa_json):
+        return self.comma_separate_list([country['LookupValue'] for country in idaa_json['Country']])
+
+    def get_discrepancy_reasons(self, worksheet_discrepancies):
+        return ','.join([ProgramDiscrepancy.DISCREPANCY_REASONS[discrepancy] for discrepancy in worksheet_discrepancies])
+
     def format_worksheet(self, worksheet, wide_cells=None, small_cells=None):
         """
         Method for formatting the worksheet
         """
         if wide_cells is None:
-            wide_cells = [0, 2]
+            wide_cells = [0, 1]
 
         if small_cells is None:
-            small_cells = [1]
+            small_cells = [2]
 
         for index in range(len(self.columns)):
             if index in wide_cells:
@@ -63,44 +72,35 @@ class DiscrepancyReportTab:
     def create_worksheet(self, wb):
         worksheet = wb.create_sheet(self.title)
         worksheet.title = self.title
-        worksheet.append(self.columns)
+
+        if type(self.columns) is list:
+            worksheet.append(self.columns)
 
         self.format_worksheet(worksheet)
 
-    def populate(self, program_discrepancy, worksheet_discrepancies, *args, **kwargs):
+    def populate(self, program_discrepancy, *args, **kwargs):
         """
         Returns a list to be appended to the worksheet
         """
         idaa_json = program_discrepancy.idaa_json
-        reasons = ','.join([ProgramDiscrepancy.DISCREPANCY_REASONS[discrepancy] for discrepancy in worksheet_discrepancies])
-        idaa_gaitids = [str(gaitid['LookupValue']).split('.')[0] for gaitid in idaa_json['GaitIDs']]
+        idaa_gaitids = self.get_idaa_gaitids(idaa_json)
 
         if len(idaa_json['Country']) == 0:
             country = ""
         else:
-            country = self.comma_separate_list([country['LookupValue'] for country in idaa_json['Country']])
+            country = self.get_idaa_countries(idaa_json)
 
-        try:
-            return [
-                reasons, idaa_json['id'], idaa_json['ProgramName'], self.comma_separate_list(idaa_gaitids), 
-                country, convert_date(idaa_json['ProgramStartDate'], readable=True), convert_date(idaa_json['ProgramEndDate'], readable=True), 
-                idaa_json['ProgramStatus']
-            ]
-        except KeyError:
-            # One of the fields to display on the tab is missing from the program
-            id = 0
-
-            if 'id' in idaa_json:
-                id = idaa_json['id']
-
-            return [f'Error adding program to the report. Discrepancy reasons: {reasons} discrepancy id {program_discrepancy.id}', id]
+        return [
+            idaa_json.get('ProgramName', 'N/A'), idaa_json['id'], idaa_gaitids, country, convert_date(idaa_json.get('ProgramStartDate', None), readable=True), 
+            convert_date(idaa_json.get('ProgramEndDate', None), readable=True), idaa_json.get('ProgramStatus', 'N/A'), ''
+        ]
 
 
 class IDAAInvalidFieldsTab(DiscrepancyReportTab):
     discrepancies = ["ProgramName", "id", "ProgramStartDate", "ProgramEndDate", "Country", "ProgramStatus", "funded", "gaitid"]
     columns = [
-        "Discrepancy Reasons", "IDAA Program ID", "IDAA Program Name", "IDAA Gait IDs", "IDAA Countries", "IDAA Start Date", "IDAA End Date",
-        "IDAA Program Status", "Notes"
+        "Discrepancy Reasons", "IDAA Program Name", "IDAA Program ID", "IDAA Gait IDs", "IDAA Countries", "IDAA Start Date", 
+        "IDAA End Date", "IDAA Program Status", "Notes"
     ]
     title = "IDAA Program Has Missing Data"
     discrepancy_to_columns = [
@@ -120,24 +120,40 @@ class IDAAInvalidFieldsTab(DiscrepancyReportTab):
 
         worksheet[coord].alignment = Alignment(wrap_text=True)
 
+    def populate(self, program_discrepancy, worksheet_discrepancies):
+        reasons = self.get_discrepancy_reasons(worksheet_discrepancies)
+
+        row = [reasons]
+
+        row.extend(super().populate(program_discrepancy, worksheet_discrepancies))
+
+        return row
+
 
 class MismatchingFieldsTab(DiscrepancyReportTab):
-    discrepancies = ["funding_status", "end_date", "start_date", "countries"]
+    discrepancies = ["funding_status", "end_date", "start_date", "countries", "out_of_bounds_tracking_dates"]
     columns = [
-        "Discrepancy Reasons", "IDAA Program ID", "IDAA Program Name", "IDAA Gait IDs", "IDAA Countries", "IDAA Start Date", "IDAA End Date",
-        "IDAA Program Status", "Tola Program Name", "Tola Gait IDs", "Tola Countries", "Tola Start Date", "Tola End Date", 
-        "Tola Funding Status", "Notes"
+        "Discrepancy Reasons", "TolaData Program Name", "TolaData Gait IDs", "TolaData Countries", "TolaData Start Date", "TolaData End Date",
+        "TolaData Indicator Tracking Start Date", "TolaData Indicator Tracking End Date", "TolaData Funding Status", "IDAA Program Name", "IDAA Program ID", 
+        "IDAA Gait IDs", "IDAA Countries", "IDAA Start Date", "IDAA End Date", "IDAA Program Status", "Notes"
     ]
     title = "MisMatching Fields"
     discrepancy_to_columns = [
-        {"discrepancy": "funding_status", "columns": ['IDAA Program Status', 'Tola Funding Status']},
-        {"discrepancy": "end_date", "columns": ['IDAA End Date', 'Tola End Date']},
-        {"discrepancy": "start_date", "columns": ['IDAA Start Date', 'Tola Start Date']},
-        {"discrepancy": "countries", "columns": ['IDAA Countries', 'Tola Countries']}
+        {"discrepancy": "funding_status", "columns": ['IDAA Program Status', 'TolaData Funding Status']},
+        {"discrepancy": "end_date", "columns": ['IDAA End Date', 'TolaData End Date']},
+        {"discrepancy": "start_date", "columns": ['IDAA Start Date', 'TolaData Start Date']},
+        {"discrepancy": "countries", "columns": ['IDAA Countries', 'TolaData Countries']},
+        {"discrepancy": "out_of_bounds_tracking_dates", "columns": [
+            'IDAA Start Date', 'IDAA End Date', 'TolaData Indicator Tracking Start Date', 'TolaData Indicator Tracking End Date'
+            ]}
     ]
 
     def format_worksheet(self, worksheet):
-        wide_cells = [0, 2, 8]
+        wide_cells = [
+            self.columns.index('Discrepancy Reasons'),
+            self.columns.index('IDAA Program Name'),
+            self.columns.index('TolaData Program Name')
+        ]
 
         super().format_worksheet(worksheet, wide_cells)
 
@@ -148,60 +164,92 @@ class MismatchingFieldsTab(DiscrepancyReportTab):
         worksheet[coord].alignment = Alignment(wrap_text=True)
 
     def populate(self, program_discrepancy, worksheet_discrepancies):
-        row = super().populate(program_discrepancy, worksheet_discrepancies)
         tola_program = program_discrepancy.program.first()
+        reasons = self.get_discrepancy_reasons(worksheet_discrepancies)
 
-        row.extend([
-            tola_program.name, self.comma_separate_list(tola_program.gaitids), tola_program.countries, 
-            convert_date(str(tola_program.start_date), readable=True), convert_date(str(tola_program.end_date), readable=True), 
-            tola_program.funding_status, ''
-        ])
+        row = [
+            reasons, tola_program.name, self.comma_separate_list(tola_program.gaitids), tola_program.countries,
+            convert_date(str(tola_program.start_date), readable=True), convert_date(str(tola_program.end_date), readable=True),
+            convert_date(str(tola_program.reporting_period_start), readable=True), convert_date(str(tola_program.reporting_period_end), readable=True),
+            tola_program.funding_status
+        ]
+
+        row.extend(super().populate(program_discrepancy, worksheet_discrepancies))
 
         return row
 
 
 class MultipleProgramsTab(DiscrepancyReportTab):
     discrepancies = ["multiple_programs"]
-    columns = ["Tola Program Name", "Tola Gait IDs", "Tola Countries", "IDAA Program Name", "IDAA Program ID", "Notes"]
-    title = "IDAA Program to Multiple Tola"
+    columns = [
+        "TolaData Program Name", "TolaData Gait IDs", "TolaData Countries", "TolaData Funding Status", 
+        "IDAA Program Name", "IDAA Program ID", "IDAA Gait IDS", "IDAA Countries", "IDAA Funding Status", "Notes"
+    ]
+    title = "IDAA Program to Multiple TolaDa"  # Max character length of 31
 
     def format_worksheet(self, worksheet):
-        wide_cells = [0, 3]
-        small_cells = [4]
+        wide_cells = [self.columns.index('TolaData Program Name'), self.columns.index('IDAA Program Name')]
+        small_cells = [self.columns.index('IDAA Program ID')]
 
         super().format_worksheet(worksheet, wide_cells, small_cells)
 
     def populate(self, idaa_json, tola_program):
         return [
-            tola_program.name, self.comma_separate_list(tola_program.gaitids), tola_program.countries, idaa_json['ProgramName'],
-            idaa_json['id'], ''
+            tola_program.name, self.comma_separate_list(tola_program.gaitids), tola_program.countries, tola_program.funding_status,
+            idaa_json['ProgramName'], idaa_json['id'], self.get_idaa_gaitids(idaa_json), self.get_idaa_countries(idaa_json),
+            idaa_json['ProgramStatus'], ''
         ]
 
 
 class OverviewTab(DiscrepancyReportTab):
-    columns = [
-        "Tola Program Name", "IDAA Program Name", "IDAA Program ID", "Discrepancies Count", "Worksheets"
-    ]
+    columns = range(2)  # columns as a range to work with inherited formating methods
+    wide_cell_width = 120
     title = "Discrepancy Report Overview"
+    static_text = [
+        {
+            "header": "ORIENTATION",
+            "body": [
+                "The Discrepancy Report is divided into 4 tabs:",
+                "The first tab, titled Discrepancy Report Overview, provides explanation and instruction on what this Discrepancy Report is and how to use this to improve program data quality and consistency in TolaData ( and IDAA)."
+                "The second tab, titled IDAA Program to Multiple TolaData, identifies duplicated programs in TolaData, where there is one program in IDAA but this single program is broken out into multiple programs in TolaData. This often happens with multi-country programs, where each individual country decided to make their own version of the program in TolaData.",
+                "The third tab, titled MisMatching Fields, identifies existing programs in TolaData whose countries, dates and/or funding status do not match the data and information in IDAA. These discrepancies are not automatically corrected by the system given their sensitive nature. As a result, these discrepancies must be dealt with manually on a case-by-case basis.",
+                "The fourth and last tab, titled IDAA Program Has Missing Data, identifies programs in IDAA, which cannot be added or updated in TolaData due to data quality issues. These issues need to be addressed directly in IDAA before these programs can be added or updated in TolaData."
+            ]
+        },
+        {
+            "header": "PURPOSE & USE",
+            "body": [
+                "The purpose of this Discrepancy Report is to provide HQ and Regional MEL/PAQ/Standards Advisors, Regional Program Team (RPT) members, and Country and Program Teams with data and information regarding discrepancies found across IDAA and TolaData with the goal of correcting these discrepancies.",
+                "Most discrepancies between IDAA and TolaData will be addressed by the systems automatically, but there are a handful of sensitive issues that merit special review and handling by people, not systems. This report attempts to identify those issues that require manual review and correction by team members. For example, the countries assigned to a program in TolaData determines in which country portfolio the program appears and, as a result, which users see and have access to that program. Changing Indicator Tracking Dates impacts time-based indicators with periodic targets and any results associated with periodic targets. Therefore, updating these dates should only be done by or with authorization from the program team. Changing the funding status currently impacts enduser permission levels, such as whether a program is viewable and accessible by endusers. Many programs continue to enter and update program data and information even after the program end date.",
+                "The Discrepancy Report is generated by the TolaData Development Team at the beginning and middle of every month and is shared with the HQ MEL and Standards Teams for communication and dissemination to the relevant teams. Issues in TolaData may be addressed by anyone with authority and authorization to do so, such as the Country or Program Teams with support from the HQ and Regional MEL Advisors. Issues in IDAA will need to be addressed by those responsible for data entry and maintenance in that system, namely the RPT and/or the Country or Program Teams with support from the HQ Standards Advisors and IDAA Product Owner. It is ultimately up to these respective teams on when, how, and if these issues are addressed."
+            ]
+        }
+    ]
 
     def format_worksheet(self, worksheet):
-        wide_cells = [0, 1, 4]
-        small_cells = [2, 3]
+        wide_cells = [1]
+        small_cells = [0]
+
+        worksheet.sheet_view.showGridLines = False
 
         super().format_worksheet(worksheet, wide_cells, small_cells)
 
     def after_populate_format(self, worksheet):
         last_row = worksheet.max_row
-        coord = f"E{last_row}"
+        coord = f"B{last_row}"
 
         worksheet[coord].alignment = Alignment(wrap_text=True)
 
-    def populate(self, program_discrepancy, used_worksheets):
-        return [
-            program_discrepancy.program.first().name if program_discrepancy.program.count() >= 1 else 'N/A',
-            program_discrepancy.idaa_json['ProgramName'], program_discrepancy.idaa_json['id'],
-            len(program_discrepancy.discrepancies), self.comma_separate_list(used_worksheets)
-        ]
+    def populate_static(self, worksheet):
+        """
+        Method for populating the worksheet with static data.
+        """
+        for static_text in self.static_text:
+            worksheet.append([static_text['header']])
+            for body_text in static_text['body']:
+                worksheet.append(['', body_text])
+                self.after_populate_format(worksheet)
+                worksheet.append([])
 
 
 class GenerateDiscrepancyReport:
@@ -276,6 +324,7 @@ class GenerateDiscrepancyReport:
         """
         program_discrepancies = ProgramDiscrepancy.objects.all()
         overview_tab = OverviewTab()
+        overview_tab.populate_static(self.wb[overview_tab.title])
 
         for program_discrepancy in program_discrepancies:
             for worksheet_object in self._worksheet_mapper:
@@ -304,9 +353,5 @@ class GenerateDiscrepancyReport:
                     self.highlight_discrepancies(worksheet, worksheet_discrepancies, worksheet_object)
 
                 worksheet_tab.after_populate_format(worksheet)
-
-            used_worksheets = self.discrepancies_to_worksheets(program_discrepancy.discrepancies)
-            row = overview_tab.populate(program_discrepancy, used_worksheets)
-            self.wb[overview_tab.title].append(row)
 
         self.wb.save(self.file_path)
