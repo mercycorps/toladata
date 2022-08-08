@@ -79,7 +79,7 @@ export default class EditProgramProfile extends React.Component {
         if (!listArray) return "null";        
         return listArray.reduce((list, item, i) => {
             let separator = i === 0 ? "" : ", ";
-            item = item.label || item;
+            item = item.label || item[1] || item;
             return list + separator + item;
         }, "");
     }
