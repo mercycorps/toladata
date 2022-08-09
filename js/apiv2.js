@@ -89,7 +89,10 @@ const api = {
     async updateProgramPeriodData(programPk, data) {
         return await this.apiSession.put(`/workflow/api/program_period_update/${programPk}/`, data)
         .then(response => response)
-        .catch(this.logFailure);
+        .catch((err) => {
+            this.logFailure(err.response.data)
+            return err.response;
+        });
     },
     ipttFilterData(programPk) {
         return this.apiInstance.get(`/iptt/${programPk}/filter_data/`)

@@ -330,7 +330,9 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
         // on the page.  Can't do it in the picker because it results in a calendar flash before picker is closed.
         $("#ui-datepicker-div").removeClass("month-only");
         $(".indicator-tracking__description").empty(); // Removes the description text when modal is closed
-
+        $(".dynamic-alert").remove() // Removes all alert boxes
+        $(start_date_id).removeClass("is-invalid")
+        $(end_date_id).removeClass("is-invalid")
     })
 
     // Send updated data with API Call
@@ -380,14 +382,36 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                         }, 2000);
                     } else {
                         setLockForm(false);
-                        let msg = res.failmsg || gettext('There was a problem saving your changes.');
-                        window.unified_error_message( gettext('Saving Failed'));
-                        createAlert(
-                            "danger",
-                            msg,
-                            false,
-                            "#div-id-reportingperiod-alert"
-                        )
+                        if(res.data) {
+                            Object.keys(res.data).map((err) => {
+                                console.log(res.data);
+                                if (err === "reporting_period_start") {
+                                    $(start_date_id).addClass('is-invalid');
+                                    createAlert(
+                                        "danger",
+                                        res.data[err][0],
+                                        false,
+                                        "#div-id-reportingperiod-alert"
+                                    )
+                                }
+                                if (err === "reporting_period_end") {
+                                    $(end_date_id).addClass('is-invalid');
+                                    createAlert(
+                                        "danger",
+                                        res.data[err][0],
+                                        false,
+                                        "#div-id-reportingperiod-alert"
+                                    )
+                                }
+                            })
+                        } else {
+                            createAlert(
+                                "danger",
+                                gettext('There was a problem saving your changes.'),
+                                false,
+                                "#div-id-reportingperiod-alert"
+                            )
+                        }
                     }
                 })
         }
@@ -417,7 +441,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                 <div className="modal-dialog modal-lg" role="document">
                     <div id={`program-period__content--${programPk}`} className="modal-content">
 
-                        <div className="modal-body" style={{pointerEvents: lockForm ? "none" : "all"}}>
+                        <div className={`modal-body ${lockForm ? "waiting" : ""}`}>
 
                             <button
                                 type="button"
