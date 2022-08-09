@@ -385,6 +385,7 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
 
                     actual_double_disagg = [actual for actual in disaggregations if
                                             actual['disaggregation_type'] == 'Actual with double counting'][0]
+
                     value_direct = [label['value'] for label in actual_double_disagg['labels'] if label['label'] == 'Direct']
                     value_indirect = [label['value'] for label in actual_double_disagg['labels'] if label['label'] == 'Indirect']
 
