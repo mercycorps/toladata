@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from workflow.program import ProgramUpload
 from workflow.discrepancy_report import GenerateDiscrepancyReport
-from workflow.utils import AccessMSR
+from workflow.utils import AccessMSR, check_IDAA_duplicates
 
 
 class Command(BaseCommand):
@@ -36,6 +36,9 @@ class Command(BaseCommand):
         idaa_programs = AccessMSR().program_project_list()
         msr_country_codes_list = AccessMSR().countrycode_list()
         msr_gaitid_list = AccessMSR().gaitid_list()
+
+        # Logs any duplicated gaitids
+        check_IDAA_duplicates(idaa_programs)
 
         counts = {
             'created': 0,

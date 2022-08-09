@@ -241,7 +241,7 @@ class NestedCountrySerializer(Serializer):
         return country
 
 
-class GaitIDSerializer(ModelSerializer):
+class NestedGaitIDSerializer(Serializer):
 
     def to_representation(self, instance):
         return {
@@ -251,9 +251,8 @@ class GaitIDSerializer(ModelSerializer):
             'fund_code': [fc.fund_code for fc in instance.fundcode_set.all()]
         }
 
-    class Meta:
-        model = GaitID
-        fields = '__all__'
+    def to_internal_value(self, data):
+        return data
 
 
 class NestedIDAAOutcomeThemeSerializer(Serializer):
@@ -270,7 +269,7 @@ class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
     name = CharField(required=True, max_length=255)
     funding_status = CharField(required=True)
-    gaitid = GaitIDSerializer(many=True)
+    gaitid = NestedGaitIDSerializer(required=True, many=True)
     fundCode = CharField(required=False, allow_blank=True, allow_null=True, source='cost_center')
     description = CharField(allow_null=True, allow_blank=True)
     sector = NestedSectorSerializer(required=True, many=True)
@@ -287,16 +286,6 @@ class ProgramAdminSerializer(ModelSerializer):
     start_date = DateField(read_only=True)
     end_date = DateField(read_only=True)
     idaa_outcome_theme = NestedIDAAOutcomeThemeSerializer(required=True, many=True)
-
-    def __init__(self, instance=None, data=..., **kwargs):
-        super().__init__(instance, data, **kwargs)
-
-        try:
-            if self.context['request'].method in ['POST', 'PUT']:
-                self.fields['gaitid'] = JSONField()
-        # When called from a test 'request' is not in context
-        except KeyError:
-            self.fields['gaitid'] = JSONField()
 
     def validate_country(self, values):
         if not values:
@@ -407,8 +396,6 @@ class ProgramAdminSerializer(ModelSerializer):
             entry=program.admin_logged_fields,
         )
 
-        self.fields['gaitid'] = GaitIDSerializer(many=True)
-
         return program
 
     @transaction.atomic
@@ -438,6 +425,25 @@ class ProgramAdminSerializer(ModelSerializer):
         incoming_outcome_theme = validated_data.pop('idaa_outcome_theme')
         added_outcome_theme = [x for x in incoming_outcome_theme if x not in original_outcome_theme]
         removed_outcome_theme = [x for x in original_outcome_theme if x not in incoming_outcome_theme]
+
+        gaitid_data = validated_data.pop('gaitid')
+        for gid in gaitid_data:
+            gaitid_obj, created = GaitID.objects.get_or_create(gaitid=gid['gaitid'], program_id=instance.id)
+            gaitid_obj.donor = gid['donor']
+            gaitid_obj.save()
+
+            for fund_code in gid['fund_code']:
+                _ = FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+
+            if not created:
+                for previous_fund_code in gaitid_obj.fundcode_set.all():
+                    if previous_fund_code.fund_code not in gid['fund_code']:
+                        previous_fund_code.delete()
+
+        for previous_gaitid in instance.gaitid.all():
+            if previous_gaitid.gaitid not in [gid['gaitid'] for gid in gaitid_data]:
+                previous_gaitid.delete()
+
 
         instance.country.remove(*removed_countries)
         instance.country.add(*added_countries)
@@ -585,7 +591,15 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 ),
                 to_attr='country_with_users'
             ),
-            'gaitid'
+            models.Prefetch(
+                'gaitid',
+                queryset=GaitID.objects.select_related(None).order_by().prefetch_related(
+                    models.Prefetch(
+                        'fundcode_set',
+                        queryset=FundCode.objects.order_by().only('fund_code')
+                    )
+                )
+            )
         )
         return queryset
 

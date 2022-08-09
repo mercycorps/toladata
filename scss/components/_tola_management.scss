@@ -227,3 +227,30 @@
     list-style-type: none;
     padding-inline-start: 0px;
 }
+
+// Styling for the Profile tab's GAIT IDs, Fund Codes, Donors table
+.profile__table {
+    display: flex;
+    justify-content: space-between;
+    .header {
+        font-size: 85%;
+    }
+}
+.profile-table__column {
+    &--left {
+        width: 13%;
+        margin-right: 1rem;
+    }
+    &--middle {
+        width: 22%;
+        margin-right: 1rem;
+    }
+    &--right {
+        width: 65%;
+    }
+}
+#id_admin_program_profile-tab {
+    .form-control {
+        text-overflow: ellipsis;
+    }
+}
