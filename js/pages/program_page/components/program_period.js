@@ -115,7 +115,6 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                     else {
                         $(this).datepicker('option', 'defaultDate', new Date());
                     }
-
                     // If the start date field has a value, set the minDate to that value.
                     let selectedDate;
                     if ((selectedDate = $(start_date_id).val()).length > 0) {
@@ -157,60 +156,39 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
     // Handle validation of the editable start and end dates before sending them to the backend.
     const handleValidation = () => {
         let valid = true;
+        let errorMessages = [];
         let hasStartChanged = origData.start_date === programPeriodInputs.indicator_tracking_start_date;
         let hasEndChanged = origData.end_date === programPeriodInputs.indicator_tracking_end_date;
 
         if (hasStartChanged && programPeriodInputs.indicator_tracking_start_date === "") {
-            createAlert(
-                "danger",
-                gettext("You must enter values for the indicator tracking period start date before saving."),
-                false,
-                "#div-id-reportingperiod-alert"
-            )
-            $(start_date_id).addClass('is-invalid')
+            errorMessages.push(gettext("You must enter values for the indicator tracking period start date before saving."));
+            $(start_date_id).addClass('is-invalid');
             valid = false;
         }
         if (hasEndChanged && programPeriodInputs.indicator_tracking_end_date === "") {
-            createAlert(
-                "danger",
-                gettext("You must enter values for the indicator tracking period end date before saving."),
-                false,
-                "#div-id-reportingperiod-alert"
-            )
+            errorMessages.push(gettext("You must enter values for the indicator tracking period end date before saving."));
             $(end_date_id).addClass('is-invalid');
             valid = false;
         }
         if (programPeriodInputs.indicator_tracking_start_date > programPeriodInputs.indicator_tracking_end_date) {
-            createAlert(
-                "danger",
-                gettext("The end date must come after the start date."),
-                false,
-                "#div-id-reportingperiod-alert"
-            )
+            errorMessages.push(gettext("The end date must come after the start date."));
             $(start_date_id).addClass('is-invalid');
             $(end_date_id).addClass('is-invalid');
             valid = false;
         }
         if (hasStartChanged && idaaDates.start_date && programPeriodInputs.indicator_tracking_start_date < idaaDates.start_date) {
-            createAlert(
-                "danger",
-                gettext("The indicator tracking start must be later than the IDAA start date."),
-                false,
-                "#div-id-reportingperiod-alert"
-            )
+            errorMessages.push(gettext("The indicator tracking start must be later than the IDAA start date."));
             $(start_date_id).addClass('is-invalid');
             valid = false;
         }
         if (hasEndChanged && idaaDates.end_date && programPeriodInputs.indicator_tracking_end_date > idaaDates.end_date) {
-            createAlert(
-                "danger",
-                gettext("The indicator tracking end dates must be earlier the IDAA end date."),
-                false,
-                "#div-id-reportingperiod-alert"
-            )
+            errorMessages.push(gettext("The indicator tracking end dates must be earlier the IDAA end date."));
             $(end_date_id).addClass('is-invalid');
             valid = false;
         }
+        errorMessages.map((msg) => {
+            createAlert( "danger", msg, false, alertMessageDiv );
+        })
         return valid;
     }
 
@@ -221,6 +199,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
     const [origData, setOrigData] = useState({});
     const start_date_id = `#indicator-tracking__date--start-${programPk}`;
     const end_date_id = `#indicator-tracking__date--end-${programPk}`;
+    const alertMessageDiv = `#program-period__alert--${programPk}`;
 
     // On component mount
     useEffect(() => {
@@ -316,7 +295,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                         "danger",
                         gettext("Error. Could not retrieve data from server. Please report this to the Tola team."),
                         false,
-                        "#div-id-reportingperiod-alert"
+                        alertMessageDiv
                     );
                 })
         })
@@ -325,6 +304,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
         setupDatePickers();
     }, [])
 
+    // On component unmount/hide
     $(`#program-period__modal--${programPk}`).on('hide.bs.modal', function () {
         // Need to remove the month-only class from the date-picker so it doesn't interfere with other datepickers
         // on the page.  Can't do it in the picker because it results in a calendar flash before picker is closed.
@@ -335,12 +315,67 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
         $(end_date_id).removeClass("is-invalid")
     })
 
-    // Send updated data with API Call
+    // Send updated data to backend with API Call
     const handleUpdateData = () => {
-        // setLockForm(true);
-        $(".dynamic-alert").remove() // Removes all alert boxes
+        setLockForm(true); // Lock form to prevent button smashing
+
+        // Removes all alert boxes and invalid fields prior to valdating again
+        $(".dynamic-alert").remove() 
         $(start_date_id).removeClass("is-invalid")
         $(end_date_id).removeClass("is-invalid")
+
+        // API calls function that sends the editable indicator tracking start and end dates along with the rationale for the update.
+        let sendData = (rationale) => {
+            let data = {
+                reporting_period_start: programPeriodInputs.indicator_tracking_start_date,
+                reporting_period_end: programPeriodInputs.indicator_tracking_end_date,
+                rationale: rationale,
+            };
+            api.updateProgramPeriodData(programPk, data)
+                .then(res => {
+                    if (res.status === 200) {
+                        window.unified_success_message( 
+                            // # Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period
+                            gettext('Indicator tracking period updated')
+                        );
+                        // Allows the success message to be visible and read before the page is refreshed
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 3000);
+                    } else {
+                        setLockForm(false); // Unlock form for editing and resubmission
+                        if(res.data) {
+                            Object.keys(res.data).map((err) => {
+                                if (err === "reporting_period_start") {
+                                    $(start_date_id).addClass('is-invalid');
+                                    createAlert(
+                                        "danger",
+                                        res.data[err][0],
+                                        false,
+                                        alertMessageDiv
+                                    )
+                                }
+                                if (err === "reporting_period_end") {
+                                    $(end_date_id).addClass('is-invalid');
+                                    createAlert(
+                                        "danger",
+                                        res.data[err][0],
+                                        false,
+                                        alertMessageDiv
+                                    )
+                                }
+                            })
+                        } else {
+                            createAlert(
+                                "danger",
+                                gettext('There was a problem saving your changes.'),
+                                false,
+                                alertMessageDiv
+                            )
+                        }
+                    }
+                })
+        }
 
         // Text to display in the rationale popup.
         const INDICATOR_TRACKING_CHANGE_TEXT = gettext( 'This action may result in changes to your periodic targets. If you have already set up periodic targets for your indicators, you may need to enter additional target values to cover the entire indicator tracking period. For future reference, please provide a reason for modifying the indicator tracking period.' )
@@ -362,59 +397,6 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
             // If there has not been a change in the editable dates, just close the modal when the save changes button is clicked.
             $(`#program-period__modal--${programPk}`).modal('hide');
         }
-
-        // API calls function that sends the editable indicator tracking start and end dates along with the rationale for the update.
-        let sendData = (rationale) => {
-            let data = {
-                reporting_period_start: programPeriodInputs.indicator_tracking_start_date,
-                reporting_period_end: programPeriodInputs.indicator_tracking_end_date,
-                rationale: rationale,
-            };
-            api.updateProgramPeriodData(programPk, data)
-                .then(res => {
-                    if (res.status === 200) {
-                        window.unified_success_message( 
-                            // # Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period
-                            gettext('Indicator tracking period updated')
-                        );
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000);
-                    } else {
-                        setLockForm(false);
-                        if(res.data) {
-                            Object.keys(res.data).map((err) => {
-                                console.log(res.data);
-                                if (err === "reporting_period_start") {
-                                    $(start_date_id).addClass('is-invalid');
-                                    createAlert(
-                                        "danger",
-                                        res.data[err][0],
-                                        false,
-                                        "#div-id-reportingperiod-alert"
-                                    )
-                                }
-                                if (err === "reporting_period_end") {
-                                    $(end_date_id).addClass('is-invalid');
-                                    createAlert(
-                                        "danger",
-                                        res.data[err][0],
-                                        false,
-                                        "#div-id-reportingperiod-alert"
-                                    )
-                                }
-                            })
-                        } else {
-                            createAlert(
-                                "danger",
-                                gettext('There was a problem saving your changes.'),
-                                false,
-                                "#div-id-reportingperiod-alert"
-                            )
-                        }
-                    }
-                })
-        }
     }
 
     // Handle Cancel changes button click to restore indicator tracking start and end dates to original database dates
@@ -423,8 +405,8 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
             indicator_tracking_start_date: origData.indicator_tracking_start_date,
             indicator_tracking_end_date: origData.indicator_tracking_end_date
         });
-        $(start_date_id).datepicker("setDate", origData.indicator_tracking_start_date)
-        $(end_date_id).datepicker("setDate", origData.indicator_tracking_end_date)
+        $(start_date_id).datepicker("setDate", origData.indicator_tracking_start_date);
+        $(end_date_id).datepicker("setDate", origData.indicator_tracking_end_date);
     }
 
     return (
@@ -434,27 +416,26 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                 href="#"
                 data-toggle="modal"
                 data-target={`#program-period__modal--${programPk}`}
-            >{heading}
-            </a>
+            >{heading}</a>
 
             <div id={`program-period__modal--${programPk}`} className="modal fade" role="dialog" aria-hidden="true">
                 <div className="modal-dialog modal-lg" role="document">
-                    <div id={`program-period__content--${programPk}`} className="modal-content">
+                    <div id={`program-period__content--${programPk}`} className="program-period__content modal-content">
 
-                        <div className={`modal-body ${lockForm ? "waiting" : ""}`}>
+                        <div className={`modal-body program-period__body ${lockForm ? "waiting" : ""}`}>
 
                             <button
                                 type="button"
-                                className="close"
+                                className="close program-period__close"
                                 data-dismiss="modal"
                                 aria-label="Close">
                                 <span>&times;</span>
                             </button>
 
                             <div id="program-period__section--heading" className="mb-4">
-                                <div className="pt-3" style={{display: "inline-block", width: "90%"}}>
-                                    <div className="mb-4"><h2>{ gettext("Program period")}</h2></div>
-                                    <div id="div-id-reportingperiod-alert" className="text-danger"></div>
+                                <div className="section__content-column">
+                                <div className="mb-4"><h2>{ gettext("Program period")}</h2></div>
+                                    <div id={`program-period__alert--${programPk}`} className="text-danger"></div>
                                     <div>
                                         { gettext("The program period is used as the default for the initial setup of time-based target periods (e.g., annually, quarterly, etc.) and in the Indicator Performance Tracking Tables (IPTTs). The Program Period is based on the program’s official start and end dates as recorded in the Identification Assignment Assistant (IDAA) system and cannot be adjusted in TolaData.") }
                                     </div>
@@ -463,37 +444,29 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
 
                             <div id="program-period__section--idaa-dates" className="mb-3">
                                 <h3>{ gettext('IDAA program dates')}</h3>
-                                <div style={{display: "flex"}}>
+                                <div className="section__content">
                                     <h4 className="mr-4">
-                                        <label htmlFor="idaa__date--start" className="text-uppercase"><div className="mb-0">{ gettext("Start date") }</div></label>
-                                        {idaaDates.start_date ? 
-                                            <div className="idaa__date--start">{idaaDates.start_date}</div>
-                                            : 
-                                            <div className="idaa__date--start color-red">{ gettext("Unavailable")}</div>
-                                        }
+                                        <label htmlFor="idaa__date--start" className="mb-0 text-uppercase"><div>{ gettext("Start date") }</div></label>
+                                        <div className={`idaa__date--start ${!idaaDates.start_date ? "color-red" : ""}`}>{idaaDates.start_date || gettext("Unavailable")}</div>
                                     </h4>
                                     <h4>
-                                        <label htmlFor="idaa__date--start" className="text-uppercase"><div className="mb-0">{ gettext("End date") }</div></label>
-                                        {idaaDates.end_date ? 
-                                            <div className="idaa__date--end">{idaaDates.end_date}</div>
-                                            : 
-                                            <div className="idaa__date--end color-red">{ gettext("Unavailable")}</div>
-                                        }
+                                        <label htmlFor="idaa__date--end" className="mb-0 text-uppercase"><div>{ gettext("End date") }</div></label>
+                                        <div className={`idaa__date--end ${!idaaDates.end_date ? "color-red" : ""}`}>{idaaDates.end_date || gettext("Unavailable")}</div>
                                     </h4>
                                 </div>
                             </div>
 
-                            <div id="program-period__section--indicator-dates" className="mb-4" style={{width: "90%"}}>
+                            <div id="program-period__section--indicator-dates" className="mb-4">
                                 <div className="card inputs-in-a-box">
                                     <div className="card-body px-4 py-3">
 
-                                        <div className="indicator-tracking__description"></div>
-                                        <br/>
+                                        <div className="indicator-tracking__description mb-3"></div>
+
                                         <h3 className="mb-3">{ gettext('Indicator tracking period') }</h3>
 
-                                        <div className="mb-3" style={{display: "flex"}}>
+                                        <div className="section__content mb-3">
                                             <div className="mr-4">
-                                                <label htmlFor={`indicator-tracking__date--start-${programPk}`} className="text-uppercase"><h4 className="mb-1">{ gettext("Start date") }</h4></label>
+                                                <label htmlFor={`indicator-tracking__date--start-${programPk}`} className="text-uppercase mb-0"><h4>{ gettext("Start date") }</h4></label>
                                                 <input 
                                                     type="text"
                                                     name={`indicator-tracking__date--start-${programPk}`}
@@ -504,7 +477,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                                                     />
                                             </div>
                                             <div>
-                                                <label htmlFor={`indicator-tracking__date--end-${programPk}`} className="text-uppercase"><h4 className="mb-1">{ gettext("End date") }</h4></label>
+                                                <label htmlFor={`indicator-tracking__date--end-${programPk}`} className="text-uppercase mb-0"><h4>{ gettext("End date") }</h4></label>
                                                 <input 
                                                     type="text"
                                                     name={`indicator-tracking__date--end-${programPk}`}
@@ -521,7 +494,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                                 </div>
                             </div>
 
-                            { !origData.readOnly && 
+                            {!origData.readOnly && 
                                 <div id="program-period__section--indicator-actions">
                                     <button className="btn btn-primary mr-2" onClick={() => handleUpdateData()}>
                                         { gettext('Save Changes') }

@@ -1,0 +1,19 @@
+.program-period {
+    &__close {
+        position: relative;
+        right: -10%;
+    }
+    &__body {
+        width: 90%;
+    }
+    &__content {
+        .section__content {
+            display: flex;
+            &--column {
+                flex-direction: column;
+            }
+        }
+    }
+
+}
+
