@@ -385,11 +385,13 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
 
                     actual_double_disagg = [actual for actual in disaggregations if
                                             actual['disaggregation_type'] == 'Actual with double counting'][0]
-                    value = [label['value'] for label in actual_double_disagg['labels'] if label['label'] == 'Direct']
 
-                    if (disagg_type == 'Sectors Direct with double counting' or
-                        disagg_type == 'Sectors Indirect with double counting') and \
-                            float(label_value['value']) > float(value[0]):
+                    value_direct = [label['value'] for label in actual_double_disagg['labels'] if label['label'] == 'Direct']
+                    value_indirect = [label['value'] for label in actual_double_disagg['labels'] if label['label'] == 'Indirect']
+
+                    if (disagg_type == 'Sectors Direct with double counting' and float(label_value['value']) > \
+                       float(value_direct[0])) or (disagg_type == 'Sectors Indirect with double counting' and
+                                                   float(label_value['value']) > float(value_indirect[0])):
                         raise exceptions.ValidationError(
                             _("Sector values should be less than or equal to the 'Direct/Indirect with double counting' value."))
 
