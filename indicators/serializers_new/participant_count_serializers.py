@@ -286,8 +286,8 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         actual_with_indirect = used_disaggregations['Actual with double counting']['indirect']['value']
         actual_without_direct = used_disaggregations['Actual without double counting']['direct']['value']
         actual_without_indirect = used_disaggregations['Actual without double counting']['indirect']['value']
-        sectors_direct = used_disaggregations['Sectors Direct with double counting']['direct']['value']
-        sectors_indirect = used_disaggregations['Sectors Indirect with double counting']['indirect']['value']
+        # sectors_direct = used_disaggregations['Sectors Direct with double counting']['direct']['value']
+        # sectors_indirect = used_disaggregations['Sectors Indirect with double counting']['indirect']['value']
 
         if not sadd_with_direct == actual_with_direct:
             # Translators: An error message detailing that the sum of 'SADD with double counting' should be equal to the sum of 'Direct with double counting'
@@ -305,9 +305,10 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
             # Translators: An error message detailing that the Direct and Indirect without double counting should be equal to or lower than the value of Direct and Indirect with double counting
             raise exceptions.ValidationError(_("Direct/indirect without double counting should be equal to or lower than direct/indirect with double counting."))
 
-        if (sectors_direct + sectors_indirect) > (actual_with_direct + actual_with_indirect):
-            # Translators: An error message detailing that the Sector values should be less to or equal to the sum of Direct and Indirect with double counting value
-            raise exceptions.ValidationError(_("Sector values should be less than or equal to the 'Direct/Indirect with double counting' value."))
+        # TODO this check does not seem to be necessary
+        # if (sectors_direct + sectors_indirect) > (actual_with_direct + actual_with_indirect):
+        #     # Translators: An error message detailing that the Sector values should be less to or equal to the sum of Direct and Indirect with double counting value
+        #     raise exceptions.ValidationError(_("Sector values should be less than or equal to the 'Direct/Indirect with double counting' value."))
 
         return True
 
@@ -380,13 +381,23 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
                     else:
                         key = disagg['count_type'].lower()
 
-                    try:
-                        used_disaggregations[disagg_type][key]['value'] += int(label_value['value'])
-                    except ValueError:
-                        used_disaggregations[disagg_type][key]['value'] += float(label_value['value'])
+                    used_disaggregations[disagg_type][key]['value'] += float(label_value['value'])
+
+                    actual_double_disagg = [actual for actual in disaggregations if
+                                            actual['disaggregation_type'] == 'Actual with double counting'][0]
+
+                    value_direct = [label['value'] for label in actual_double_disagg['labels'] if label['label'] == 'Direct']
+                    value_indirect = [label['value'] for label in actual_double_disagg['labels'] if label['label'] == 'Indirect']
+
+                    if (disagg_type == 'Sectors Direct with double counting' and float(label_value['value']) > \
+                       float(value_direct[0])) or (disagg_type == 'Sectors Indirect with double counting' and
+                                                   float(label_value['value']) > float(value_indirect[0])):
+                        raise exceptions.ValidationError(
+                            _("Sector values should be less than or equal to the 'Direct/Indirect with double counting' value."))
 
                     new_value_objs.append(DisaggregatedValue(
-                        category_id=label_value['disaggregationlabel_id'], result=instance, value=label_value['value']))
+                        category_id=label_value['disaggregationlabel_id'], result=instance,
+                        value=label_value['value']))
 
         if self.disaggregations_are_valid(used_disaggregations):
             if preserve_old_ids:
