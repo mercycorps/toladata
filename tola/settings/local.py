@@ -108,6 +108,7 @@ DEFAULT_FROM_EMAIL = app_settings.get('DEFAULT_FROM_EMAIL', 'systems@mercycorps.
 SERVER_EMAIL = app_settings['SERVER_EMAIL']
 EMAIL_BACKEND = app_settings.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 
+SKIP_USER_EMAILS = app_settings.get('SKIP_USER_EMAILS', True)
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
