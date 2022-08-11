@@ -16,13 +16,13 @@ class TestPCResultSerializerWriteValidation(test.TestCase):
     serializer = program_period_serializer.ProgramPeriodSerializerUpdate
     error_messages = {
         'rationale': 'Reason for change is required',
-        'wrong_start_day': 'Indicator tracking period must start on the first of the month',
-        'time_aware_targets': 'Indicator tracking period start date cannot be changed while time-aware periodic targets are in place',
-        'no_end_date': 'You must select a Indicator tracking period end date',
-        'time_aware_indicator': 'Indicator tracking period must end after the start of the last target period',
-        'wrong_end_day': 'Indicator tracking period must end on the last day of the month',
-        'end_greater': 'Indicator tracking period must start before tracking period end',
-        'outside_IDAA_dates': 'Indicator tracking period cannot be outside of IDAA dates'
+        'wrong_start_day': 'Indicator tracking period must start on the first of the month.',
+        'time_aware_targets': 'Indicator tracking period start date cannot be changed while time-aware periodic targets are in place.',
+        'no_end_date': 'You must select an indicator tracking period end date.',
+        'time_aware_indicator': 'Indicator tracking period must end after the start of the last target period.',
+        'wrong_end_day': 'Indicator tracking period must end on the last day of the month.',
+        'end_greater': 'Indicator tracking period start date must be before the indicator tracking period end date.',
+        'outside_IDAA_dates': 'Indicator tracking period cannot be outside of the IDAA program dates.'
     }
 
     @classmethod

@@ -177,12 +177,12 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
             valid = false;
         }
         if (hasStartChanged && idaaDates.start_date && programPeriodInputs.indicator_tracking_start_date < idaaDates.start_date) {
-            errorMessages.push(gettext("The indicator tracking start must be later than the IDAA start date."));
+            errorMessages.push(gettext("The indicator tracking start date must be later than or equal to the IDAA start date."));
             $(start_date_id).addClass('is-invalid');
             valid = false;
         }
         if (hasEndChanged && idaaDates.end_date && programPeriodInputs.indicator_tracking_end_date > idaaDates.end_date) {
-            errorMessages.push(gettext("The indicator tracking end dates must be earlier the IDAA end date."));
+            errorMessages.push(gettext("The indicator tracking end date must be earlier than or equal to the IDAA end date."));
             $(end_date_id).addClass('is-invalid');
             valid = false;
         }
@@ -336,7 +336,7 @@ const ProgramPeriod = ({programPk, heading, headingClass}) => {
                     if (res.status === 200) {
                         window.unified_success_message( 
                             // # Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period
-                            gettext('Indicator tracking period updated')
+                            gettext('Indicator tracking period is updated.')
                         );
                         // Allows the success message to be visible and read before the page is refreshed
                         setTimeout(() => {

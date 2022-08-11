@@ -35,16 +35,16 @@ class ProgramPeriodSerializerUpdate(serializers.ModelSerializer):
                 adjusted_start_date = date(earliest_date.year, earliest_date.month, 1)
                 if data['reporting_period_start'] < adjusted_start_date:
                     raise serializers.ValidationError(
-                        {'reporting_period_start': _('Indicator tracking period cannot be outside of IDAA dates')})
+                        {'reporting_period_start': _('Indicator tracking period cannot be outside of the IDAA program dates.')})
             if data['reporting_period_start'].day != 1:
                 raise serializers.ValidationError(
-                    {'reporting_period_start': _('Indicator tracking period must start on the first of the month')})
+                    {'reporting_period_start': _('Indicator tracking period must start on the first of the month.')})
             elif data['reporting_period_start'] == self.instance.reporting_period_start:
                 pass
             elif self.instance.has_time_aware_targets:
                 raise serializers.ValidationError(
                     {'reporting_period_start':
-                         _('Indicator tracking period start date cannot be changed while time-aware periodic targets are in place')}
+                         _('Indicator tracking period start date cannot be changed while time-aware periodic targets are in place.')}
                 )
 
         if 'reporting_period_end' in data:
@@ -55,23 +55,23 @@ class ProgramPeriodSerializerUpdate(serializers.ModelSerializer):
                     latest_date.year + latest_date.month // 12, latest_date.month % 12 + 1, 1) - timedelta(days=1)
                 if data['reporting_period_end'] > adjusted_end_date:
                     raise serializers.ValidationError(
-                        {'reporting_period_end': _('Indicator tracking period cannot be outside of IDAA dates')})
+                        {'reporting_period_end': _('Indicator tracking period cannot be outside of the IDAA program dates.')})
             next_day = data['reporting_period_end'] + timedelta(days=1)
             if next_day.day != 1:
                 raise serializers.ValidationError(
-                    {'reporting_period_end': _('Indicator tracking period must end on the last day of the month')})
+                    {'reporting_period_end': _('Indicator tracking period must end on the last day of the month.')})
             elif data['reporting_period_end'] == self.instance.reporting_period_end:
                 pass
             elif (self.instance.last_time_aware_indicator_start_date and
                   data['reporting_period_end'] < self.instance.last_time_aware_indicator_start_date):
                 raise serializers.ValidationError(
-                    {'reporting_period_end': _('Indicator tracking period must end after the start of the last target period')})
+                    {'reporting_period_end': _('Indicator tracking period must end after the start of the last target period.')})
             if data['reporting_period_start'] and data['reporting_period_start'] >= data['reporting_period_end']:
                 raise serializers.ValidationError(
-                    {'reporting_period_end': _('Indicator tracking period must start before tracking period end')})
+                    {'reporting_period_end': _('Indicator tracking period start date must be before the indicator tracking period end date.')})
 
         else:
-            raise serializers.ValidationError({'reporting_period_end': _('You must select a Indicator tracking period end date')})
+            raise serializers.ValidationError({'reporting_period_end': _('You must select an indicator tracking period end date.')})
 
         return data
 
