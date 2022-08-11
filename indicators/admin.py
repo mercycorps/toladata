@@ -292,7 +292,7 @@ class ResultResource(resources.ModelResource):
 class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     resource_class = ResultResource
     list_display = ('indicator', 'program')
-    search_fields = ('indicator', 'program', 'owner__username')
+    search_fields = ('indicator__name', 'program__name')
     list_filter = ('indicator__program__country__country', 'program', 'approved_by')
     display = 'Indicators Results'
 
