@@ -8,27 +8,47 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 #from tola.util import getCountry, get_GAIT_data
 from tola import util
 from .models import (
-    Country, SiteProfile,
-    Program, TolaUser, ProfileType, TolaUserProxy,
-    Organization, Sector,
-    OrganizationAdmin,
+    Country,
+    CountryAccess,
+    Organization,
+    ProfileType,
+    Program,
     ProgramAccess,
-    TolaUserAdmin,
-    Region
+    Region,
+    Sector,
+    SiteProfile,
+    TolaUser,
+    TolaUserProxy,
 )
 
 
-# Resource for CSV export
-class CountryResource(resources.ModelResource):
+##########################
+# Resources for CSV export
+##########################
 
+class CountryResource(resources.ModelResource):
     class Meta:
         model = Country
 
 
-class CountryAdmin(ImportExportModelAdmin):
-    resource_class = CountryResource
-    list_display = ('country','code','organization','create_date', 'edit_date')
-    list_filter = ('country','organization__name')
+class SiteProfileResource(resources.ModelResource):
+    country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
+    type = fields.Field(column_name='type', attribute='type', widget=ForeignKeyWidget(ProfileType, 'profile'))
+
+    class Meta:
+        model = SiteProfile
+        skip_unchanged = True
+        report_skipped = False
+        # import_id_fields = ['id']
+
+
+################
+# Inline editors
+################
+
+class CountryAccessInline(admin.TabularInline):
+    model = CountryAccess
+    ordering = ('country',)
 
 
 class CountryInLineAdmin(admin.StackedInline):
@@ -44,24 +64,6 @@ class CountryInLineAdmin(admin.StackedInline):
         css = {"all": ("css/admin/inline_forms.css",)}
 
 
-# Resource for CSV export
-class SiteProfileResource(resources.ModelResource):
-    country = fields.Field(column_name='country', attribute='country', widget=ForeignKeyWidget(Country, 'country'))
-    type = fields.Field(column_name='type', attribute='type', widget=ForeignKeyWidget(ProfileType, 'profile'))
-
-    class Meta:
-        model = SiteProfile
-        skip_unchanged = True
-        report_skipped = False
-        # import_id_fields = ['id']
-
-
-class SiteProfileAdmin(ImportExportModelAdmin):
-    resource_class = SiteProfileResource
-    list_display = ('name', 'country')
-    list_filter = ('country__country',)
-    search_fields = ('country__country',)
-
 class ProgramAccessInline(admin.TabularInline):
     model = ProgramAccess
 
@@ -76,6 +78,44 @@ class ProgramAccessInline(admin.TabularInline):
         return field
 
 
+#########################
+# Customized model admins
+#########################
+
+@admin.register(Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'create_date', 'edit_date')
+    display = 'Organization'
+
+
+@admin.register(Country)
+class CountryAdmin(ImportExportModelAdmin):
+    resource_class = CountryResource
+    list_display = ('country','code','organization','create_date', 'edit_date')
+    list_filter = ('country','organization__name')
+
+
+@admin.register(TolaUser)
+class TolaUserAdmin(admin.ModelAdmin):
+    list_display = ('name', 'country')
+    display = 'Tola User'
+    list_filter = ('country', 'user__is_staff',)
+    search_fields = ('name', 'country__country', 'title')
+    inlines = (CountryAccessInline, )
+
+
+@admin.register(SiteProfile)
+class SiteProfileAdmin(ImportExportModelAdmin):
+    resource_class = SiteProfileResource
+    list_display = ('name', 'country')
+    list_filter = ('country__country',)
+    search_fields = ('country__country',)
+    # Following lines copied from .models for historical purposes
+    # list_display = ('name', 'code', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
+    # display = 'SiteProfile'
+
+
+@admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
     list_display = ('countries', 'name', 'gaitids', 'description', 'budget_check', 'funding_status')
     search_fields = ('name', 'gaitid__gaitid')
@@ -106,10 +146,23 @@ class RegionAdmin(admin.ModelAdmin):
     inlines = [CountryInLineAdmin]
 
 
-admin.site.register(Organization, OrganizationAdmin)
-admin.site.register(Country, CountryAdmin)
-admin.site.register(Program, ProgramAdmin)
-admin.site.register(Sector)
-admin.site.register(SiteProfile, SiteProfileAdmin)
-admin.site.register(ProfileType)
-admin.site.register(TolaUser,TolaUserAdmin)
+@admin.register(Sector)
+class SectorAdmin(admin.ModelAdmin):
+    list_display = ('sector', 'create_date', 'edit_date')
+    display = 'Sector'
+
+
+@admin.register(ProfileType)
+class ProfileTypeAdmin(admin.ModelAdmin):
+    list_display = ('profile', 'create_date', 'edit_date')
+    display = 'ProfileType'
+
+
+###################
+# Apparently unused
+###################
+
+class LandTypeAdmin(admin.ModelAdmin):
+    list_display = ('classify_land', 'create_date', 'edit_date')
+    display = 'Land Type'
+

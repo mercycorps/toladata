@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.contrib import admin
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth.models import User
 from decimal import Decimal
@@ -113,11 +112,6 @@ class Organization(models.Model):
     @classmethod
     def mercy_corps(cls):
         return cls.objects.get(pk=cls.MERCY_CORPS_ID)
-
-
-class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'create_date', 'edit_date')
-    display = 'Organization'
 
 
 class Region(models.Model):
@@ -433,24 +427,6 @@ class TolaUserProxy(TolaUser):
     class Meta:
         verbose_name, verbose_name_plural = u"Report Tola User", u"Report Tola Users"
         proxy = True
-
-
-class CountryAccessInline(admin.TabularInline):
-    model = CountryAccess
-    ordering = ('country',)
-
-class TolaUserAdmin(admin.ModelAdmin):
-
-    list_display = ('name', 'country')
-    display = 'Tola User'
-    list_filter = ('country', 'user__is_staff',)
-    search_fields = ('name', 'country__country', 'title')
-    inlines = (CountryAccessInline, )
-
-
-class SectorAdmin(admin.ModelAdmin):
-    list_display = ('sector', 'create_date', 'edit_date')
-    display = 'Sector'
 
 
 class ActiveProgramsMixin:
@@ -900,11 +876,6 @@ class ProfileType(models.Model):
         return self.profile
 
 
-class ProfileTypeAdmin(admin.ModelAdmin):
-    list_display = ('profile', 'create_date', 'edit_date')
-    display = 'ProfileType'
-
-
 # Add land classification - 'Rural', 'Urban', 'Peri-Urban', tola-help issue #162
 class LandType(models.Model):
     classify_land = models.CharField(_("Land Classification"), help_text=_("Rural, Urban, Peri-Urban"), max_length=100, blank=True)
@@ -925,11 +896,6 @@ class LandType(models.Model):
     # displayed in admin templates
     def __str__(self):
         return self.classify_land
-
-
-class LandTypeAdmin(admin.ModelAdmin):
-    list_display = ('classify_land', 'create_date', 'edit_date')
-    display = 'Land Type'
 
 
 class SiteProfileManager(models.Manager):
@@ -1028,13 +994,6 @@ class SiteProfile(models.Model):
     def __str__(self):
         new_name = self.name
         return new_name
-
-
-class SiteProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
-    list_filter = ('country__country')
-    search_fields = ('code', 'country__country')
-    display = 'SiteProfile'
 
 
 
