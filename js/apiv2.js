@@ -81,6 +81,19 @@ const api = {
         .then(response => response.data)
         .catch(this.logFailure);
     },
+    async getProgramPeriodData(programPk) {
+        return await this.apiSession.get(`/workflow/api/program_period_update/${programPk}/`)
+        .then(response => ({...response.data, status: response.status}))
+        .catch(this.logFailure);
+    },
+    async updateProgramPeriodData(programPk, data) {
+        return await this.apiSession.put(`/workflow/api/program_period_update/${programPk}/`, data)
+        .then(response => response)
+        .catch((err) => {
+            this.logFailure(err.response.data)
+            return err.response;
+        });
+    },
     ipttFilterData(programPk) {
         return this.apiInstance.get(`/iptt/${programPk}/filter_data/`)
                     .then(response => response.data)

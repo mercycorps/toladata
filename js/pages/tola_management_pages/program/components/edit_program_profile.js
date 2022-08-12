@@ -153,7 +153,7 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-funding_status-input">{gettext("Program funding status")}</label>
                         <input
                             type="text"
-                            value={formdata.funding_status || "None"}
+                            value={formdata.funding_status || gettext("None")}
                             onChange={(e) => this.updateFormField('funding_status', e.target.value) }
                             className={classNames('form-control', { 'is-invalid': this.formErrors('funding_status') })}
                             id="program-funding_status-input"
@@ -166,7 +166,7 @@ export default class EditProgramProfile extends React.Component {
                         {/* {this.state.formEditable ? */}
                             <input
                                 type="text"                      
-                                value={this.createDisplayList(selectedCountries) || "None"}
+                                value={this.createDisplayList(selectedCountries) || gettext("None")}
                                 className={classNames('form-control', { 'is-invalid': this.formErrors('country') })}
                                 id="program-country-input"
                                 readOnly
@@ -188,7 +188,7 @@ export default class EditProgramProfile extends React.Component {
                         {/* {this.state.formEditable ?  */}
                             <input
                                 type="text"                      
-                                value={this.createDisplayList(selectedSectors) || "None Selected"}
+                                value={this.createDisplayList(selectedSectors) || gettext("None Selected")}
                                 className={classNames('form-control', { 'is-invalid': this.formErrors('sector') })}
                                 id="program-sector-input"
                                 readOnly
@@ -209,7 +209,7 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-outcome_themes-input">{gettext("Outcome themes")}</label>
                             <input
                                 type="text"
-                                value={this.createDisplayList(formdata.idaa_outcome_theme) || "None Selected"}
+                                value={this.createDisplayList(formdata.idaa_outcome_theme) || gettext("None Selected")}
                                 onChange={(e) => this.updateFormField('outcome_themes', e.target.value) }
                                 className={classNames('form-control', { 'is-invalid': this.formErrors('outcome_themes') })}
                                 id="program-outcome_themes-input"
@@ -237,7 +237,7 @@ export default class EditProgramProfile extends React.Component {
                                         <div className="form-group">
                                             <input
                                                 type="text"
-                                                value={gaitRow.gaitid || "None"}
+                                                value={gaitRow.gaitid || gettext("None")}
                                                 onChange={(e) => this.updateFormField('gaitid', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('gaitid') })}
                                                 id="program-gait-input"
@@ -247,10 +247,10 @@ export default class EditProgramProfile extends React.Component {
                                         </div>
                                     </div>
                                     <div className="profile-table__column--middle">
-                                        <div data-toggle="tooltip" title={this.createDisplayList(gaitRow.fund_code) || "None"} className="form-group">
+                                        <div data-toggle="tooltip" title={this.createDisplayList(gaitRow.fund_code) || gettext("None")} className="form-group">
                                             <input
                                                 type="text"
-                                                value={this.createDisplayList(gaitRow.fund_code) || "None"}
+                                                value={this.createDisplayList(gaitRow.fund_code) || gettext("None")}
                                                 onChange={(e) => this.updateFormField('fundCode', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
                                                 id="program-fund-code-input"
@@ -260,10 +260,10 @@ export default class EditProgramProfile extends React.Component {
                                         </div>
                                     </div>
                                     <div className="profile-table__column--right">
-                                        <div className="form-group" data-toggle="tooltip" title={donorText || "None"} >
+                                        <div className="form-group" data-toggle="tooltip" title={donorText || gettext("None")} >
                                             <input
                                                 type="text"
-                                                value={donorText || "None"}
+                                                value={donorText || gettext("None")}
                                                 onChange={(e) => this.updateFormField('fundCode', e.target.value) }
                                                 className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('fundCode') })}
                                                 id="program-donor-input"

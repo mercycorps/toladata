@@ -1,33 +1,33 @@
 from django.utils.translation import ugettext_lazy as _
 
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string0 = _("By training")
+string0 = _("Baseline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string1 = _("Endline")
+string1 = _("By distribution")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string2 = _("Weekly")
+string2 = _("Semi-annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string3 = _("Annual")
+string3 = _("Post shock")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string4 = _("Final evaluation")
+string4 = _("By event")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 string5 = _("Monthly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string6 = _("Midline")
+string6 = _("Annual")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string7 = _("Baseline")
+string7 = _("By training")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string8 = _("By distribution")
+string8 = _("Final evaluation")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string9 = _("By batch")
+string9 = _("Midline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string10 = _("Quarterly")
+string10 = _("Endline")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string11 = _("By event")
+string11 = _("Quarterly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string12 = _("Post shock")
+string12 = _("Weekly")
 # Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-string13 = _("Semi-annual")
+string13 = _("By batch")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 string14 = _("Agribusiness")
 # Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
@@ -141,38 +141,34 @@ string68 = _("Process / Management")
 # Translators: The main area of a program
 string69 = _("Economic Opportunity")
 # Translators: The main area of a program
-string70 = _("Economic Opportunity / Opportunité économique / Oportunidad económica")
+string70 = _("Food Security")
 # Translators: The main area of a program
-string71 = _("Food Security")
+string71 = _("Good Governance and Peace")
 # Translators: The main area of a program
-string72 = _("Good Governance and Peace")
+string72 = _("Resilience approach (tick this box if the program used a resilience approach)")
 # Translators: The main area of a program
-string73 = _("Good Governance and Peace / Bonne gouvernance et paix / Buena gobernanza y paz")
-# Translators: The main area of a program
-string74 = _("Resilience approach (tick this box if the program used a resilience approach)")
-# Translators: The main area of a program
-string75 = _("Water Security")
+string73 = _("Water Security")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string76 = _("Agriculture")
+string74 = _("Agriculture")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string77 = _("Cash and Voucher Assistance")
+string75 = _("Cash and Voucher Assistance")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string78 = _("Direct")
+string76 = _("Direct")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string79 = _("Employment")
+string77 = _("Employment")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string80 = _("Environment (DRR, Energy and Water)")
+string78 = _("Environment (DRR, Energy and Water)")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string81 = _("Financial Services")
+string79 = _("Financial Services")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string82 = _("Indirect")
+string80 = _("Indirect")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string83 = _("Infrastructure (non - WASH, non - energy)")
+string81 = _("Infrastructure (non - WASH, non - energy)")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string84 = _("Nutrition")
+string82 = _("Nutrition")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string85 = _("Peace, Governance and Partnership")
+string83 = _("Peace, Governance and Partnership")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string86 = _("Public Health (non - nutrition, non - WASH)")
+string84 = _("Public Health (non - nutrition, non - WASH)")
 # Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-string87 = _("WASH")
+string85 = _("WASH")
