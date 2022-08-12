@@ -22,7 +22,6 @@ from django.http import QueryDict
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
-from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
 
@@ -73,12 +72,6 @@ class IndicatorType(models.Model):
 
     def __str__(self):
         return self.indicator_type
-
-
-class IndicatorTypeAdmin(admin.ModelAdmin):
-    list_display = ('indicator_type', 'description', 'create_date',
-                    'edit_date')
-    display = 'Indicator Type'
 
 
 class StrategicObjective(SafeDeleteModel):
@@ -302,11 +295,6 @@ class Level(models.Model):
         shrunk, only expanded or reordered.
         """
         return ['name', 'assumptions']
-
-
-class LevelAdmin(admin.ModelAdmin):
-    list_display = ('name')
-    display = 'Levels'
 
 
 class LevelTier(models.Model):
@@ -700,11 +688,6 @@ class DataCollectionFrequency(models.Model):
         return self.frequency
 
 
-class DataCollectionFrequencyAdmin(admin.ModelAdmin):
-    list_display = ('frequency', 'description', 'create_date', 'edit_date')
-    display = 'Data Collection Frequency'
-
-
 class OutcomeTheme(models.Model):
     name = models.CharField(max_length=256, verbose_name=_('Outcome theme name'))
     is_active = models.BooleanField(verbose_name=_('Active?'))
@@ -737,11 +720,6 @@ class ExternalService(models.Model):
         return self.name
 
 
-class ExternalServiceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'url', 'feed_url', 'create_date', 'edit_date')
-    display = 'External Indicator Data Service'
-
-
 class ExternalServiceRecord(models.Model):
     external_service = models.ForeignKey(
         ExternalService, blank=True, null=True, on_delete=models.SET_NULL,
@@ -757,11 +735,6 @@ class ExternalServiceRecord(models.Model):
     def __str__(self):
         return self.full_url
 
-
-class ExternalServiceRecordAdmin(admin.ModelAdmin):
-    list_display = ('external_service', 'full_url', 'record_id', 'create_date',
-                    'edit_date')
-    display = 'Exeternal Indicator Data Service'
 
 # pylint: disable=W0223
 class DecimalSplit(models.Func):
@@ -2273,12 +2246,6 @@ class PeriodicTarget(models.Model):
         return period_generator
 
 
-class PeriodicTargetAdmin(admin.ModelAdmin):
-    list_display = ('period', 'target', 'customsort',)
-    display = 'Indicator Periodic Target'
-    list_filter = ('period',)
-
-
 class ResultManager(models.Manager):
     def get_queryset(self):
         return super(ResultManager, self).get_queryset().prefetch_related(
@@ -2417,12 +2384,6 @@ class Result(models.Model):
         return [
             'id', 'date', 'target', 'value', 'outcome_themes', 'disaggregation_values', 'evidence_url',
             'evidence_name', 'sites']
-
-
-class ResultAdmin(admin.ModelAdmin):
-    list_display = ('indicator', 'date_collected', 'create_date', 'edit_date')
-    list_filter = ['indicator__program__country__country']
-    display = 'Indicator Output/Outcome Result'
 
 
 class PinnedReport(models.Model):

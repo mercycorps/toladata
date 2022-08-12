@@ -5,10 +5,20 @@ from django.utils.encoding import force_text
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from indicators.models import (
-    Indicator, IndicatorType, Result, StrategicObjective, Objective, Level,
-    ExternalService, ExternalServiceRecord, DataCollectionFrequency,
-    DisaggregationType, PeriodicTarget, DisaggregationLabel, ReportingFrequency,
-    ExternalServiceAdmin, ExternalServiceRecordAdmin, PeriodicTargetAdmin, OutcomeTheme
+    DataCollectionFrequency,
+    DisaggregationLabel, 
+    DisaggregationType, 
+    ExternalService, 
+    ExternalServiceRecord, 
+    Indicator, 
+    IndicatorType, 
+    Level,
+    Objective, 
+    OutcomeTheme,
+    PeriodicTarget, 
+    ReportingFrequency,
+    Result, 
+    StrategicObjective, 
 )
 from workflow.models import Sector, Program, Country
 from import_export import resources, fields
@@ -20,6 +30,10 @@ DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
 DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
 DISAG_PARTICIPANT_COUNT = DisaggregationType.DISAG_PARTICIPANT_COUNT
 
+
+#########
+# Filters
+#########
 
 class BooleanListFilterWithDefault(admin.SimpleListFilter):
     all_value = 'all'
@@ -67,29 +81,6 @@ class ArchivedFilter(BooleanListFilterWithDefault):
         return 0
 
 
-# TODO: is this obsolete?
-class IndicatorResource(resources.ModelResource):
-
-    indicator_type = ManyToManyWidget(IndicatorType, separator=" | ", field="indicator_type")
-    objective = ManyToManyWidget(Objective, separator=" | ", field="objective")
-    strategic_objective = ManyToManyWidget(StrategicObjective, separator=" | ", field="strategic_objective")
-    level = ManyToManyWidget(Level, separator=" | ", field="level")
-    reporting_frequencies = ManyToManyWidget(ReportingFrequency, separator=" | ", field="frequency")
-    data_collection_frequencies = ManyToManyWidget(DataCollectionFrequency, separator=" | ", field="frequency")
-    sector = fields.Field(column_name='sector', attribute='sector', widget=ForeignKeyWidget(Sector, 'sector'))
-    program = ManyToManyWidget(Program, separator=" | ", field="name")
-
-    class Meta:
-        model = Indicator
-        fields = ('id', 'indicator_type', 'level', 'objective', 'strategic_objective', 'name', 'number',
-                  'source', 'definition', 'justification', 'unit_of_measure', 'baseline', 'lop_target',
-                  'rationale_for_target', 'means_of_verification', 'data_collection_method',
-                  'data_collection_frequencies', 'data_points', 'responsible_person',
-                  'method_of_analysis', 'information_use', 'reporting_frequencies', 'quality_assurance',
-                  'data_issues', 'comments', 'disaggregation', 'sector',
-                  'program')
-
-
 class IndicatorListFilter(admin.SimpleListFilter):
     title = "Program"
     parameter_name = 'program'
@@ -105,23 +96,6 @@ class IndicatorListFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value():
             queryset = queryset.filter(program__in=[self.value()])
-        return queryset
-
-
-class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    resource_class = IndicatorResource
-    list_display = ('indicator_types', 'name', 'sector')
-    search_fields = ('name', 'number', 'program__name')
-    list_filter = (IndicatorListFilter, 'sector')
-    display = 'Indicators'
-    filter_horizontal = ('objectives', 'strategic_objectives', 'disaggregation')
-
-    def get_queryset(self, request):
-        queryset = super(IndicatorAdmin, self).get_queryset(request)
-        if request.user.is_superuser is False:
-            user_country = request.user.tola_user.country
-            programs = Program.objects.filter(country__in=[user_country])
-            queryset = queryset.filter(program__in=programs)
         return queryset
 
 
@@ -145,6 +119,139 @@ class CountryFilter(admin.SimpleListFilter):
                 queryset = queryset.filter(country=self.value())
         return queryset
 
+
+
+###########
+# Resources
+###########
+
+# TODO: is this obsolete?
+class IndicatorResource(resources.ModelResource):
+
+    indicator_type = ManyToManyWidget(IndicatorType, separator=" | ", field="indicator_type")
+    objective = ManyToManyWidget(Objective, separator=" | ", field="objective")
+    strategic_objective = ManyToManyWidget(StrategicObjective, separator=" | ", field="strategic_objective")
+    level = ManyToManyWidget(Level, separator=" | ", field="level")
+    reporting_frequencies = ManyToManyWidget(ReportingFrequency, separator=" | ", field="frequency")
+    data_collection_frequencies = ManyToManyWidget(DataCollectionFrequency, separator=" | ", field="frequency")
+    sector = fields.Field(column_name='sector', attribute='sector', widget=ForeignKeyWidget(Sector, 'sector'))
+    program = ManyToManyWidget(Program, separator=" | ", field="name")
+
+    class Meta:
+        model = Indicator
+        fields = ('id', 'indicator_type', 'level', 'objective', 'strategic_objective', 'name', 'number',
+                  'source', 'definition', 'justification', 'unit_of_measure', 'baseline', 'lop_target',
+                  'rationale_for_target', 'means_of_verification', 'data_collection_method',
+                  'data_collection_frequencies', 'data_points', 'responsible_person',
+                  'method_of_analysis', 'information_use', 'reporting_frequencies', 'quality_assurance',
+                  'data_issues', 'comments', 'disaggregation', 'sector',
+                  'program')
+
+
+class ResultResource(resources.ModelResource):
+    class Meta:
+        model = Result
+        # import_id_fields = ['id']
+
+
+#########################
+# Customized model admins
+#########################
+
+@admin.register(Indicator)
+class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    resource_class = IndicatorResource
+    list_display = ('indicator_types', 'name', 'sector')
+    search_fields = ('name', 'number', 'program__name')
+    list_filter = (IndicatorListFilter, 'sector')
+    display = 'Indicators'
+    filter_horizontal = ('objectives', 'strategic_objectives', 'disaggregation')
+
+    def get_queryset(self, request):
+        queryset = super(IndicatorAdmin, self).get_queryset(request)
+        if request.user.is_superuser is False:
+            user_country = request.user.tola_user.country
+            programs = Program.objects.filter(country__in=[user_country])
+            queryset = queryset.filter(program__in=programs)
+        return queryset
+
+
+@admin.register(ExternalService)
+class ExternalServiceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'url', 'feed_url', 'create_date', 'edit_date')
+    display = 'External Indicator Data Service'
+
+
+@admin.register(ExternalServiceRecord)
+class ExternalServiceRecordAdmin(admin.ModelAdmin):
+    list_display = ('external_service', 'full_url', 'record_id', 'create_date',
+                    'edit_date')
+    display = 'Exeternal Indicator Data Service'
+
+
+@admin.register(PeriodicTarget)
+class PeriodicTargetAdmin(admin.ModelAdmin):
+    list_display = ('period', 'target', 'customsort',)
+    display = 'Indicator Periodic Target'
+    list_filter = ('period',)
+
+
+@admin.register(Objective)
+class ObjectiveAdmin(admin.ModelAdmin):
+    list_display = ('program', 'name')
+    search_fields = ('name', 'program__name')
+    list_filter = (CountryFilter,)   # ('program__country__country',)
+    display = 'Program Objectives'
+
+    def get_queryset(self, request):
+        queryset = super(ObjectiveAdmin, self).get_queryset(request)
+        if request.user.is_superuser is False:
+            user_country = request.user.tola_user.country
+            programs = Program.objects.filter(country__in=[user_country]).values('id')
+            program_ids = [p['id'] for p in programs]
+            queryset = queryset.filter(program__in=program_ids)
+        return queryset
+
+
+@admin.register(StrategicObjective)
+class StrategicObjectiveAdmin(admin.ModelAdmin):
+    list_display = ('country', 'name')
+    search_fields = ('country__country', 'name')
+    list_filter = (CountryFilter,)  # ('country__country',)
+    display = 'Country Strategic Objectives'
+
+    def get_queryset(self, request):
+        queryset = super(StrategicObjectiveAdmin, self).get_queryset(request)
+        if request.user.is_superuser is False:
+            user_country = request.user.tola_user.country
+            queryset = queryset.filter(country=user_country)
+        return queryset
+
+
+@admin.register(Result)
+class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    resource_class = ResultResource
+    list_display = ('indicator', 'program')
+    search_fields = ('indicator__name', 'program__name')
+    list_filter = ('indicator__program__country__country', 'program', 'approved_by')
+    display = 'Indicators Results' # overridden by Meta(verbose_name_plural)
+    # copied from duplicate in .models
+    # list_display = ('indicator', 'date_collected', 'create_date', 'edit_date')
+    # display = 'Indicator Output/Outcome Result'
+
+
+@admin.register(OutcomeTheme)
+class OutcomeThemeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active', 'create_date')
+    display = 'Outcome Theme'
+    readonly_fields = ('create_date',)
+
+
+#################
+# Disaggregations
+#################
+
+# Includes proxy admin models and inline admin models
 
 class DisaggregationCategoryAdmin(SortableInlineAdminMixin, admin.StackedInline):
     model = DisaggregationLabel
@@ -212,6 +319,7 @@ class DisaggregationAdmin(admin.ModelAdmin):
                 output_field=models.IntegerField()
             ))
 
+
 class GlobalDisaggregation(DisaggregationType):
     """Proxy model to allow for two admins for one model (disaggregation)"""
     class Meta:
@@ -253,48 +361,36 @@ class CountryDisaggregationAdmin(DisaggregationAdmin):
         super().save_model(request, obj, form, change)
 
 
-class ObjectiveAdmin(admin.ModelAdmin):
-    list_display = ('program', 'name')
-    search_fields = ('name', 'program__name')
-    list_filter = (CountryFilter,)   # ('program__country__country',)
-    display = 'Program Objectives'
+#####################
+# Uncustomized models
+#####################
 
-    def get_queryset(self, request):
-        queryset = super(ObjectiveAdmin, self).get_queryset(request)
-        if request.user.is_superuser is False:
-            user_country = request.user.tola_user.country
-            programs = Program.objects.filter(country__in=[user_country]).values('id')
-            program_ids = [p['id'] for p in programs]
-            queryset = queryset.filter(program__in=program_ids)
-        return queryset
+# TODO the following models have unregistered admin classes (below)
+
+admin.site.register(IndicatorType)
+admin.site.register(Level)
+admin.site.register(DataCollectionFrequency)
+admin.site.register(ReportingFrequency)
 
 
-class StrategicObjectiveAdmin(admin.ModelAdmin):
-    list_display = ('country', 'name')
-    search_fields = ('country__country', 'name')
-    list_filter = (CountryFilter,)  # ('country__country',)
-    display = 'Country Strategic Objectives'
+############################
+# Unregistered Admin classes
+############################
 
-    def get_queryset(self, request):
-        queryset = super(StrategicObjectiveAdmin, self).get_queryset(request)
-        if request.user.is_superuser is False:
-            user_country = request.user.tola_user.country
-            queryset = queryset.filter(country=user_country)
-        return queryset
+class IndicatorTypeAdmin(admin.ModelAdmin):
+    list_display = ('indicator_type', 'description', 'create_date',
+                    'edit_date')
+    display = 'Indicator Type'
 
 
-class ResultResource(resources.ModelResource):
-    class Meta:
-        model = Result
-        # import_id_fields = ['id']
+class LevelAdmin(admin.ModelAdmin):
+    list_display = ('name')
+    display = 'Levels'
 
 
-class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
-    resource_class = ResultResource
-    list_display = ('indicator', 'program')
-    search_fields = ('indicator__name', 'program__name')
-    list_filter = ('indicator__program__country__country', 'program', 'approved_by')
-    display = 'Indicators Results'
+class DataCollectionFrequencyAdmin(admin.ModelAdmin):
+    list_display = ('frequency', 'description', 'create_date', 'edit_date')
+    display = 'Data Collection Frequency'
 
 
 class ReportingFrequencyAdmin(admin.ModelAdmin):
@@ -302,21 +398,3 @@ class ReportingFrequencyAdmin(admin.ModelAdmin):
     display = 'Reporting Frequency'
 
 
-class OutcomeThemeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_active', 'create_date')
-    display = 'Outcome Theme'
-    readonly_fields = ('create_date',)
-
-
-admin.site.register(IndicatorType)
-admin.site.register(Indicator, IndicatorAdmin)
-admin.site.register(ReportingFrequency)
-admin.site.register(Result, ResultAdmin)
-admin.site.register(Objective, ObjectiveAdmin)
-admin.site.register(StrategicObjective, StrategicObjectiveAdmin)
-admin.site.register(Level)
-admin.site.register(ExternalService, ExternalServiceAdmin)
-admin.site.register(ExternalServiceRecord, ExternalServiceRecordAdmin)
-admin.site.register(DataCollectionFrequency)
-admin.site.register(PeriodicTarget, PeriodicTargetAdmin)
-admin.site.register(OutcomeTheme, OutcomeThemeAdmin)
