@@ -505,15 +505,23 @@ class Program(models.Model):
     MIGRATED = 2 # programs created before satsuma which have switched to new RF levels
     RF_ALWAYS = 3 # programs created after satsuma release - on new RF levels with no option
 
-    legacy_gaitid = models.CharField(_("ID"), max_length=255, null=True, blank=True)
+    legacy_gaitid = models.CharField(_("Legacy GAIT ID"), max_length=255, null=True, blank=True)
     external_program_id = models.IntegerField(_('External program id'), null=True, blank=False)
     name = models.CharField(_("Program Name"), max_length=255, blank=True)
     funding_status = models.CharField(_("Funding Status"), max_length=255, blank=True)
     cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)  # Deprecated use program.gaitid.fund_code
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
-    idaa_sector = models.ManyToManyField(IDAASector, blank=True, verbose_name=_('Sector'))
-    idaa_outcome_theme = models.ManyToManyField('indicators.IDAAOutcomeTheme', blank=True)
+    idaa_sector = models.ManyToManyField(
+            IDAASector, 
+            blank=True, 
+            verbose_name=_('IDAA Sector'))
+    # NOTE: Participant Count "sectors" do not refer to either of these sector fields, but are actually disaggregation categories (DisaggregationLabel)
+    idaa_outcome_theme = models.ManyToManyField(
+            'indicators.IDAAOutcomeTheme', 
+            blank=True,
+            verbose_name=_('IDAA Outcome Theme')
+            )
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
     budget_check = models.BooleanField(_("Enable Approval Authority"), default=False)

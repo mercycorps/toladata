@@ -96,6 +96,7 @@ class CountryAdmin(ImportExportModelAdmin):
     resource_class = CountryResource
     list_display = ('country','code','organization','create_date', 'edit_date')
     list_filter = ('country','organization__name')
+    search_fields = ('country',)
 
 
 @admin.register(TolaUser)
@@ -118,11 +119,13 @@ class SiteProfileAdmin(ImportExportModelAdmin):
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = ('countries', 'name', 'gaitids', 'description', 'budget_check', 'funding_status')
+    list_display = ('name', 'countries', 'gaitids', 'budget_check', 'funding_status', 'gaitids')
     search_fields = ('name', 'gaitid__gaitid')
     list_filter = ('funding_status', 'country', 'budget_check', 'funding_status')
-    readonly_fields = ('start_date', 'end_date', 'reporting_period_start', 'reporting_period_end', )
+    readonly_fields = ('start_date', 'end_date', 'reporting_period_start', 'reporting_period_end', 'gaitids')
     inlines = (ProgramAccessInline,)
+    autocomplete_fields = ('sector', 'idaa_sector', 'idaa_outcome_theme', 'country')
+    exclude = ('create_date', 'edit_date')
 
     #we need a reference for the inline to limit country choices properly
     def get_form(self, request, obj=None, **kwargs):
@@ -149,6 +152,7 @@ class RegionAdmin(admin.ModelAdmin):
 @admin.register(Sector)
 class SectorAdmin(admin.ModelAdmin):
     list_display = ('sector', 'create_date', 'edit_date')
+    search_fields =('sector',)
 
 
 @admin.register(ProfileType)
@@ -159,6 +163,7 @@ class ProfileTypeAdmin(admin.ModelAdmin):
 @admin.register(IDAASector)
 class IDAASectorAdmin(admin.ModelAdmin):
     list_display = ('sector', 'create_date', 'edit_date')
+    search_fields =('sector',)
 
 
 @admin.register(ProgramDiscrepancy)
@@ -170,7 +175,7 @@ class ProgramDiscrepancyAdmin(admin.ModelAdmin):
 @admin.register(GaitID)
 class GaitIDAdmin(admin.ModelAdmin):
     list_display = ('gaitid', 'program', 'create_date', 'edit_date')
-    search_fields = ('gaitid', 'program')
+    search_fields = ('gaitid', 'program',)
     autocomplete_fields = ('program',)
 
 
