@@ -15,6 +15,7 @@ from .models import (
     ProfileType,
     Program,
     ProgramAccess,
+    ProgramDiscrepancy,
     Region,
     Sector,
     SiteProfile,
@@ -156,6 +157,13 @@ class ProfileTypeAdmin(admin.ModelAdmin):
 @admin.register(IDAASector)
 class IDAASectorAdmin(admin.ModelAdmin):
     list_display = ('sector', 'create_date', 'edit_date')
+
+
+@admin.register(ProgramDiscrepancy)
+class ProgramDiscrepancyAdmin(admin.ModelAdmin):
+    list_display = ('create_date', 'edit_date')
+    autocomplete_fields = ('program',)
+
 
 ###################
 # Apparently unused

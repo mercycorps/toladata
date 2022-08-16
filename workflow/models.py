@@ -793,6 +793,10 @@ class ProgramDiscrepancy(models.Model):
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = _('Program discrepancy')
+        verbose_name_plural = _('Program discrepancies')
+
     def __str__(self):
         return self.idaa_json['ProgramName']
 
