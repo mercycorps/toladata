@@ -701,6 +701,7 @@ class IDAAOutcomeTheme(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = _('IDAA Outcome Theme')
 
     def __str__(self):
         return self.name

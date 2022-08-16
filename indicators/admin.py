@@ -10,6 +10,7 @@ from indicators.models import (
     DisaggregationType, 
     ExternalService, 
     ExternalServiceRecord, 
+    IDAAOutcomeTheme,
     Indicator, 
     IndicatorType, 
     Level,
@@ -359,6 +360,13 @@ class CountryDisaggregationAdmin(DisaggregationAdmin):
     def save_model(self, request, obj, form, change):
         obj.global_type = DISAG_COUNTRY_ONLY
         super().save_model(request, obj, form, change)
+
+
+@admin.register(IDAAOutcomeTheme)
+class IDAAOutcomeThemeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active', 'create_date')
+    list_filter = ('is_active',)
+    search_fields = ('name',)
 
 
 #####################
