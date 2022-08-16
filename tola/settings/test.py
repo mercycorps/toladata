@@ -79,7 +79,7 @@ REPORTING_PERIOD_LAST_MONTH = 8
 
 DEBUG = False
 
-SKIP_USER_EMAILS = app_settings.get('SKIP_USER_EMAILS', True)
+# SKIP_USER_EMAILS = app_settings.get('SKIP_USER_EMAILS', True)
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
