@@ -56,7 +56,7 @@ class IDAASector(models.Model):
     edit_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("Sector")
+        verbose_name = _("IDAA Sector") 
         ordering = ('sector',)
 
     def __str__(self):

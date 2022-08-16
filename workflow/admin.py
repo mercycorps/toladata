@@ -10,6 +10,7 @@ from tola import util
 from .models import (
     Country,
     CountryAccess,
+    IDAASector,
     Organization,
     ProfileType,
     Program,
@@ -85,7 +86,6 @@ class ProgramAccessInline(admin.TabularInline):
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'create_date', 'edit_date')
-    display = 'Organization'
 
 
 @admin.register(Country)
@@ -98,7 +98,6 @@ class CountryAdmin(ImportExportModelAdmin):
 @admin.register(TolaUser)
 class TolaUserAdmin(admin.ModelAdmin):
     list_display = ('name', 'country')
-    display = 'Tola User'
     list_filter = ('country', 'user__is_staff',)
     search_fields = ('name', 'country__country', 'title')
     inlines = (CountryAccessInline, )
@@ -112,7 +111,6 @@ class SiteProfileAdmin(ImportExportModelAdmin):
     search_fields = ('country__country',)
     # Following lines copied from .models for historical purposes
     # list_display = ('name', 'code', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
-    # display = 'SiteProfile'
 
 
 @admin.register(Program)
@@ -120,7 +118,6 @@ class ProgramAdmin(admin.ModelAdmin):
     list_display = ('countries', 'name', 'gaitids', 'description', 'budget_check', 'funding_status')
     search_fields = ('name', 'gaitid__gaitid')
     list_filter = ('funding_status', 'country', 'budget_check', 'funding_status')
-    display = 'Program'
     readonly_fields = ('start_date', 'end_date', 'reporting_period_start', 'reporting_period_end', )
     inlines = (ProgramAccessInline,)
 
@@ -149,14 +146,16 @@ class RegionAdmin(admin.ModelAdmin):
 @admin.register(Sector)
 class SectorAdmin(admin.ModelAdmin):
     list_display = ('sector', 'create_date', 'edit_date')
-    display = 'Sector'
 
 
 @admin.register(ProfileType)
 class ProfileTypeAdmin(admin.ModelAdmin):
     list_display = ('profile', 'create_date', 'edit_date')
-    display = 'ProfileType'
 
+
+@admin.register(IDAASector)
+class IDAASectorAdmin(admin.ModelAdmin):
+    list_display = ('sector', 'create_date', 'edit_date')
 
 ###################
 # Apparently unused
@@ -164,5 +163,4 @@ class ProfileTypeAdmin(admin.ModelAdmin):
 
 class LandTypeAdmin(admin.ModelAdmin):
     list_display = ('classify_land', 'create_date', 'edit_date')
-    display = 'Land Type'
 
