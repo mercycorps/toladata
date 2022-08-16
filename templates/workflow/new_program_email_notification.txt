@@ -1,0 +1,82 @@
+{% load i18n %}{% autoescape on %}
+
+{% if no_basic_admin %}
+{{ no_basic_admin }}
+{% endif %}
+
+{% if recipient_refused %}
+{{ recipient_refused }}
+{% endif %}
+
+Dear TolaData Country Administrator,
+
+The following program or project has been created in TolaData:
+
+- Name: {{ program_name }}
+- Start Date: {{ program_start_date }}
+- End Date: {{ program_end_date }}
+- Countries: {{ Countries }}
+- GAIT IDs: {{ gaitids }}
+{% if fundcodes %}
+- Fund Codes: {{ fundcodes }}
+{% endif %}
+{% if donors %}
+- Donors: {{ donors }}
+{% endif %}
+
+Please ensure the following:
+- The program Settings are correct for the program, and
+- The program or project team members are assigned the appropriate program-level permissions in Admin-Users in order to begin setting up the program in TolaData.
+For instructions on how to perform Country Administrator functions, please visit the TolaData User Guide: https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide
+
+
+Cher administrateur de pays TolaData,
+
+Le programme ou projet suivant a été créé dans TolaData :
+
+- Nom : {{ program_name }}
+- Date de début : {{ program_start_date }}
+- Date de fin : {{ program_end_date }}
+- Pays : {{ Countries }}
+- GAIT IDs: {{ gaitids }}
+{% if fundcodes %}
+- Codes de fonds : {{ fundcodes }}
+{% endif %}
+{% if donors %}
+- Bailleurs de fonds : {{ donors }}
+{% endif %}
+
+
+Veuillez vous assurer de ce qui suit:
+- Les Paramètres du programme sont corrects pour le programme, et
+- Les membres de l'équipe du programme ou du projet ont les permissions appropriées au niveau du programme dans Admin - Utilisateurs afin de commencer à configurer le programme dans TolaData.
+
+Pour obtenir des instructions sur la façon d'exécuter les fonctions de l'administrateur de pays, veuillez consulter le Guide de l'Utilisateur de TolaData: https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide
+
+
+Estimado Administrador de País de TolaData,
+
+El siguiente programa o proyecto ha sido creado en TolaData:
+
+- Nombre: {{ program_name }}
+- Fecha de inicio: {{ program_start_date }}
+- Fecha de finalización: {{ program_end_date }}
+- Países: {{ Countries }}
+- GAIT IDs: {{ gaitids }}
+{% if fundcodes %}
+- Códigos de fondos: {{ fundcodes }}
+{% endif %}
+{% if donors %}
+- Financiadores: {{ donors }}
+{% endif %}
+
+Por favor, asegúrese de lo siguiente:
+- La Configuración del programa es correcta para el programa, y
+- Los miembros del equipo del programa o del proyecto tienen asignados los permisos adecuados a nivel de programa en Admin - Usuarios para poder empezar a configurar el programa en TolaData.
+
+Para obtener instrucciones sobre cómo realizar las funciones de Administrador del País, por favor visite la Guía del Usuario de TolaData: https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide
+{% endautoescape %}
+
+
+Thank you,
+The Mercy Corps team

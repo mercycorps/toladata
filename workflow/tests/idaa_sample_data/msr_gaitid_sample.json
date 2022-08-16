@@ -1,0 +1,11 @@
+[
+        {
+            "fields": {
+                "GaitID": "12345.0000000",
+                "FundCode": "5678",
+                "Donor": "Testdonor",
+                "DonorDept": ""
+            }
+        }
+]
+

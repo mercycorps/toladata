@@ -1,3 +1,4 @@
+from django.core import mail
 from factories import workflow_models
 from workflow import program, models, utils
 from tola_management.models import ProgramAdminAuditLog
@@ -14,19 +15,32 @@ except AttributeError:
     pass
 
 
+# TODO ATTENTION! The test_program_create method includes testing email notifications. In order for the test to work,
+#  the "django.core.mail.backends.smtp.EmailBackend" has to be enabled and SKIP_USER_EMAILS has to be set to FALSE in
+#  settings!
+
 @skip('Tests will fail on GitHub without the secret_keys')
 class TestProgramUpload(test.TestCase):
     idaa_sample_data_path = 'workflow/tests/idaa_sample_data/idaa_sample.json'
+    msr_sample_data_path = 'workflow/tests/idaa_sample_data/msr_gaitid_sample.json'
     create_idaa_program_index = 2
     new_idaa_program_index = 5
     idaa_json = None
+    msr_json = None
 
     def setUp(self):
         """
         Need to create a program that is from the idaa sample
         """
+        self._create_IDAA_user()
+        # Create admin_user for country HQ
+        self._create_admin_user()
+
         with open(self.idaa_sample_data_path) as file:
             self.idaa_json = json.load(file)
+
+        with open(self.msr_sample_data_path) as file:
+            self.msr_json = json.load(file)
 
         target_idaa_program = self.idaa_json['value'][self.create_idaa_program_index]['fields']
 
@@ -43,6 +57,12 @@ class TestProgramUpload(test.TestCase):
 
         workflow_models.CountryFactory(country='HQ', code='HQ')
         workflow_models.CountryFactory(country='Palestine (West Bank / Gaza)', code='PS')
+
+    def _create_IDAA_user(self):
+        user = workflow_models.UserFactory(username='IDAA', first_name='IDAA', last_name='')
+        user.save()
+        tola_user = workflow_models.TolaUserFactory(user=user, organization_id=1)
+        tola_user.save()
 
     def _create_tola_program(self, idaa_program, fields, create_country=True):
         """
@@ -64,6 +84,13 @@ class TestProgramUpload(test.TestCase):
             new_gaitid.save()
 
         return new_program
+
+    def _create_admin_user(self):
+        mc = workflow_models.OrganizationFactory(pk=1, name="MC")
+        hq = workflow_models.CountryFactory(code="HQ", country="HQ")
+        admin_user = workflow_models.UserFactory(username="admin_user")
+        tola_admin_user = workflow_models.TolaUserFactory(user=admin_user, country=hq, organization=mc)
+        workflow_models.grant_country_access(tola_admin_user, hq, role='basic_admin')
 
     def test_validation_idaa_not_funded(self):
         """
@@ -101,7 +128,7 @@ class TestProgramUpload(test.TestCase):
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
             msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
         )
-        
+
         self.assertTrue(upload_program.is_valid())
         self.assertFalse(upload_program.tola_program_exists)
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
@@ -131,31 +158,6 @@ class TestProgramUpload(test.TestCase):
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
         self.assertTrue(upload_program.has_discrepancy('countries'))
 
-    def test_invalid_fields_tola_program(self):
-        """
-        Test validation when a Tola program has mismatching fields to the IDAA program
-        """
-        idaa_index = 3
-        expected_discrepancies = 2
-
-        idaa_program = self.idaa_json['value'][idaa_index]['fields']
-
-        self._create_tola_program(idaa_program, fields={
-            "name": idaa_program['ProgramName'],
-            "funding_status": idaa_program['ProgramStatus'],
-            "start_date": "2022-05-12",
-            "end_date": "2022-08-01"
-        })
-
-        upload_program = program.ProgramUpload(idaa_program=idaa_program,
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
-        )
-
-        self.assertFalse(upload_program.is_valid())
-        self.assertTrue(upload_program.tola_program_exists)
-        self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
-        self.assertTrue(upload_program.has_discrepancy('start_date'))
-        self.assertTrue(upload_program.has_discrepancy('end_date'))
 
     def test_invalid_gaitid_idaa_program(self):
         """
@@ -305,8 +307,11 @@ class TestProgramUpload(test.TestCase):
 
     def test_program_create(self):
         """
-        Test that a new program is created if it does not exist in Tola
+        Test that a new program is created if it does not exist in Tola. This test includes email notifications.
+        In order for the test to work, the "django.core.mail.backends.smtp.EmailBackend" has to be enabled and
+        SKIP_USER_EMAILS has to be set to FALSE in settings!
         """
+
         external_program_id = self.idaa_json['value'][self.new_idaa_program_index]['fields']['id']
         expected_program_name = self.idaa_json['value'][self.new_idaa_program_index]['fields']['ProgramName']
         gaitidvalue = self.idaa_json['value'][self.new_idaa_program_index]['fields']['GaitIDs'][0]['LookupValue']
@@ -315,7 +320,7 @@ class TestProgramUpload(test.TestCase):
 
         program_to_be_created = program.ProgramUpload(
             idaa_program=self.idaa_json['value'][self.new_idaa_program_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=self.msr_json
             )
 
         if program_to_be_created.is_valid():
@@ -332,5 +337,16 @@ class TestProgramUpload(test.TestCase):
         self.assertEquals(tola_program.country.first().country, expected_country)
         self.assertEquals(tola_program.idaa_outcome_theme.all().count(), 2)
         self.assertEquals(audit_log_count, 1)
+
+        # Verify that one message has been sent.
+        self.assertEqual(len(mail.outbox), 1)
+        # Verify to, from_email and message subject.
+        to = ['admin_user@testenv.com']
+        self.assertEqual(mail.outbox[0].to, to)
+        from_email = 'test@example.com'
+        self.assertEqual(mail.outbox[0].from_email, from_email)
+        subject = "Attention: A new program was added to TolaData - Attention: Un nouveau programme a été ajouté à TolaData - Atención: Se ha añadido un nuevo programa a TolaData"
+        self.assertEqual(mail.outbox[0].subject, subject)
+
 
 
