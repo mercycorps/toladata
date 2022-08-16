@@ -168,7 +168,7 @@ class IDAASectorAdmin(admin.ModelAdmin):
 
 @admin.register(ProgramDiscrepancy)
 class ProgramDiscrepancyAdmin(admin.ModelAdmin):
-    list_display = ('create_date', 'edit_date')
+    list_display = ('idaa_program_name', 'create_date', 'edit_date')
     autocomplete_fields = ('program',)
 
 

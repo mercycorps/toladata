@@ -805,8 +805,13 @@ class ProgramDiscrepancy(models.Model):
         verbose_name = _('Program discrepancy')
         verbose_name_plural = _('Program discrepancies')
 
+    @property
+    def idaa_program_name(self):
+        result = self.idaa_json['ProgramName']
+        return result if result else _('(None)')
+
     def __str__(self):
-        return self.idaa_json['ProgramName']
+        idaa_program_name(self)
 
 
 class GaitID(models.Model):
