@@ -165,7 +165,6 @@ class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ('indicator_types', 'name', 'sector')
     search_fields = ('name', 'number', 'program__name')
     list_filter = (IndicatorListFilter, 'sector')
-    display = 'Indicators'
     filter_horizontal = ('objectives', 'strategic_objectives', 'disaggregation')
 
     def get_queryset(self, request):
@@ -180,20 +179,17 @@ class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 @admin.register(ExternalService)
 class ExternalServiceAdmin(admin.ModelAdmin):
     list_display = ('name', 'url', 'feed_url', 'create_date', 'edit_date')
-    display = 'External Indicator Data Service'
 
 
 @admin.register(ExternalServiceRecord)
 class ExternalServiceRecordAdmin(admin.ModelAdmin):
     list_display = ('external_service', 'full_url', 'record_id', 'create_date',
                     'edit_date')
-    display = 'Exeternal Indicator Data Service'
 
 
 @admin.register(PeriodicTarget)
 class PeriodicTargetAdmin(admin.ModelAdmin):
     list_display = ('period', 'target', 'customsort',)
-    display = 'Indicator Periodic Target'
     list_filter = ('period',)
 
 
@@ -202,7 +198,6 @@ class ObjectiveAdmin(admin.ModelAdmin):
     list_display = ('program', 'name')
     search_fields = ('name', 'program__name')
     list_filter = (CountryFilter,)   # ('program__country__country',)
-    display = 'Program Objectives'
 
     def get_queryset(self, request):
         queryset = super(ObjectiveAdmin, self).get_queryset(request)
@@ -219,7 +214,6 @@ class StrategicObjectiveAdmin(admin.ModelAdmin):
     list_display = ('country', 'name')
     search_fields = ('country__country', 'name')
     list_filter = (CountryFilter,)  # ('country__country',)
-    display = 'Country Strategic Objectives'
 
     def get_queryset(self, request):
         queryset = super(StrategicObjectiveAdmin, self).get_queryset(request)
@@ -235,7 +229,6 @@ class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = ('indicator', 'program')
     search_fields = ('indicator__name', 'program__name')
     list_filter = ('indicator__program__country__country', 'program', 'approved_by')
-    display = 'Indicators Results' # overridden by Meta(verbose_name_plural)
     # copied from duplicate in .models
     # list_display = ('indicator', 'date_collected', 'create_date', 'edit_date')
     # display = 'Indicator Output/Outcome Result'
@@ -244,7 +237,6 @@ class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 @admin.register(OutcomeTheme)
 class OutcomeThemeAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active', 'create_date')
-    display = 'Outcome Theme'
     readonly_fields = ('create_date',)
 
 
@@ -276,7 +268,6 @@ class DisaggregationCategoryAdmin(SortableInlineAdminMixin, admin.StackedInline)
 
 class DisaggregationAdmin(admin.ModelAdmin):
     """Abstract base class for the two kinds of disaggregation admins (country and global)"""
-    display = _('Disaggregation')
     inlines = [
         DisaggregationCategoryAdmin,
     ]
@@ -369,40 +360,28 @@ class IDAAOutcomeThemeAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-#####################
-# Uncustomized models
-#####################
-
-# TODO the following models have unregistered admin classes (below)
-
-admin.site.register(IndicatorType)
-admin.site.register(Level)
-admin.site.register(DataCollectionFrequency)
-admin.site.register(ReportingFrequency)
-
-
-############################
-# Unregistered Admin classes
-############################
-
+@admin.register(IndicatorType)
 class IndicatorTypeAdmin(admin.ModelAdmin):
-    list_display = ('indicator_type', 'description', 'create_date',
-                    'edit_date')
-    display = 'Indicator Type'
+    exclude = ('create_date', 'edit_date')
+    list_display = ('indicator_type', 'create_date', 'edit_date')
 
 
+@admin.register(Level)
 class LevelAdmin(admin.ModelAdmin):
-    list_display = ('name')
-    display = 'Levels'
+    exclude = ('create_date', 'edit_date')
+    list_display = ('name',)
+    search_fields = ('parent',)
+    autocomplete_fields = ('parent', 'program')
 
 
+@admin.register(DataCollectionFrequency)
 class DataCollectionFrequencyAdmin(admin.ModelAdmin):
-    list_display = ('frequency', 'description', 'create_date', 'edit_date')
-    display = 'Data Collection Frequency'
+    exclude = ('create_date', 'edit_date')
+    list_display = ('frequency', 'description', 'sort_order', 'create_date', 'edit_date')
 
 
+@admin.register(ReportingFrequency)
 class ReportingFrequencyAdmin(admin.ModelAdmin):
-    list_display = ('frequency', 'description', 'create_date', 'edit_date')
-    display = 'Reporting Frequency'
-
+    exclude = ('create_date', 'edit_date')
+    list_display = ('frequency', 'description', 'sort_order', 'create_date', 'edit_date')
 
