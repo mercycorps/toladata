@@ -10,6 +10,7 @@ from tola import util
 from .models import (
     Country,
     CountryAccess,
+    GaitID,
     IDAASector,
     Organization,
     ProfileType,
@@ -162,6 +163,12 @@ class IDAASectorAdmin(admin.ModelAdmin):
 @admin.register(ProgramDiscrepancy)
 class ProgramDiscrepancyAdmin(admin.ModelAdmin):
     list_display = ('create_date', 'edit_date')
+    autocomplete_fields = ('program',)
+
+
+@admin.register(GaitID)
+class GaitIDAdmin(admin.ModelAdmin):
+    list_display = ('gaitid', 'program', 'create_date', 'edit_date')
     autocomplete_fields = ('program',)
 
 

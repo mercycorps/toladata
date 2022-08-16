@@ -811,6 +811,8 @@ class GaitID(models.Model):
 
     class Meta:
         unique_together = ['gaitid', 'program']
+        verbose_name = 'GAIT ID'
+        verbose_name_plural = 'GAIT IDs'
 
     def fund_codes(self):
         return list(self.fund_code.values_list('fund_code', flat=True))
