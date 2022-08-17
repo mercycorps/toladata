@@ -6,3 +6,4 @@ from django.apps import AppConfig
 
 class TolaManagementConfig(AppConfig):
     name = 'tola_management'
+    verbose_name = 'Tola Management'
