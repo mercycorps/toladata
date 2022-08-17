@@ -610,8 +610,6 @@ class ProgramUpload(ProgramValidation):
                     else:
                         # For QA log the email
                         logger.info(f"To:{admin_emails}\n{subject_line}\n{plain_message}")
-                except SMTPRecipientsRefused as e:
-                    logger.exception(f"{subject_line}\n{plain_message}\nHello. {e.recipients} is no longer with Mercy Corps. Please update the country user role for this user and Basic Administrator(s) for this country. Exception: {e}")
                 except SMTPException as e:
                     logger.exception(f"Unknown Error When Sending Email for Updated Dates.\nTolaData Program ID: {self.tola_program.id}\nReciepent List: {admin_emails}\nException: {e}")
             else:
