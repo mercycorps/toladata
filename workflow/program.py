@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models.query import QuerySet
+from django.template import loader
 from tola import util
 from workflow import models
 from tola_management.models import ProgramAdminAuditLog
@@ -321,7 +322,7 @@ class ProgramValidation(ProgramDiscrepancies):
     def valid_tola_program(self):
         """
         Validation for tola programs
-        - countires match
+        - countries match
         """
         return self.matching_countries()
 
@@ -339,7 +340,7 @@ class ProgramValidation(ProgramDiscrepancies):
                 valid = True
         except TypeError:
             valid = False
-        
+
         if not valid:
             self.add_discrepancy('out_of_bounds_tracking_dates')
             self.create_discrepancies()
@@ -393,7 +394,7 @@ class ProgramUpload(ProgramValidation):
     def new_upload(self):
         return not self.tola_program_exists
 
-    def get_country_admin_emails(self):
+    def get_country_admin_emails(self, program):
         """
         Returns a list of emails for each country admin for the tola_program
 
@@ -405,11 +406,12 @@ class ProgramUpload(ProgramValidation):
             'ajoce@mercycorps.org'
         ]
         admin_emails = []
-        for country in self.tola_program.country.all():
+        for country in program.country.all():
             country_admin_emails = models.CountryAccess.objects.filter(country=country, role='basic_admin').exclude(tolauser__user__is_superuser=True).exclude(tolauser__user__email__in=mel_admins).values_list('tolauser__user__email', flat=True)
             admin_emails.extend(country_admin_emails)
 
         return admin_emails
+
 
     def get_tola_programs(self):
         """
@@ -600,7 +602,7 @@ class ProgramUpload(ProgramValidation):
                 f"<p>Las fechas oficiales del programa {self.tola_program.name} fueron actualizadas en base a la nueva información del Asistente de Asignación de Identificación (IDAA). Como resultado, el Período de Seguimiento del Indicador puede necesitar ser actualizado también. Por favor, coordine con los miembros del equipo del programa para revisar y actualizar el Período de Seguimiento del Indicador, si es necesario.</p>"
                 "<p>Para obtener instrucciones sobre cómo realizar las funciones de Administrador del País, por favor visite <a href='https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide'>la Guía del Usuario de TolaData.</a></p>"
             )
-            admin_emails = self.get_country_admin_emails()
+            admin_emails = self.get_country_admin_emails(self.tola_program)
             if len(admin_emails) > 0:
                 try:
                     if not settings.SKIP_USER_EMAILS:
@@ -716,6 +718,50 @@ class ProgramUpload(ProgramValidation):
 
         idaa_user = self.get_idaa_user()
         ProgramAdminAuditLog.created(new_tola_program, idaa_user, new_tola_program.idaa_logged_fields)
+
+        # Email notification
+        subject_line = "Attention: A new program was added to TolaData - Attention: Un nouveau programme a été ajouté à TolaData - Atención: Se ha añadido un nuevo programa a TolaData"
+        countries = ", ".join(country.country for country in new_tola_program.country.all())
+        gaitids = ", ".join(gid for gid in idaa_gaitids)
+        fundcode_list = []
+        fundcodes = None
+        for gid in idaa_gaitids:
+            for entry in self.msr_gaitid_list:
+                if int(str(entry['fields']['GaitID']).split('.')[0]) == int(gid):
+                    if 'FundCode' in entry['fields']:
+                        fcs = entry['fields']['FundCode'].split(',')
+                        for fc in fcs:
+                            fundcode_list.append(fc)
+                        fundcodes = ", ".join(f for f in fundcode_list)
+                    donor = entry['fields']['Donor'] if 'Donor' in entry['fields'] else ''
+                    donor_dept = entry['fields']['DonorDept'] if 'DonorDept' in entry['fields'] else ''
+                    if donor and donor_dept:
+                        donors = donor + ", " + donor_dept
+                    else:
+                        donors = donor + "" + donor_dept
+        c = {'program_name': name, 'program_start_date': start_date, 'program_end_date': end_date, 'Countries': countries, 'gaitids': gaitids, 'fundcodes': fundcodes, 'donors': donors}
+        text_email_template_name = 'workflow/new_program_email_notification.txt'
+        html_email_template_name = 'workflow/new_program_email_notification.html'
+        text_email = loader.render_to_string(text_email_template_name, c)
+        html_email = loader.render_to_string(html_email_template_name, c)
+        admin_emails = self.get_country_admin_emails(new_tola_program)
+        if len(admin_emails) > 0:
+            try:
+                if not settings.SKIP_USER_EMAILS:
+                    send_mail(subject=subject_line, message=text_email, from_email=settings.DEFAULT_FROM_EMAIL,
+                              recipient_list=admin_emails, fail_silently=False, html_message=html_email)
+                else:
+                    # For QA log the email
+                    logger.info(f"To:{admin_emails}\n{subject_line}\n{text_email}")
+            except SMTPException as e:
+                logger.exception(
+                    f"Unknown Error When Sending Email new program creation.\nTolaData Program ID: {new_tola_program.id}\nRecipient List: {admin_emails}\nException: {e}")
+        else:
+            c['no_basic_admin'] = f"No Basic Administrators are assigned to {countries}. Please assign a Basic Administrator(s) to this country."
+            text_email = loader.render_to_string(text_email_template_name, c)
+            logger.exception(
+                f"{subject_line}\n{text_email}")
+
 
     def upload(self):
         # TODO: Before creating or updating need to clean fields
