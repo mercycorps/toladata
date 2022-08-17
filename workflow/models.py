@@ -811,7 +811,7 @@ class ProgramDiscrepancy(models.Model):
         return result if result else _('(None)')
 
     def __str__(self):
-        idaa_program_name(self)
+        return self.idaa_json['ProgramName']
 
 
 class GaitID(models.Model):
@@ -839,6 +839,10 @@ class FundCode(models.Model):
     gaitid = models.ForeignKey(GaitID, on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
+
+    @property
+    def program(self):
+        return self.gaitid.program
 
     class Meta:
         unique_together = ['fund_code', 'gaitid']

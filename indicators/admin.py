@@ -15,6 +15,7 @@ from indicators.models import (
     IndicatorType, 
     Level,
     LevelTier,
+    LevelTierTemplate,
     Objective, 
     OutcomeTheme,
     PeriodicTarget, 
@@ -371,9 +372,9 @@ class IndicatorTypeAdmin(admin.ModelAdmin):
 @admin.register(Level)
 class LevelAdmin(admin.ModelAdmin):
     exclude = ('create_date', 'edit_date')
-    list_display = ('name',)
-    search_fields = ('parent',)
+    list_display = ('name', 'parent', 'program', 'customsort', 'create_date', 'edit_date')
     autocomplete_fields = ('parent', 'program')
+    search_fields = ('name', 'parent__name', 'program__name')
 
 
 @admin.register(DataCollectionFrequency)
@@ -393,9 +394,18 @@ class PinnedReportAdmin(admin.ModelAdmin):
     list_display = ('name', 'tola_user', 'program', 'creation_date')
     autocomplete_fields = ('tola_user', 'program')
 
+
 @admin.register(LevelTier)
 class LevelTierAdmin(admin.ModelAdmin):
     exclude = ('create_date', 'edit_date')
     autocomplete_fields = ('program',)
     list_display = ('name', 'program', 'tier_depth', 'create_date', 'edit_date')
     search_fields = ('name', 'program__name',)
+
+
+@admin.register(LevelTierTemplate)
+class LevelTierTemplateAdmin(admin.ModelAdmin):
+    exclude = ('create_date', 'edit_date')
+    autocomplete_fields = ('program',)
+    list_display = ('names', 'program', 'create_date', 'edit_date')
+    search_fields = ('names', 'program__name',)

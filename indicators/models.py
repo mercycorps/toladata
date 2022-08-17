@@ -427,7 +427,8 @@ class LevelTierTemplate(models.Model):
 
     class Meta:
         # Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.  There are several templates that users can choose from with different names for the Tiers.
-        verbose_name = _("Level tier templates")
+        verbose_name = _("Level Tier Templates")
+        verbose_name_plural = _("Level Tier Templates") # same as verbose_name
 
     def __str__(self):
         return ",".join(self.names)

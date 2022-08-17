@@ -170,19 +170,22 @@ class IDAASectorAdmin(admin.ModelAdmin):
 class ProgramDiscrepancyAdmin(admin.ModelAdmin):
     list_display = ('idaa_program_name', 'create_date', 'edit_date')
     autocomplete_fields = ('program',)
+    search_fields = ('program__name', 'idaa_json', 'discrepancies')
 
 
 @admin.register(GaitID)
 class GaitIDAdmin(admin.ModelAdmin):
     list_display = ('gaitid', 'program', 'create_date', 'edit_date')
-    search_fields = ('gaitid', 'program',)
+    search_fields = ('gaitid', 'program__name',)
     autocomplete_fields = ('program',)
 
 
 @admin.register(FundCode)
 class FundCodeAdmin(admin.ModelAdmin):
-    list_display = ('fund_code', 'gaitid', 'create_date', 'edit_date')
+    list_display = ('fund_code', 'gaitid', 'program', 'create_date', 'edit_date')
+    readonly_fields = ('program',)
     autocomplete_fields = ('gaitid',)
+    search_fields = ('fund_code', 'gaitid__gaitid') # TODO: add program property
 
 
 ###################
