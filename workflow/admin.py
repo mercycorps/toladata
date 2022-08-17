@@ -188,10 +188,3 @@ class FundCodeAdmin(admin.ModelAdmin):
     search_fields = ('fund_code', 'gaitid__gaitid') # TODO: add program property
 
 
-###################
-# Apparently unused
-###################
-
-class LandTypeAdmin(admin.ModelAdmin):
-    list_display = ('classify_land', 'create_date', 'edit_date')
-

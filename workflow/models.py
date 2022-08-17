@@ -900,6 +900,7 @@ class ProfileType(models.Model):
 
 
 # Add land classification - 'Rural', 'Urban', 'Peri-Urban', tola-help issue #162
+# TODO this may be unused? No data in the DB
 class LandType(models.Model):
     classify_land = models.CharField(_("Land Classification"), help_text=_("Rural, Urban, Peri-Urban"), max_length=100, blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
