@@ -14,9 +14,11 @@ from indicators.models import (
     Indicator, 
     IndicatorType, 
     Level,
+    LevelTier,
     Objective, 
     OutcomeTheme,
     PeriodicTarget, 
+    PinnedReport,
     ReportingFrequency,
     Result, 
     StrategicObjective, 
@@ -385,3 +387,15 @@ class ReportingFrequencyAdmin(admin.ModelAdmin):
     exclude = ('create_date', 'edit_date')
     list_display = ('frequency', 'description', 'sort_order', 'create_date', 'edit_date')
 
+
+@admin.register(PinnedReport)
+class PinnedReportAdmin(admin.ModelAdmin):
+    list_display = ('name', 'tola_user', 'program', 'creation_date')
+    autocomplete_fields = ('tola_user', 'program')
+
+@admin.register(LevelTier)
+class LevelTierAdmin(admin.ModelAdmin):
+    exclude = ('create_date', 'edit_date')
+    autocomplete_fields = ('program',)
+    list_display = ('name', 'program', 'tier_depth', 'create_date', 'edit_date')
+    search_fields = ('name', 'program__name',)

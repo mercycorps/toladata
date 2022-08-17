@@ -2539,3 +2539,6 @@ class PinnedReport(models.Model):
             report_type='timeperiods',
             query_string='timeperiods=7&timeframe=2&numrecentperiods=2',
         )
+
+    def __str__(self):
+        return self.name
