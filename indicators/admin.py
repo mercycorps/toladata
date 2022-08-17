@@ -5,6 +5,7 @@ from django.utils.encoding import force_text
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from indicators.models import (
+    BulkIndicatorImportFile,
     DataCollectionFrequency,
     DisaggregationLabel, 
     DisaggregationType, 
@@ -409,3 +410,13 @@ class LevelTierTemplateAdmin(admin.ModelAdmin):
     autocomplete_fields = ('program',)
     list_display = ('names', 'program', 'create_date', 'edit_date')
     search_fields = ('names', 'program__name',)
+
+
+@admin.register(BulkIndicatorImportFile)
+class BulkIndicatorImportFileAdmin(admin.ModelAdmin):
+    autocomplete_fields = ('program', 'user')
+    exclude = ('create_date',)
+    list_display = ('file_name', 'file_type', 'program', 'create_date')
+    search_fields = ('file_name', 'program__name',)
+    list_filter = ('file_type',)
+

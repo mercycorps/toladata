@@ -1958,6 +1958,7 @@ class BulkIndicatorImportFile(models.Model):
     file_type = models.IntegerField(choices=FILE_TYPE_CHOICES)
     file_name = models.CharField(max_length=100)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='bulk_indicator_import_files')
+    # TODO: elsewhere we refer to users as tola_user or tolauser
     user = models.ForeignKey(
         TolaUser, on_delete=models.SET_NULL, related_name='bulk_indicator_import_files', null=True)
     create_date = models.DateTimeField(auto_now=True)
