@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 
 from tola_management.models import (
+    OrganizationAdminAuditLog,
     ProgramAdminAuditLog,
     ProgramAuditLog,
     UserManagementAuditLog,
@@ -35,3 +36,11 @@ class ProgramAdminAuditLogAdmin(admin.ModelAdmin):
     search_fields = ('admin_user__name', 'program__name',)
     list_filter = ('change_type',)
     
+
+@admin.register(OrganizationAdminAuditLog)
+class OrganizationAdminAuditLogAdmin(admin.ModelAdmin):
+    autocomplete_fields = ('admin_user',)
+    readonly_fields = ('date',)
+    list_display = ('date', 'admin_user', 'change_type')
+    search_fields = ('admin_user__name',)
+    list_filter = ('change_type', 'organization__name')
