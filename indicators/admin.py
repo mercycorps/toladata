@@ -322,6 +322,15 @@ class GlobalDisaggregation(DisaggregationType):
         proxy = True
 
 
+@admin.register(DisaggregationType)
+class DisaggregationTypeAdmin(admin.ModelAdmin):
+    readonly_fields = ('create_date', 'edit_date')
+    list_display = ('disaggregation_type', 'country', 'create_date', 'edit_date')
+    list_filter = ('global_type', 'is_archived', 'country')
+    search_fields = ('disaggregation_type', 'country__country')
+
+
+
 @admin.register(GlobalDisaggregation)
 class GlobalDisaggregationAdmin(DisaggregationAdmin):
     list_display = ('disaggregation_type', 'global_type', 'pretty_archived', 'program_count', 'categories')
