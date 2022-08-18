@@ -86,7 +86,16 @@
                     {% if has_high_role %}
                         <p>
                             {% blocktrans with id=program.id %}
-                            <span class="program-period__link--{{ id }}"></span>
+                            <span 
+                                id="id_link_reporting_period_{{ id }}"
+                                class="program-period__link--{{ id }}"
+                                data-program="{{ id }}"
+                                data-progstart="{{ start_date }}"
+                                data-progend="{{ end_date }}"
+                                data-rptstart="{{ reporting_period_start }}"
+                                data-rptend="{{ reporting_period_end }}"
+                                data-indicator_count="{{program.indicator_count}}"
+                            ></span>
                             {% endblocktrans %}
                         </p>
                     {% else %}
