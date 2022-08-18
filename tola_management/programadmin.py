@@ -27,6 +27,9 @@ from openpyxl import Workbook, utils
 from openpyxl.cell import Cell
 from openpyxl.styles import Alignment, Font, PatternFill
 
+from dateutil.relativedelta import relativedelta
+from datetime import date
+
 from workflow.models import (
     Program,
     TolaUser,
@@ -36,7 +39,8 @@ from workflow.models import (
     ProgramAccess,
     CountryAccess,
     GaitID,
-    FundCode
+    FundCode,
+    IDAASector
 )
 
 from indicators.models import (
@@ -222,12 +226,12 @@ class Paginator(pagination.PageNumberPagination):
         return response
 
 
-class NestedSectorSerializer(Serializer):
+class NestedIDAASectorSerializer(Serializer):
     def to_representation(self, sector):
         return sector.id
 
     def to_internal_value(self, data):
-        sector = Sector.objects.get(pk=data)
+        sector = IDAASector.objects.get(pk=data)
         return sector
 
 
@@ -241,7 +245,29 @@ class NestedCountrySerializer(Serializer):
         return country
 
 
-class NestedGaitIDSerializer(Serializer):
+class NestedFundCodeSerializer(ModelSerializer):
+    fund_code = IntegerField(max_value=99999)
+
+    class Meta:
+        model = FundCode
+        fields = ('fund_code',)
+
+    def to_representation(self, instance):
+        return instance.fund_code
+
+    def to_internal_value(self, data):
+        return data
+
+
+class NestedGaitIDSerializer(ModelSerializer):
+    gaitid = IntegerField(max_value=99999)
+    donor = CharField(max_length=255)
+    donor_dept = CharField()
+    fund_code = NestedFundCodeSerializer(many=True)
+
+    class Meta:
+        model = GaitID
+        fields = ('gaitid', 'donor', 'donor_dept', 'fund_code')
 
     def to_representation(self, instance):
         return {
@@ -250,9 +276,6 @@ class NestedGaitIDSerializer(Serializer):
             'donor_dept': instance.donor_dept,
             'fund_code': [fc.fund_code for fc in instance.fundcode_set.all()]
         }
-
-    def to_internal_value(self, data):
-        return data
 
 
 class NestedIDAAOutcomeThemeSerializer(Serializer):
@@ -266,13 +289,13 @@ class NestedIDAAOutcomeThemeSerializer(Serializer):
 
 
 class ProgramAdminSerializer(ModelSerializer):
-    id = IntegerField(allow_null=True, required=False)
+    id = IntegerField(read_only=True)
+    external_program_id = IntegerField(required=True, max_value=9999)
     name = CharField(required=True, max_length=255)
     funding_status = CharField(required=True)
     gaitid = NestedGaitIDSerializer(required=True, many=True)
     fundCode = CharField(required=False, allow_blank=True, allow_null=True, source='cost_center')
-    description = CharField(allow_null=True, allow_blank=True)
-    sector = NestedSectorSerializer(required=True, many=True)
+    idaa_sector = NestedIDAASectorSerializer(required=True, many=True)
     country = NestedCountrySerializer(required=True, many=True)
     auto_number_indicators = BooleanField(required=False)
     #organizations = IntegerField(source='organization_count', read_only=True)
@@ -282,9 +305,8 @@ class ProgramAdminSerializer(ModelSerializer):
     program_users = SerializerMethodField()
     onlyOrganizationId = SerializerMethodField()
     _using_results_framework = IntegerField(required=False, allow_null=True)
-    # TODO read-only=True needs to be removed when 'Add Program' functionality is updated
-    start_date = DateField(read_only=True)
-    end_date = DateField(read_only=True)
+    start_date = DateField(required=True)
+    end_date = DateField(required=True)
     idaa_outcome_theme = NestedIDAAOutcomeThemeSerializer(required=True, many=True)
 
     def validate_country(self, values):
@@ -292,16 +314,49 @@ class ProgramAdminSerializer(ModelSerializer):
             raise ValidationError("This field may not be blank.")
         return values
 
+    def validate_dates(self, start_date, end_date):
+        if start_date and end_date:
+            if start_date > end_date:
+                raise ValidationError(_("The program start date may not be after the program end date."))
+            if end_date < start_date:
+                raise ValidationError(_("The program end date may not be before the program start date."))
+
+    def validate(self, data):
+        self.validate_dates(data['start_date'], data['end_date'])
+        return super().validate(data)
+
+    def validate_start_date(self, value):
+        past_limit = date.today() - relativedelta(years=10)
+        if value < past_limit:
+            raise ValidationError(_("The program start date may not be more than 10 years in the past."))
+        return value
+
+    def validate_end_date(self, value):
+        future_limit = date.today() + relativedelta(years=10)
+        if value > future_limit:
+            raise ValidationError(_("The program end date may not be more than 10 years in the future."))
+
+    def validate_gaitid(self, values):
+        checked_gaitids = []
+        for gid in values:
+            if gid['gaitid'] in checked_gaitids:
+                # error
+                raise ValidationError(_("Duplicate GAIT ID numbers are not allowed."))
+            else:
+                checked_gaitids.append(gid['gaitid'])
+
+        return values
+
     class Meta:
         model = Program
         fields = (
             'id',
+            'external_program_id',
             'name',
             'funding_status',
             'gaitid',
             'fundCode',
-            'description',
-            'sector',
+            'idaa_sector',
             'country',
             'organizations',
             'program_users',
@@ -350,34 +405,18 @@ class ProgramAdminSerializer(ModelSerializer):
             ret.pop('_using_results_framework')
         return ret
 
-    def to_internal_value(self, data):
-        # TODO: This can be removed with ticket #2770
-        if type(data['gaitid']) is str:
-            if data['gaitid'] == '':
-                data['gaitid'] = []
-            else:
-                data['gaitid'] = [
-                    {
-                        'gaitid': data['gaitid'],
-                        'fund_code': [data['fundCode'] if 'fundCode' in data else None],
-                        'donor': ''
-                    }
-                ]
-
-        return super().to_internal_value(data)
-
     @transaction.atomic
     def create(self, validated_data):
         if '_using_results_framework' in validated_data and \
                 validated_data['_using_results_framework'] is None:
             validated_data.pop('_using_results_framework')
         country = validated_data.pop('country')
-        sector = validated_data.pop('sector')
+        sector = validated_data.pop('idaa_sector')
         gaitid_data = validated_data.pop('gaitid')
         idaa_outcome_theme = validated_data.pop('idaa_outcome_theme')
         program = super(ProgramAdminSerializer, self).create(validated_data)
         program.country.add(*country)
-        program.sector.add(*sector)
+        program.idaa_sector.add(*sector)
         program.idaa_outcome_theme.add(*idaa_outcome_theme)
         program.save()
 
@@ -417,7 +456,7 @@ class ProgramAdminSerializer(ModelSerializer):
         removed_countries = [x for x in original_countries if x not in incoming_countries]
 
         original_sectors = instance.sector.all()
-        incoming_sectors = validated_data.pop('sector')
+        incoming_sectors = validated_data.pop('idaa_sector')
         added_sectors = [x for x in incoming_sectors if x not in original_sectors]
         removed_sectors = [x for x in original_sectors if x not in incoming_sectors]
 
@@ -447,8 +486,8 @@ class ProgramAdminSerializer(ModelSerializer):
 
         instance.country.remove(*removed_countries)
         instance.country.add(*added_countries)
-        instance.sector.remove(*removed_sectors)
-        instance.sector.add(*added_sectors)
+        instance.idaa_sector.remove(*removed_sectors)
+        instance.idaa_sector.add(*added_sectors)
         instance.idaa_outcome_theme.remove(*removed_outcome_theme)
         instance.idaa_outcome_theme.add(*added_outcome_theme)
 
@@ -568,6 +607,10 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 queryset=IDAAOutcomeTheme.objects.select_related(None).order_by().only('id', 'name')
             ),
             models.Prefetch(
+                'idaa_sector',
+                queryset=IDAASector.objects.select_related(None).order_by().only('id')
+            ),
+            models.Prefetch(
                 'country',
                 queryset=Country.objects.select_related(None).order_by().only('id')
             ),
@@ -628,7 +671,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
 
         sectorFilter = params.getlist('sectors[]')
         if sectorFilter:
-            queryset = queryset.filter(sector__in=sectorFilter)
+            queryset = queryset.filter(idaa_sector__in=sectorFilter)
 
         usersFilter = params.getlist('users[]')
         if usersFilter:
