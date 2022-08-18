@@ -158,12 +158,14 @@ class ProgramDiscrepancies:
 class ProgramValidation(ProgramDiscrepancies):
     funded_str = 'Funded'
 
-    def __init__(self, idaa_program, msr_country_codes_list, msr_gaitid_list):
+    def __init__(self, idaa_program, msr_country_codes_list, msr_gaitid_list, duplicated_gaitids):
         self.idaa_program = idaa_program
         self._validated = False
 
         self.msr_country_codes_list = msr_country_codes_list
         self.msr_gaitid_list = msr_gaitid_list
+
+        self.duplicated_gaitids = [clean_idaa_gaitid(gaitid) for gaitid in duplicated_gaitids]
 
         super().__init__()
 
@@ -246,6 +248,20 @@ class ProgramValidation(ProgramDiscrepancies):
 
         return valid
 
+    def has_duplicated_gaitids(self):
+        """
+        Returns True if the program has a gaitid shared with another IDAA program else False
+        """
+        has_duplicates = False
+        gaitids = self.compressed_idaa_gaitids()
+
+        for gaitid in gaitids:
+            if gaitid in self.duplicated_gaitids:
+                self.add_discrepancy('duplicate_gaitid')
+                has_duplicates = True
+
+        return has_duplicates
+
     def missing_fields(self):
         """
         Checks that idaa_program is not missing any fields
@@ -275,9 +291,13 @@ class ProgramValidation(ProgramDiscrepancies):
             return False
 
         valid_gaitids = self.valid_gaitids()
+        # Check duplicated gaitids
+        if valid_gaitids:
+            has_duplicates = self.has_duplicated_gaitids()
+        
         matching_countries = self.matching_countries()
 
-        return not missing_fields and valid_gaitids and matching_countries
+        return not missing_fields and valid_gaitids and matching_countries and not has_duplicates
 
     def matching_countries(self):
         """
@@ -356,10 +376,12 @@ class ProgramValidation(ProgramDiscrepancies):
             # There is a case when a non-funded program can already have discrepancies at this point.
             # Clear all discrepancies just in case.
             self.clear_discrepancies()
+            self.has_duplicated_gaitids()
             return False
 
         # These discrepancies can come up while trying to retrieve the Tola program
         if self.has_discrepancy('multiple_programs') or self.has_discrepancy('gaitid'):
+            self.has_duplicated_gaitids()
             return False
 
         valid_idaa_program = self.valid_idaa_program()
@@ -379,13 +401,15 @@ class ProgramValidation(ProgramDiscrepancies):
 
 class ProgramUpload(ProgramValidation):
 
-    def __init__(self, idaa_program, msr_country_codes_list, msr_gaitid_list):
+    def __init__(self, idaa_program, msr_country_codes_list, msr_gaitid_list, duplicated_gaitids=None):
         self.idaa_program = idaa_program
 
         self.msr_country_codes_list = msr_country_codes_list
         self.msr_gaitid_list = msr_gaitid_list
 
-        super().__init__(idaa_program, msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list)
+        self.duplicated_gaitids = duplicated_gaitids
+
+        super().__init__(idaa_program, msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=duplicated_gaitids)
 
         self.tola_program = self.get_tola_programs()
         self.program_updated = False

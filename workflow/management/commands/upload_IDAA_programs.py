@@ -38,7 +38,7 @@ class Command(BaseCommand):
         msr_gaitid_list = AccessMSR().gaitid_list()
 
         # Logs any duplicated gaitids
-        check_IDAA_duplicates(idaa_programs)
+        duplicated_gaitids = check_IDAA_duplicates(idaa_programs)
 
         counts = {
             'created': 0,
@@ -49,8 +49,9 @@ class Command(BaseCommand):
 
         for program in idaa_programs:
             upload_program = ProgramUpload(
-                program['fields'], msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+                program['fields'], msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=duplicated_gaitids
             )
+
             if upload_program.is_valid():
                 if options['upload']:
                     upload_program.upload()

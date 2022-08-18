@@ -201,6 +201,46 @@ class MultipleProgramsTab(DiscrepancyReportTab):
         ]
 
 
+class DuplicateIDAAProgramsTab(DiscrepancyReportTab):
+    columns = [
+        "IDAA Program Name", "IDAA Program ID", "IDAA Gait IDs", "IDAA Countries", "IDAA Start Date", 
+        "IDAA End Date", "IDAA Program Status", "Notes"
+    ]
+    title = "Duplicate IDAA Programs"
+    discrepancies = ["duplicate_gaitid"]
+
+    def format_worksheet(self, worksheet, wide_cells=None, small_cells=None):
+        wide_cells = [self.columns.index('IDAA Program Name')]
+        small_cells = [self.columns.index('IDAA Program ID')]
+        return super().format_worksheet(worksheet, wide_cells, small_cells)
+
+    def sort_by_gaitids(self, programs):
+        """
+        Takes a list of programs formatted from super().populate()
+        Sorts the programs to have duplicates show as the next list item
+        """
+        sorted_programs = []
+        checked_ids = []
+        gaitid_key = self.columns.index('IDAA Gait IDs')
+        id_key = self.columns.index('IDAA Program ID')
+        for program in programs:
+            gaitids = [int(gaitid) for gaitid in program[gaitid_key].split(',')]
+            if program[id_key] in checked_ids:
+                continue
+            checked_ids.append(program[1])
+            sorted_programs.append(program)
+            for gaitid in gaitids:
+                for other_program in programs:
+                    if other_program[id_key] in checked_ids:
+                        continue
+                    other_gaitids = [int(gaitid) for gaitid in other_program[gaitid_key].split(',')]
+                    if gaitid in other_gaitids:
+                        sorted_programs.append(other_program)
+                        checked_ids.append(other_program[1])
+
+        return sorted_programs
+
+
 class OverviewTab(DiscrepancyReportTab):
     columns = range(2)  # columns as a range to work with inherited formating methods
     wide_cell_width = 120
@@ -209,11 +249,12 @@ class OverviewTab(DiscrepancyReportTab):
         {
             "header": "ORIENTATION",
             "body": [
-                "The Discrepancy Report is divided into 4 tabs:",
+                "The Discrepancy Report is divided into 5 tabs:",
                 "The first tab, titled Discrepancy Report Overview, provides explanation and instruction on what this Discrepancy Report is and how to use this to improve program data quality and consistency in TolaData ( and IDAA)."
                 "The second tab, titled IDAA Program to Multiple TolaData, identifies duplicated programs in TolaData, where there is one program in IDAA but this single program is broken out into multiple programs in TolaData. This often happens with multi-country programs, where each individual country decided to make their own version of the program in TolaData.",
                 "The third tab, titled MisMatching Fields, identifies existing programs in TolaData whose countries, dates and/or funding status do not match the data and information in IDAA. These discrepancies are not automatically corrected by the system given their sensitive nature. As a result, these discrepancies must be dealt with manually on a case-by-case basis.",
-                "The fourth and last tab, titled IDAA Program Has Missing Data, identifies programs in IDAA, which cannot be added or updated in TolaData due to data quality issues. These issues need to be addressed directly in IDAA before these programs can be added or updated in TolaData."
+                "The fourth tab, titled IDAA Program Has Missing Data, identifies programs in IDAA, which cannot be added or updated in TolaData due to data quality issues. These issues need to be addressed directly in IDAA before these programs can be added or updated in TolaData.",
+                "The fifth tab, titled Duplicate IDAA Programs, identifies programs in IDAA that have the same GAIT ID(s) assigned to them. A GAIT ID should only ever be assigned to one program. A single program may have multiple GAIT IDs associated to it, but a single GAIT ID should never be assigned to multiple programs. This check also attempts to address or prevent two possible undesireable scenarios: 1) many IDAA programs to one TolaData program and 2) many IDAA programs to many TolaData programs."
             ]
         },
         {
@@ -255,7 +296,7 @@ class OverviewTab(DiscrepancyReportTab):
 class GenerateDiscrepancyReport:
     file_path = path.join(path.dirname(path.abspath(__file__)), f'discrepancy_report_{date.today().isoformat()}.xlsx')
     _worksheet_mapper = [
-        OverviewTab, MultipleProgramsTab, MismatchingFieldsTab, IDAAInvalidFieldsTab
+        OverviewTab, MultipleProgramsTab, MismatchingFieldsTab, IDAAInvalidFieldsTab, DuplicateIDAAProgramsTab
     ]
     discrepancy_highlight = '40 % - Accent2'
     discrepancy_border = Border(left=Side(style='thin', color='fff00000'), 
@@ -322,9 +363,12 @@ class GenerateDiscrepancyReport:
         """
         Method to generate the discrepancy report
         """
+        duplicated_idaa_programs = []
         program_discrepancies = ProgramDiscrepancy.objects.all()
         overview_tab = OverviewTab()
         overview_tab.populate_static(self.wb[overview_tab.title])
+        duplicate_idaa_tab = DuplicateIDAAProgramsTab()
+        duplicate_idaa_worksheet = self.wb[duplicate_idaa_tab.title]
 
         for program_discrepancy in program_discrepancies:
             for worksheet_object in self._worksheet_mapper:
@@ -340,11 +384,14 @@ class GenerateDiscrepancyReport:
 
                 worksheet_tab = worksheet_object()
 
-                if worksheet_object is MultipleProgramsTab:
+                if isinstance(worksheet_tab, MultipleProgramsTab):
                     for tola_program in program_discrepancy.program.all():
                         row = worksheet_tab.populate(program_discrepancy.idaa_json, tola_program)
 
                         worksheet.append(row)
+                elif isinstance(worksheet_tab, DuplicateIDAAProgramsTab):
+                    row = worksheet_tab.populate(program_discrepancy, worksheet_discrepancies)
+                    duplicated_idaa_programs.append(row)
                 else:
                     row = worksheet_tab.populate(program_discrepancy, worksheet_discrepancies)
 
@@ -353,5 +400,10 @@ class GenerateDiscrepancyReport:
                     self.highlight_discrepancies(worksheet, worksheet_discrepancies, worksheet_object)
 
                 worksheet_tab.after_populate_format(worksheet)
+
+        rows = duplicate_idaa_tab.sort_by_gaitids(duplicated_idaa_programs)
+
+        for row in rows:
+            duplicate_idaa_worksheet.append(row)
 
         self.wb.save(self.file_path)

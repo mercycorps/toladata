@@ -48,23 +48,44 @@ class AccessMSR:
 
 
 def check_IDAA_duplicates(idaa_programs):
+    """
+    Loops through all idaa programs.
+    Checks if the gaitid for each program is a duplicate.
+    There are two type of duplicates that are being checked against. Overall duplicates and duplicates for report.
+    The overall duplicates are checking regardless of program status and generates a sharepoint list url that gets added to the logger.
+    The duplicates for report are checking only programs with the status of Funded or Concluded
+
+    Returns:
+        A set of duplicated gaitids for the report
+    """
     base_url = "https://mercycorpsemea.sharepoint.com/sites/MSRCommsSite/Lists/ProgramProjectID/AllItems.aspx?FilterFields1=GaitIDs&FilterTypes1=LookupMulti&FilterValues1="
     checked_gaitids = set()
     duplicated_gaitids = set()
+    gaitid_filter_values = set()
+    checked_for_report = set()
+    duplicates_for_report = set()
 
     for idaa_program in idaa_programs:
         idaa_fields = idaa_program['fields']
         program_status = idaa_fields.get('ProgramStatus', None)
-        if program_status == 'Funded':
-            gaitids = [gaitid['LookupValue'] for gaitid in idaa_fields['GaitIDs']]
+        gaitids = [gaitid['LookupValue'] for gaitid in idaa_fields['GaitIDs']]
 
-            for gaitid in gaitids:
-                if gaitid in checked_gaitids:
-                    gaitid = gaitid.replace('.', '%2E')
-                    duplicated_gaitids.add(gaitid)
+        for gaitid in gaitids:
+            if program_status in ['Funded', 'Concluded']:
+                if gaitid in checked_for_report:
+                    duplicates_for_report.add(gaitid)
                 else:
-                    checked_gaitids.add(gaitid)
+                    checked_for_report.add(gaitid)
+
+            if gaitid in checked_gaitids:
+                duplicated_gaitids.add(gaitid)
+                gaitid = gaitid.replace('.', '%2E')
+                gaitid_filter_values.add(gaitid)
+            else:
+                checked_gaitids.add(gaitid)
 
     if len(duplicated_gaitids):
-        filter_values = "%3B%23".join(duplicated_gaitids)
+        filter_values = "%3B%23".join(gaitid_filter_values)
         logger.exception(f"Found {len(duplicated_gaitids)} duplicated gaitids\nSharePoint URL for duplicated GaitIDs: {base_url + filter_values}")
+
+    return duplicates_for_report

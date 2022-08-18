@@ -21,6 +21,7 @@ class TestDiscrepancyReport(test.TestCase):
     idaa_sample_data_path = 'workflow/tests/idaa_sample_data/idaa_invalid_sample.json'
     discrepancy_report_path = f'workflow/discrepancy_report_{date.today().isoformat()}.xlsx'
     idaa_json = None
+    duplicated_gaitids = ["1111.0000000000"]
 
     def setUp(self):
         with open(self.idaa_sample_data_path) as file:
@@ -71,7 +72,7 @@ class TestDiscrepancyReport(test.TestCase):
     def test_discrepancy_report(self):
         for idaa_program in self.idaa_json['value']:
             upload_program = program.ProgramUpload(idaa_program=idaa_program['fields'], 
-                msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+                msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
             )
 
             self.assertFalse(upload_program.is_valid())
@@ -86,10 +87,11 @@ class TestDiscrepancyReport(test.TestCase):
 
     def assert_workbook(self, workbook):
         worksheets = [
-            {'class': discrepancy_report.OverviewTab, 'expected_rows': 16, 'id_col': None, 'expected_ids': None},
+            {'class': discrepancy_report.OverviewTab, 'expected_rows': 18, 'id_col': None, 'expected_ids': None},
             {'class': discrepancy_report.MultipleProgramsTab, 'expected_rows': 3, 'id_col': 'F', 'expected_ids': [3, 3]},
             {'class': discrepancy_report.MismatchingFieldsTab, 'expected_rows': 3, 'id_col': 'K', 'expected_ids': [2, 4]},
-            {'class': discrepancy_report.IDAAInvalidFieldsTab, 'expected_rows': 4, 'id_col': 'C', 'expected_ids': [1, 5, 6]}
+            {'class': discrepancy_report.IDAAInvalidFieldsTab, 'expected_rows': 4, 'id_col': 'C', 'expected_ids': [1, 5, 6]},
+            {'class': discrepancy_report.DuplicateIDAAProgramsTab, 'expected_rows': 3, 'id_col': 'B', 'expected_ids': [8, 9]}
         ]
 
         self.assertEquals(len(worksheets), len(workbook.worksheets))
