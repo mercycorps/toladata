@@ -801,6 +801,7 @@ class ProgramDiscrepancy(models.Model):
         "countries": "TolaData program countries does not match IDAA Country",
         "multiple_programs": "Multiple TolaData programs retrieved from IDAA program",
         "gaitid": "IDAA program has invalid Gait ID",
+        "duplicate_gaitid": "IDAA program has a duplicated gaitid",
         "ProgramName": "IDAA program is missing ProgramName",
         "id": "IDAA program is missing ID",
         "ProgramStartDate": "IDAA program is missing ProgramStartDate",

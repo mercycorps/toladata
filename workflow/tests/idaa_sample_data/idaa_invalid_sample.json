@@ -120,6 +120,37 @@
                 "ProgramStartDate": "2022-05-01T01:00:00Z",
                 "ProgramEndDate": "2023-05-01T01:00:00Z"
             }
+        },
+        {
+            "fields": {
+                "id": 8,
+                "ProgramName": "Test Duplicate IDAA Progam",
+                "GaitIDs": [
+                    {"LookupValue": "1111.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": [
+                    {"LookupValue": "Colombia"}
+                ],
+                "ProgramStartDate": "2022-05-01T01:00:00Z",
+                "ProgramEndDate": "2023-05-01T01:00:00Z"
+            }
+        },
+        {
+            "fields": {
+                "id": 9,
+                "ProgramName": "Test Duplicate IDAA Progam2",
+                "GaitIDs": [
+                    {"LookupValue": "1111.0000000000"},
+                    {"LookupValue": "1222.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": [
+                    {"LookupValue": "Colombia"}
+                ],
+                "ProgramStartDate": "2022-05-01T01:00:00Z",
+                "ProgramEndDate": "2023-05-01T01:00:00Z"
+            }
         }
     ]
 }

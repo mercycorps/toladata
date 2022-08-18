@@ -98,6 +98,24 @@
                 "_x0032_030OutcomeTheme": ["new", "program"],
                 "Sector": []
             }
+        },
+        {
+            "fields": {
+                "id": 1525,
+                "ProgramName": "Program Create Test ",
+                "GaitIDs": [
+                    {"LookupValue": "99999.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": [
+                    {"LookupValue": "HQ"}
+                ],
+                "Region": "HQ Managed",
+                "ProgramStartDate": "2023-04-29T07:00:00Z",
+                "ProgramEndDate": "2025-09-29T07:00:00Z",
+                "_x0032_030OutcomeTheme": ["new", "program"],
+                "Sector": []
+            }
         }
     ]
 }

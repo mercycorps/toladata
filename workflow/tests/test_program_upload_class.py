@@ -27,6 +27,7 @@ class TestProgramUpload(test.TestCase):
     new_idaa_program_index = 5
     idaa_json = None
     msr_json = None
+    duplicated_gaitids = ["99999.0000000000"]
 
     def setUp(self):
         """
@@ -99,7 +100,7 @@ class TestProgramUpload(test.TestCase):
         idaa_not_funded_index = 0
 
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_not_funded_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         self.assertFalse(upload_program.is_valid())
@@ -111,7 +112,7 @@ class TestProgramUpload(test.TestCase):
         expected_discrepancies = 0
 
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         self.assertTrue(upload_program.is_valid())
@@ -126,7 +127,7 @@ class TestProgramUpload(test.TestCase):
         expected_discrepancies = 0
 
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         self.assertTrue(upload_program.is_valid())
@@ -150,7 +151,7 @@ class TestProgramUpload(test.TestCase):
         }, create_country=False)
 
         upload_program = program.ProgramUpload(idaa_program=idaa_program,
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         self.assertFalse(upload_program.is_valid())
@@ -171,7 +172,7 @@ class TestProgramUpload(test.TestCase):
         idaa_program['GaitIDs'][0] = {'LookupValue': '1237a'}
 
         upload_program = program.ProgramUpload(idaa_program=idaa_program,
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         self.assertFalse(upload_program.is_valid())
@@ -190,7 +191,7 @@ class TestProgramUpload(test.TestCase):
         idaa_program['GaitIDs'] = []
 
         upload_program = program.ProgramUpload(idaa_program=idaa_program,
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         self.assertFalse(upload_program.is_valid())
@@ -211,7 +212,7 @@ class TestProgramUpload(test.TestCase):
             idaa_program[field] = ''
 
             upload_program = program.ProgramUpload(idaa_program=idaa_program,
-                msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+                msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
             )
 
             self.assertFalse(upload_program.is_valid())
@@ -226,7 +227,7 @@ class TestProgramUpload(test.TestCase):
         expected_discrepancies = 0
 
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         self.assertTrue(upload_program.is_valid())
@@ -239,10 +240,23 @@ class TestProgramUpload(test.TestCase):
         idaa_index = 3
 
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         self.assertRaises(Exception, upload_program.upload)
+
+    def test_duplicated_gaitid(self):
+        """
+        Test to check if a duplicated gaitid is properly assigned a discrepancy
+        """
+        idaa_index = 6
+
+        upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][idaa_index]['fields'],
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
+        )
+
+        self.assertFalse(upload_program.is_valid())
+        self.assertTrue(upload_program.has_discrepancy('duplicate_gaitid'))
 
     def test_program_update(self):
         """
@@ -259,7 +273,7 @@ class TestProgramUpload(test.TestCase):
         tola_program.save()
 
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         if upload_program.is_valid():
@@ -290,7 +304,7 @@ class TestProgramUpload(test.TestCase):
         new_gaitid.save()
 
         upload_program = program.ProgramUpload(idaa_program=self.idaa_json['value'][self.create_idaa_program_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
 
         if upload_program.is_valid():
@@ -320,7 +334,7 @@ class TestProgramUpload(test.TestCase):
 
         program_to_be_created = program.ProgramUpload(
             idaa_program=self.idaa_json['value'][self.new_idaa_program_index]['fields'],
-            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=self.msr_json
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=self.msr_json, duplicated_gaitids=self.duplicated_gaitids
             )
 
         if program_to_be_created.is_valid():
