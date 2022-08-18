@@ -6,7 +6,14 @@
 {% block content %}
 <div class="">
     {% blocktrans with id=program.id %}
-    <span class="program-period__link--{{ id }}"></span>
+    <span
+        id="id_link_reporting_period_{{ id }}"
+        class="program-period__link--{{ id }}"
+        data-progstart="{{ start_date }}"
+        data-progend="{{ end_date }}"
+        data-rptstart="{{ reporting_period_start }}"
+        data-rptend="{{ reporting_period_end }}"
+    ></span>
     {% endblocktrans %}
 </div>
 {% include 'indicators/indicator_reportingperiod_modal.html' with close_only=True %}
