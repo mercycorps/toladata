@@ -33,13 +33,13 @@ export default class EditProgramProfile extends React.Component {
 
     componentDidMount() {
         // Set the form to editable for demo, devs, and local servers
-        // let editableEnv = ["demo", "dev", "local"].reduce((editable, env) => {
-        //     if (!editable) editable = window.location.href.includes(env);
-        //     return editable;
-        // }, false)
-        // this.setState({
-        //     formEditable: editableEnv
-        // })
+        let editableEnv = ["demo", "dev", "local"].reduce((editable, env) => {
+            if (!editable) editable = window.location.href.includes(env);
+            return editable;
+        }, false)
+        this.setState({
+            formEditable: editableEnv
+        })
     }
 
     hasUnsavedDataAction() {
@@ -89,7 +89,7 @@ export default class EditProgramProfile extends React.Component {
         const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
         const selectedSectors = formdata.sector.map(x=>this.props.sectorOptions.find(y=>y.value==x));
         let sectionGaitFundDonor = formdata.gaitid.length > 0 ? formdata.gaitid : [{gaitid: null, fund_code: null, donor: null, donor_dept: null}];
-
+        console.log(formdata)
         return (
             <div className="tab-pane--react">
                 <h2 className="no-bold">{this.props.program_data.name ? this.props.program_data.name+': ' : ''}{gettext("Profile")}
@@ -163,7 +163,7 @@ export default class EditProgramProfile extends React.Component {
                     </div>
                     <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedCountries)}>
                         <label htmlFor="program-country-input" >{gettext("Countries")}</label>
-                        {/* {this.state.formEditable ? */}
+                        {!this.state.formEditable ?
                             <input
                                 type="text"                      
                                 value={this.createDisplayList(selectedCountries) || gettext("None")}
@@ -172,7 +172,7 @@ export default class EditProgramProfile extends React.Component {
                                 readOnly
                                 disabled={!this.state.formEditable}
                             />
-                        {/* :
+                        :
                             <CheckboxedMultiSelect
                                 value={selectedCountries}
                                 options={this.props.countryOptions}
@@ -180,12 +180,12 @@ export default class EditProgramProfile extends React.Component {
                                 className={classNames('react-select', {'is-invalid': this.formErrors('country')})}
                                 id="program-country-input"
                             />
-                        } */}
+                        }
                         <ErrorFeedback errorMessages={this.formErrors('country')} />
                     </div>
                     <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedSectors)}>
                         <label htmlFor="program-sectors-input">{gettext("Sectors")}</label>
-                        {/* {this.state.formEditable ?  */}
+                        {!this.state.formEditable ? 
                             <input
                                 type="text"                      
                                 value={this.createDisplayList(selectedSectors) || gettext("None Selected")}
@@ -194,7 +194,7 @@ export default class EditProgramProfile extends React.Component {
                                 readOnly
                                 disabled={!this.state.formEditable}
                             />
-                        {/* :
+                        :
                             <CheckboxedMultiSelect
                                 value={selectedSectors}
                                 options={this.props.sectorOptions}
@@ -202,7 +202,7 @@ export default class EditProgramProfile extends React.Component {
                                 className={classNames('react-select', {'is-invalid': this.formErrors('sector')})}
                                 id="program-sectors-input"
                             />
-                        } */}
+                        }
                         <ErrorFeedback errorMessages={this.formErrors('sector')} />
                     </div>
                     <div className="form-group" data-toggle="tooltip" title={this.createDisplayList(formdata.idaa_outcome_theme)}>
@@ -275,10 +275,10 @@ export default class EditProgramProfile extends React.Component {
                             </div>
                         )
                     })}
-                    {/* <div className="form-group btn-row">
+                    <div className="form-group btn-row">
                         <button className="btn btn-primary" type="button" onClick={(e) => this.saveNew(e)}>{gettext("Save Changes")}</button>
                         <button className="btn btn-reset" type="button" onClick={() => this.resetForm()}>{gettext("Reset")}</button>
-                    </div> */}
+                    </div>
                 </form>
             </div>
         )
