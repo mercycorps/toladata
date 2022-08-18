@@ -22,7 +22,6 @@ from django.http import QueryDict
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
-from django.contrib import admin
 from django.utils.functional import cached_property
 import django.template.defaultfilters
 
@@ -73,12 +72,6 @@ class IndicatorType(models.Model):
 
     def __str__(self):
         return self.indicator_type
-
-
-class IndicatorTypeAdmin(admin.ModelAdmin):
-    list_display = ('indicator_type', 'description', 'create_date',
-                    'edit_date')
-    display = 'Indicator Type'
 
 
 class StrategicObjective(SafeDeleteModel):
@@ -304,11 +297,6 @@ class Level(models.Model):
         return ['name', 'assumptions']
 
 
-class LevelAdmin(admin.ModelAdmin):
-    list_display = ('name')
-    display = 'Levels'
-
-
 class LevelTier(models.Model):
 
     MAX_TIERS = 8
@@ -439,7 +427,8 @@ class LevelTierTemplate(models.Model):
 
     class Meta:
         # Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.  There are several templates that users can choose from with different names for the Tiers.
-        verbose_name = _("Level tier templates")
+        verbose_name = _("Level Tier Templates")
+        verbose_name_plural = _("Level Tier Templates") # same as verbose_name
 
     def __str__(self):
         return ",".join(self.names)
@@ -677,6 +666,7 @@ class ReportingFrequency(models.Model):
 
     class Meta:
         verbose_name = _("Reporting Frequency")
+        verbose_name_plural = _("Reporting Frequencies")
         ordering = ['sort_order']
 
     def __str__(self):
@@ -694,15 +684,11 @@ class DataCollectionFrequency(models.Model):
 
     class Meta:
         verbose_name = _("Data Collection Frequency")
+        verbose_name_plural = _("Data Collection Frequencies")
         ordering = ['sort_order']
 
     def __str__(self):
         return self.frequency
-
-
-class DataCollectionFrequencyAdmin(admin.ModelAdmin):
-    list_display = ('frequency', 'description', 'create_date', 'edit_date')
-    display = 'Data Collection Frequency'
 
 
 class OutcomeTheme(models.Model):
@@ -718,6 +704,7 @@ class IDAAOutcomeTheme(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = _('IDAA Outcome Theme')
 
     def __str__(self):
         return self.name
@@ -737,11 +724,6 @@ class ExternalService(models.Model):
         return self.name
 
 
-class ExternalServiceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'url', 'feed_url', 'create_date', 'edit_date')
-    display = 'External Indicator Data Service'
-
-
 class ExternalServiceRecord(models.Model):
     external_service = models.ForeignKey(
         ExternalService, blank=True, null=True, on_delete=models.SET_NULL,
@@ -757,11 +739,6 @@ class ExternalServiceRecord(models.Model):
     def __str__(self):
         return self.full_url
 
-
-class ExternalServiceRecordAdmin(admin.ModelAdmin):
-    list_display = ('external_service', 'full_url', 'record_id', 'create_date',
-                    'edit_date')
-    display = 'Exeternal Indicator Data Service'
 
 # pylint: disable=W0223
 class DecimalSplit(models.Func):
@@ -1981,6 +1958,7 @@ class BulkIndicatorImportFile(models.Model):
     file_type = models.IntegerField(choices=FILE_TYPE_CHOICES)
     file_name = models.CharField(max_length=100)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='bulk_indicator_import_files')
+    # TODO: elsewhere we refer to users as tola_user or tolauser
     user = models.ForeignKey(
         TolaUser, on_delete=models.SET_NULL, related_name='bulk_indicator_import_files', null=True)
     create_date = models.DateTimeField(auto_now=True)
@@ -2273,12 +2251,6 @@ class PeriodicTarget(models.Model):
         return period_generator
 
 
-class PeriodicTargetAdmin(admin.ModelAdmin):
-    list_display = ('period', 'target', 'customsort',)
-    display = 'Indicator Periodic Target'
-    list_filter = ('period',)
-
-
 class ResultManager(models.Manager):
     def get_queryset(self):
         return super(ResultManager, self).get_queryset().prefetch_related(
@@ -2417,12 +2389,6 @@ class Result(models.Model):
         return [
             'id', 'date', 'target', 'value', 'outcome_themes', 'disaggregation_values', 'evidence_url',
             'evidence_name', 'sites']
-
-
-class ResultAdmin(admin.ModelAdmin):
-    list_display = ('indicator', 'date_collected', 'create_date', 'edit_date')
-    list_filter = ['indicator__program__country__country']
-    display = 'Indicator Output/Outcome Result'
 
 
 class PinnedReport(models.Model):
@@ -2575,3 +2541,6 @@ class PinnedReport(models.Model):
             report_type='timeperiods',
             query_string='timeperiods=7&timeframe=2&numrecentperiods=2',
         )
+
+    def __str__(self):
+        return self.name

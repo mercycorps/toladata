@@ -371,6 +371,9 @@ class AuditLogRationaleSelection(models.Model):
         """returns list of selected value names, human readable"""
         return [_(label) for (option, field, label) in self.ordered_options() if getattr(self, field, False)]
 
+    def __str__(self):
+        return ', '.join(self.pretty_list)
+
 
 class ProgramAuditLog(models.Model, DiffableLog):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="audit_logs")
