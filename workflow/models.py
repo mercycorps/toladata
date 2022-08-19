@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.contrib import admin
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth.models import User
 from decimal import Decimal
@@ -57,7 +56,7 @@ class IDAASector(models.Model):
     edit_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("Sector")
+        verbose_name = _("IDAA Sector") 
         ordering = ('sector',)
 
     def __str__(self):
@@ -113,11 +112,6 @@ class Organization(models.Model):
     @classmethod
     def mercy_corps(cls):
         return cls.objects.get(pk=cls.MERCY_CORPS_ID)
-
-
-class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'create_date', 'edit_date')
-    display = 'Organization'
 
 
 class Region(models.Model):
@@ -435,24 +429,6 @@ class TolaUserProxy(TolaUser):
         proxy = True
 
 
-class CountryAccessInline(admin.TabularInline):
-    model = CountryAccess
-    ordering = ('country',)
-
-class TolaUserAdmin(admin.ModelAdmin):
-
-    list_display = ('name', 'country')
-    display = 'Tola User'
-    list_filter = ('country', 'user__is_staff',)
-    search_fields = ('name', 'country__country', 'title')
-    inlines = (CountryAccessInline, )
-
-
-class SectorAdmin(admin.ModelAdmin):
-    list_display = ('sector', 'create_date', 'edit_date')
-    display = 'Sector'
-
-
 class ActiveProgramsMixin:
     """eliminates all non active programs"""
     qs_name = 'ActivePrograms'
@@ -529,15 +505,23 @@ class Program(models.Model):
     MIGRATED = 2 # programs created before satsuma which have switched to new RF levels
     RF_ALWAYS = 3 # programs created after satsuma release - on new RF levels with no option
 
-    legacy_gaitid = models.CharField(_("ID"), max_length=255, null=True, blank=True)
+    legacy_gaitid = models.CharField(_("Legacy GAIT ID"), max_length=255, null=True, blank=True)
     external_program_id = models.IntegerField(_('External program id'), null=True, blank=False)
     name = models.CharField(_("Program Name"), max_length=255, blank=True)
     funding_status = models.CharField(_("Funding Status"), max_length=255, blank=True)
     cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)  # Deprecated use program.gaitid.fund_code
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
-    idaa_sector = models.ManyToManyField(IDAASector, blank=True, verbose_name=_('Sector'))
-    idaa_outcome_theme = models.ManyToManyField('indicators.IDAAOutcomeTheme', blank=True)
+    idaa_sector = models.ManyToManyField(
+            IDAASector, 
+            blank=True, 
+            verbose_name=_('IDAA Sector'))
+    # NOTE: Participant Count "sectors" do not refer to either of these sector fields, but are actually disaggregation categories (DisaggregationLabel)
+    idaa_outcome_theme = models.ManyToManyField(
+            'indicators.IDAAOutcomeTheme', 
+            blank=True,
+            verbose_name=_('IDAA Outcome Theme')
+            )
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
     budget_check = models.BooleanField(_("Enable Approval Authority"), default=False)
@@ -801,6 +785,7 @@ class ProgramDiscrepancy(models.Model):
         "countries": "TolaData program countries does not match IDAA Country",
         "multiple_programs": "Multiple TolaData programs retrieved from IDAA program",
         "gaitid": "IDAA program has invalid Gait ID",
+        "duplicate_gaitid": "IDAA program has a duplicated gaitid",
         "ProgramName": "IDAA program is missing ProgramName",
         "id": "IDAA program is missing ID",
         "ProgramStartDate": "IDAA program is missing ProgramStartDate",
@@ -817,6 +802,15 @@ class ProgramDiscrepancy(models.Model):
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = _('Program discrepancy')
+        verbose_name_plural = _('Program discrepancies')
+
+    @property
+    def idaa_program_name(self):
+        result = self.idaa_json['ProgramName']
+        return result if result else _('(None)')
+
     def __str__(self):
         return self.idaa_json['ProgramName']
 
@@ -831,6 +825,8 @@ class GaitID(models.Model):
 
     class Meta:
         unique_together = ['gaitid', 'program']
+        verbose_name = 'GAIT ID'
+        verbose_name_plural = 'GAIT IDs'
 
     def fund_codes(self):
         return list(self.fund_code.values_list('fund_code', flat=True))
@@ -844,6 +840,10 @@ class FundCode(models.Model):
     gaitid = models.ForeignKey(GaitID, on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
+
+    @property
+    def program(self):
+        return self.gaitid.program
 
     class Meta:
         unique_together = ['fund_code', 'gaitid']
@@ -900,12 +900,8 @@ class ProfileType(models.Model):
         return self.profile
 
 
-class ProfileTypeAdmin(admin.ModelAdmin):
-    list_display = ('profile', 'create_date', 'edit_date')
-    display = 'ProfileType'
-
-
 # Add land classification - 'Rural', 'Urban', 'Peri-Urban', tola-help issue #162
+# TODO this may be unused? No data in the DB
 class LandType(models.Model):
     classify_land = models.CharField(_("Land Classification"), help_text=_("Rural, Urban, Peri-Urban"), max_length=100, blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
@@ -925,11 +921,6 @@ class LandType(models.Model):
     # displayed in admin templates
     def __str__(self):
         return self.classify_land
-
-
-class LandTypeAdmin(admin.ModelAdmin):
-    list_display = ('classify_land', 'create_date', 'edit_date')
-    display = 'Land Type'
 
 
 class SiteProfileManager(models.Manager):
@@ -1028,13 +1019,6 @@ class SiteProfile(models.Model):
     def __str__(self):
         new_name = self.name
         return new_name
-
-
-class SiteProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
-    list_filter = ('country__country')
-    search_fields = ('code', 'country__country')
-    display = 'SiteProfile'
 
 
 
