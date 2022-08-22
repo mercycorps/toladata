@@ -626,7 +626,7 @@ class Program(models.Model):
 
     @property
     def fund_codes(self):
-        return list(self.gaitid.values_list('fundcode', flat=True))
+        return list(self.gaitid.values_list('fundcode__fund_code', flat=True))
 
     @property
     def collected_record_count(self):
