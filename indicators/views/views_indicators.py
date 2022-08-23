@@ -1435,7 +1435,7 @@ class ParticipantCountFiscalExport(APIView):
     possible_outcome_themes = ['Economic Opportunity', 'Food Security', 'Good Governance and Peace', 'Resilience approach (tick this box if the program used a resilience approach)', 'Water Security']
     actual_list = ['Direct', 'Indirect']
     actual_keys = ['Actual without double counting', 'Actual with double counting']
-    sector_list = ['Agriculture', 'Cash and Voucher Assistance', 'Employment', 'Environment (DRR, Energy and Water)', 'Financial Services', 'Governance and Partnership',
+    sector_list = ['Agriculture', 'Cash and Voucher Assistance', 'Employment', 'Environment (DRR, Energy and Water)', 'Financial Services', 'Peace, Governance and Partnership',
                    'Public Health (non - nutrition, non - WASH)', 'Infrastructure (non - WASH, non - energy)', 'Nutrition', 'WASH']
     sector_keys = ['Sectors Direct with double counting', 'Sectors Indirect with double counting']
     sadd_list = ['Age Unknown M', 'Age Unknown F', 'Age Unknown Sex Unknown', '0-5 M', '0-5 F', '0-5 Sex Unknown', '6-9 M', '6-9 F', '6-9 Sex Unknown',
