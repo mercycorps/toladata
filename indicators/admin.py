@@ -195,6 +195,7 @@ class ExternalServiceRecordAdmin(admin.ModelAdmin):
 class PeriodicTargetAdmin(admin.ModelAdmin):
     list_display = ('period', 'target', 'customsort',)
     list_filter = ('period',)
+    search_fields = ('indicator',)
 
 
 @admin.register(Objective)
@@ -230,18 +231,38 @@ class StrategicObjectiveAdmin(admin.ModelAdmin):
 @admin.register(Result)
 class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     resource_class = ResultResource
-    list_display = ('indicator', 'program')
-    search_fields = ('indicator__name', 'program__name')
-    list_filter = ('indicator__program__country__country', 'program', 'approved_by')
-    # copied from duplicate in .models
-    # list_display = ('indicator', 'date_collected', 'create_date', 'edit_date')
-    # display = 'Indicator Output/Outcome Result'
+    list_display = (
+        'indicator',
+        'date_collected',
+        'program', 
+        'achieved', 
+        'create_date', 
+        'edit_date'
+    )
+    search_fields = (
+        'indicator__name', 
+        'program__name',
+        'periodic_target__period',
+    )
+    list_filter = ('indicator__program__country__country',)
+    readonly_fields = ('create_date', 'edit_date')
+    autocomplete_fields = (
+        'periodic_target', 
+        'approved_by',
+        'indicator', 
+        'program', 
+        'outcome_themes',
+        'site',
+    )
+    date_hierarchy = 'date_collected'
+    
 
 
 @admin.register(OutcomeTheme)
 class OutcomeThemeAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active', 'create_date')
     readonly_fields = ('create_date',)
+    search_fields = ('name',)
 
 
 #################
