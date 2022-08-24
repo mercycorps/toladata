@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-11 13:58-0700\n"
+"POT-Creation-Date: 2022-08-18 14:29-0700\n"
 "PO-Revision-Date: 2022-08-11 14:45-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,7 +19,6 @@ msgid "Import indicators.xlsx"
 msgstr "Import indicators.xlsx"
 
 #: js/base.js:17 js/pages/program_page/components/program_period.js:437
-#: js/pages/program_page/index.js:97
 msgid "Program period"
 msgstr "Période du programme"
 

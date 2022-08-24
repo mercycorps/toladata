@@ -20,6 +20,7 @@ from factory import (
 from factories.django_models import UserFactory, UserOnlyFactory
 from workflow.models import (
     Country,
+    IDAASector,
     Organization,
     ProfileType,
     Sector,
@@ -353,6 +354,13 @@ class SectorFactory(DjangoModelFactory):
         model = Sector
 
     sector = Sequence(lambda n: 'Sector {0}'.format(n))
+
+
+class IDAASectorFactory(DjangoModelFactory):
+    class Meta:
+        model = IDAASector
+
+    sector = Sequence(lambda n: f'Sector {n}')
 
 
 class ProfileType(DjangoModelFactory):
