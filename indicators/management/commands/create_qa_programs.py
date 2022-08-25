@@ -76,6 +76,7 @@ class Command(BaseCommand):
             'Karen': 'kbarkemeyer@mercycorps.org',
             'Marie': 'mbakke@mercycorps.org',
             'Marco': 'mscagliusi@mercycorps.org',
+            'Paul': 'psouders@mercycorps.org',
             'PaQ': None,
         }
 

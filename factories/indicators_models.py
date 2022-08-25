@@ -22,6 +22,7 @@ from indicators.models import (
     Result,
     ExternalService,
     ReportingFrequency,
+    IDAAOutcomeTheme,
     Indicator,
     IndicatorType,
     Level,
@@ -382,4 +383,12 @@ class OutcomeThemeFactory(DjangoModelFactory):
         model = OutcomeTheme
 
     name = Faker('text')
+    is_active = True
+
+
+class IDAAOutcomeThemeFactory(DjangoModelFactory):
+    class Meta:
+        model = IDAAOutcomeTheme
+
+    name = Sequence(lambda n: f'IDAAOutcometheme {n}')
     is_active = True

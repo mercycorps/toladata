@@ -6,9 +6,11 @@ from django.core import management
 from django.urls import reverse
 from factories.indicators_models import (
     DisaggregationTypeFactory,
-    IndicatorTypeFactory
+    IndicatorTypeFactory,
+    IDAAOutcomeThemeFactory
 )
-from factories.workflow_models import OrganizationFactory, TolaUserFactory, SectorFactory, CountryFactory
+from factories.workflow_models import OrganizationFactory, TolaUserFactory, SectorFactory, CountryFactory,\
+    IDAASectorFactory
 from factories.indicators_models import  ReportingFrequencyFactory
 from workflow.models import Program, Country, ProgramAccess, TolaUser
 from indicators.models import Indicator, IndicatorType, ReportingFrequency
@@ -27,6 +29,8 @@ class TestQAScript(test.TestCase):
         IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
         ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
         SectorFactory.create_batch(size=5)
+        IDAASectorFactory.create_batch(size=5)
+        IDAAOutcomeThemeFactory.create_batch(size=5)
         sys.stdout = io.StringIO()
         management.call_command('create_qa_programs', names='test_program', named_only=True)
         sys.stdout = sys.__stdout__
