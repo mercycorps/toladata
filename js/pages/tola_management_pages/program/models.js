@@ -11,6 +11,9 @@ export class ProgramStore {
     @observable users = {}
     @observable sectors = []
 
+    @observable idaa_sectors = []
+    @observable idaa_outcome_themes = []
+
     @observable filters = {
         countries: [],
         organizations: [],

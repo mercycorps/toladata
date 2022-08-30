@@ -19,8 +19,19 @@ from indicators.models import (
     DisaggregationType,
     DisaggregatedValue,
     LevelTier,
+    IDAAOutcomeTheme
 )
-from workflow.models import Program, Country, Organization, TolaUser, SiteProfile, Sector, GaitID
+from workflow.models import (
+    Program,
+    Country,
+    Organization,
+    TolaUser,
+    SiteProfile,
+    Sector,
+    GaitID,
+    FundCode,
+    IDAASector,
+)
 from indicators.views.views_indicators import generate_periodic_targets
 from indicators.utils import create_participant_count_indicator
 
@@ -37,8 +48,17 @@ class ProgramFactory:
         self.default_end_date = (self.default_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
 
     def create_gait_id(self, program_id):
-        gait_id = GaitID(gaitid=random.randint(1, 9999), program_id=program_id)
+        # Create unique GAIT ID
+        gid_exists = True
+        while gid_exists:
+            gaitid = random.randint(1, 99999)
+            gid_exists = GaitID.objects.filter(gaitid=gaitid).exists()
+        gait_id = GaitID(gaitid=gaitid, program_id=program_id)
+        gait_id.donor = "QATestDonor"
+        gait_id.donor_dept = "QATestDonorDept"
         gait_id.save()
+        fund_code = 12345
+        FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gait_id)
 
     def create_program(
             self, name, start_date=False, end_date=False, post_satsuma=True, multi_country=False, create_levels=True):
@@ -47,8 +67,11 @@ class ProgramFactory:
         if not end_date:
             end_date = self.default_end_date
 
+        external_program_id = random.randint(10000, 99999)
+
         program = Program.objects.create(**{
             'name': name,
+            'external_program_id': external_program_id,
             'start_date': start_date,
             'end_date': end_date,
             'reporting_period_start': start_date,
@@ -58,11 +81,21 @@ class ProgramFactory:
         })
         program.country.add(self.country)
 
-        self.create_gait_id(program.id)
-
         if multi_country:
             country2 = Country.objects.get(country="United States - MCNW")
             program.country.add(country2)
+
+        self.create_gait_id(program.id)
+
+        idaa_sectors = IDAASector.objects.all()
+        idaa_sector_list = list(idaa_sectors.exclude(sector="(Empty)"))
+        idaa_sector = random.choice(idaa_sector_list)
+        program.idaa_sector.add(idaa_sector)
+
+        idaa_outcome_themes = IDAAOutcomeTheme.objects.all()
+        idaa_outcome_themes_list = list(idaa_outcome_themes.exclude(name="(Empty)"))
+        idaa_outcometheme = random.choice(idaa_outcome_themes_list)
+        program.idaa_outcome_theme.add(idaa_outcometheme)
 
         if create_levels:
             self.create_levels(program, deepcopy(self.sample_levels))

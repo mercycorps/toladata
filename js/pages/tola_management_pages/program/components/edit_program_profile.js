@@ -112,7 +112,7 @@ export default class EditProgramProfile extends React.Component {
     render() {
         const formdata = this.state.managed_data;
         const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
-        const selectedSectors = formdata.sector.map(x=>this.props.sectorOptions.find(y=>y.value==x));
+        const selectedSectors = formdata.idaa_sector.map(x=>this.props.sectorOptions.find(y=>y.value==x));
         const fundingStatusOptions = [{value: 0, label: gettext("Funded")}, {value: 1, label: gettext("Completed")}];
         // let sectionGaitFundDonor = this.state.formEditable || formdata.gaitid.length === 0 ? Array(5).fill({gaitid: null, fund_code: null, donor: null, donor_dept: null}) : formdata.gaitid;
         let sectionGaitFundDonor = this.state.formEditable || formdata.gaitid.length === 0 ? [{gaitid: null, fund_code: null, donor: null, donor_dept: null}] : formdata.gaitid;
