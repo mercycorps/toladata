@@ -232,17 +232,14 @@
 .profile__table {
     display: flex;
     justify-content: space-between;
-    .header {
-        font-size: 85%;
-    }
 }
 .profile-table__column {
     &--left {
-        width: 13%;
+        width: 14%;
         margin-right: 1rem;
     }
     &--middle {
-        width: 22%;
+        width: 21%;
         margin-right: 1rem;
     }
     &--right {
