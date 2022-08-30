@@ -738,6 +738,11 @@ class ProgramUpload(ProgramValidation):
                         gid.donor_dept = donor_dept
                     gid.save()
 
+        program_discrepancies = self.get_program_discrepancies()
+        
+        if program_discrepancies:
+            program_discrepancies.delete()
+
         idaa_user = self.get_idaa_user()
         ProgramAdminAuditLog.created(new_tola_program, idaa_user, new_tola_program.idaa_logged_fields)
 

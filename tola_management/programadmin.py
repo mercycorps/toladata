@@ -267,6 +267,7 @@ class NestedIDAAOutcomeThemeSerializer(Serializer):
 
 class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(allow_null=True, required=False)
+    external_program_id = IntegerField(allow_null=True, required=False)
     name = CharField(required=True, max_length=255)
     funding_status = CharField(required=True)
     gaitid = NestedGaitIDSerializer(required=True, many=True)
@@ -296,6 +297,7 @@ class ProgramAdminSerializer(ModelSerializer):
         model = Program
         fields = (
             'id',
+            'external_program_id',
             'name',
             'funding_status',
             'gaitid',

@@ -22,6 +22,7 @@ from indicators.models import (
 )
 from workflow.models import Program, Country, Organization, TolaUser, SiteProfile, Sector, GaitID
 from indicators.views.views_indicators import generate_periodic_targets
+from indicators.utils import create_participant_count_indicator
 
 
 class ProgramFactory:
@@ -87,6 +88,14 @@ class ProgramFactory:
             level.program = program
             level.save()
             level_map[level_fix['pk']] = level
+            if not parent and program.reporting_period_end >= date(2021, 7, 1):
+                ProgramFactory.create_pc_indicator(program, level)
+
+    @staticmethod
+    def create_pc_indicator(program, level):
+        disaggregations = DisaggregationType.objects.filter(
+            global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
+        create_participant_count_indicator(program, level, disaggregations)
 
 
 class IndicatorFactory:

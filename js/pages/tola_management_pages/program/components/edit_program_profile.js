@@ -148,14 +148,14 @@ export default class EditProgramProfile extends React.Component {
                         <input
                             type="text"
                             id="program-id-input"
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('id') })}
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('external_program_id') })}
                             maxLength={4}
                             required
                             disabled={!this.state.formEditable}
-                            value={formdata.id}
-                            onChange={(e) => this.updateFormField('id', e.target.value.replace(/[^0-9]/g, "")) }
+                            value={formdata.external_program_id || ''}
+                            onChange={(e) => this.updateFormField('external_program_id', e.target.value.replace(/[^0-9]/g, "")) }
                         />
-                        <ErrorFeedback errorMessages={this.formErrors('id')} />
+                        <ErrorFeedback errorMessages={this.formErrors('external_program_id')} />
                     </div>
                     <div className="form-group">
                         <label htmlFor="program-start-date">{gettext("Program start date")}</label>
