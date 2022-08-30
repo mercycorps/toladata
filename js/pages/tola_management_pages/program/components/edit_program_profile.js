@@ -117,9 +117,9 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-id-input">{gettext("Program ID")}</label>
                         <input
                             type="text"
-                            value={formdata.id}
-                            onChange={(e) => this.updateFormField('id', e.target.value) }
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('id') })}
+                            value={formdata.external_program_id}
+                            onChange={(e) => this.updateFormField('external_program_id', e.target.value) }
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('external_program_id') })}
                             id="program-id-input"
                             disabled={!this.state.formEditable}
                             />
