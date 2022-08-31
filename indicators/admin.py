@@ -230,9 +230,10 @@ class PeriodicTargetAdmin(admin.ModelAdmin):
 
 @admin.register(Objective)
 class ObjectiveAdmin(admin.ModelAdmin):
-    list_display = ('program', 'name')
+    autocomplete_fields = ('program',)
+    list_display = ('name', 'program')
     search_fields = ('name', 'program__name')
-    list_filter = (CountryFilter,)   # ('program__country__country',)
+    list_filter = (ProgramFilter, CountryFilter) 
 
     def get_queryset(self, request):
         queryset = super(ObjectiveAdmin, self).get_queryset(request)
