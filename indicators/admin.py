@@ -30,6 +30,8 @@ from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
+from admin_auto_filters.filters import AutocompleteFilter, AutocompleteFilterFactory
+
 
 DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
 DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
@@ -124,6 +126,21 @@ class CountryFilter(admin.SimpleListFilter):
                 queryset = queryset.filter(country=self.value())
         return queryset
 
+
+# Autocomplete filters
+class ProgramFilter(AutocompleteFilter):
+    title = 'Program'
+    field_name = 'program'
+
+
+class ApprovedByFilter(AutocompleteFilter):
+    title = 'Originator'
+    field_name = 'approved_by'
+
+
+class IndicatorFilter(AutocompleteFilter):
+    title = 'Indicator'
+    field_name = 'indicator'
 
 
 ###########
@@ -232,10 +249,12 @@ class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     resource_class = ResultResource
     list_display = ('indicator', 'program')
     search_fields = ('indicator__name', 'program__name')
-    list_filter = ('indicator__program__country__country', 'program', 'approved_by')
-    # copied from duplicate in .models
-    # list_display = ('indicator', 'date_collected', 'create_date', 'edit_date')
-    # display = 'Indicator Output/Outcome Result'
+    list_filter = (
+        ProgramFilter, 
+        IndicatorFilter,
+        ApprovedByFilter,
+        'indicator__program__country__country', 
+    )
 
 
 @admin.register(OutcomeTheme)
