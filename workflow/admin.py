@@ -5,6 +5,8 @@ from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 
+from admin_auto_filters.filters import AutocompleteFilterFactory
+
 #from tola.util import getCountry, get_GAIT_data
 from tola import util
 from .models import (
@@ -186,5 +188,6 @@ class FundCodeAdmin(admin.ModelAdmin):
     readonly_fields = ('program',)
     autocomplete_fields = ('gaitid',)
     search_fields = ('fund_code', 'gaitid__gaitid') # TODO: add program property
+    list_filter = (AutocompleteFilterFactory('Program', 'gaitid__program'),)
 
 
