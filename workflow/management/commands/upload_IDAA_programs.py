@@ -93,7 +93,7 @@ class Command(BaseCommand):
     @staticmethod
     def email_notifications(today, start_time, end_time, counts, uploaded_programs):
         created_programs = '\n'.join([created.name for created in uploaded_programs['created']])
-        updated_programs = '\n'.join([updated.name for updated in uploaded_programs['created']])
+        updated_programs = '\n'.join([updated.name for updated in uploaded_programs['updated']])
         message = (f"Start time: {start_time}\n"
                    f"End time: {end_time}\n"
                    f"Total IDAA programs: {counts['total']}\n"
