@@ -88,8 +88,11 @@ class ArchivedFilter(BooleanListFilterWithDefault):
         return 0
 
 
-class IndicatorListFilter(admin.SimpleListFilter):
-    title = "Program"
+class ProgramByUserFilter(admin.SimpleListFilter):
+    """
+    Creates a list filter for Programs in the active user's country
+    """
+    title = "Program (in your country)"
     parameter_name = 'program'
 
     def lookups(self, request, model_admin):
@@ -183,9 +186,14 @@ class ResultResource(resources.ModelResource):
 @admin.register(Indicator)
 class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     resource_class = IndicatorResource
-    list_display = ('indicator_types', 'name', 'sector')
+    list_display = ('name', 'indicator_types', 'sector')
     search_fields = ('name', 'number', 'program__name')
-    list_filter = (IndicatorListFilter, 'sector')
+    list_filter = (
+        ProgramFilter,
+        ProgramByUserFilter, 
+        'indicator_type',
+        'sector'
+    )
     filter_horizontal = ('objectives', 'strategic_objectives', 'disaggregation')
 
     def get_queryset(self, request):
