@@ -129,6 +129,12 @@ class Command(BaseCommand):
             indicatorless_levels.append(top_level_id)
         else:
             indicatorless_levels = [int(tier_depth/2)]
+
+        # Create pc indicator
+        if program.reporting_period_end >= date(2021, 7, 1):
+            top_level = Level.objects.filter(program=program, parent__isnull=True)[0]
+            program_factory.create_pc_indicator(program, top_level)
+
         indicator_factory = IndicatorFactory(program, tolaland)
         indicator_factory.create_standard_indicators(indicatorless_levels=indicatorless_levels)
 

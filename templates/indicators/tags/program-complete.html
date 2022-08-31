@@ -3,20 +3,14 @@
     <div class="fas fa-calendar"></div>
     <p>
         {% blocktrans %}
-            <a
+            <span
                 id="id_link_reporting_period_{{ program.id }}"
-                class=""
-                href="#"
-                data-toggle="modal"
-                data-program="{{ program.id }}"
+                class="program-period__button--{{ program.id }}"
                 data-progstart="{{ program.start_date }}"
                 data-progend="{{ program.end_date }}"
                 data-rptstart="{{ program.reporting_period_start }}"
                 data-rptend="{{ program.reporting_period_end }}"
-                data-target="#id_reporting_period_modal"
-                data-read-only="{{ read_only }}">
-                Program period
-            </a>
+            ></span>
             is <br><strong class="text-dark">{{ program.percent_complete }}% complete</strong>
         {% endblocktrans %}
     </p>
