@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.contrib import admin
-
+from admin_auto_filters.filters import AutocompleteFilter
 from tola_management.models import (
     CountryAdminAuditLog,
     OrganizationAdminAuditLog,
@@ -11,13 +10,42 @@ from tola_management.models import (
     UserManagementAuditLog,
 )
 
+
+######################
+# Autocomplete filters
+######################
+
+class AdminUserFilter(AutocompleteFilter):
+    title = 'Admin user'
+    field_name = 'admin_user'
+
+
+class UserFilter(AutocompleteFilter):
+    title = 'User'
+    field_name = 'user'
+
+
+class ProgramFilter(AutocompleteFilter):
+    title = 'Program'
+    field_name = 'program'
+
+
+class ModifiedUserFilter(AutocompleteFilter):
+    title = 'Modified User'
+    field_name = 'modified_user'
+
+
+######################
+# Custom admin screens
+######################
+
 @admin.register(UserManagementAuditLog)
 class UserManagementAuditLogAdmin(admin.ModelAdmin):
     autocomplete_fields = ('admin_user', 'modified_user')
     readonly_fields = ('date',)
     list_display = ('date', 'admin_user', 'modified_user', 'change_type')
     search_fields = ('admin_user', 'modified_user')
-    list_filter = ('change_type',)
+    list_filter = ('change_type', AdminUserFilter, ModifiedUserFilter)
 
 
 @admin.register(ProgramAuditLog)
@@ -26,7 +54,7 @@ class ProgramAuditLogAdmin(admin.ModelAdmin):
     readonly_fields = ('rationale_selections', 'date')
     list_display = ('date', 'change_type', 'user', 'program', 'indicator', 'level')
     search_fields = ('user__name', 'program__name', 'indicator__name', 'level__name')
-    list_filter = ('change_type',)
+    list_filter = ('change_type', UserFilter, ProgramFilter)
 
 
 @admin.register(ProgramAdminAuditLog)
@@ -35,7 +63,7 @@ class ProgramAdminAuditLogAdmin(admin.ModelAdmin):
     readonly_fields = ('date',)
     list_display = ('date', 'admin_user', 'program', 'change_type')
     search_fields = ('admin_user__name', 'program__name',)
-    list_filter = ('change_type',)
+    list_filter = ('change_type', AdminUserFilter, ProgramFilter)
     
 
 @admin.register(OrganizationAdminAuditLog)
@@ -44,7 +72,7 @@ class OrganizationAdminAuditLogAdmin(admin.ModelAdmin):
     readonly_fields = ('date',)
     list_display = ('date', 'admin_user', 'organization', 'change_type')
     search_fields = ('admin_user__name',)
-    list_filter = ('change_type', 'organization__name')
+    list_filter = ('change_type', AdminUserFilter, 'organization__name')
 
 
 @admin.register(CountryAdminAuditLog)
@@ -53,4 +81,4 @@ class CountryAdminAuditLogAdmin(admin.ModelAdmin):
     readonly_fields = ('date',)
     list_display = ('date', 'admin_user', 'country', 'change_type')
     search_fields = ('admin_user__name', 'disaggregation_type__disaggregation_type')
-    list_filter = ('change_type', 'country')
+    list_filter = ('change_type', AdminUserFilter, 'country')
