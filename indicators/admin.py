@@ -412,6 +412,7 @@ class LevelAdmin(admin.ModelAdmin):
     list_display = ('name', 'parent', 'program', 'customsort', 'create_date', 'edit_date')
     autocomplete_fields = ('parent', 'program')
     search_fields = ('name', 'parent__name', 'program__name')
+    list_filter = (ProgramFilter,)
 
 
 @admin.register(DataCollectionFrequency)
