@@ -185,6 +185,7 @@ class ResultResource(resources.ModelResource):
 
 @admin.register(Indicator)
 class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    autocomplete_fields = ('program',)
     resource_class = IndicatorResource
     list_display = ('name', 'indicator_types', 'sector')
     search_fields = ('name', 'number', 'program__name')
@@ -218,9 +219,13 @@ class ExternalServiceRecordAdmin(admin.ModelAdmin):
 
 @admin.register(PeriodicTarget)
 class PeriodicTargetAdmin(admin.ModelAdmin):
-    list_display = ('period', 'target', 'customsort',)
-    list_filter = ('period',)
-    search_fields = ('indicator',)
+    autocomplete_fields = ('indicator',)
+    list_display = ('period', 'target', 'customsort', 'indicator')
+    search_fields = ('indicator', 'period',)
+    list_filter = (
+        IndicatorFilter,
+        AutocompleteFilterFactory('Program', 'indicator__program')
+    )
 
 
 @admin.register(Objective)
