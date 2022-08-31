@@ -53,9 +53,9 @@ const SectorFilter = observer(({store, filterOptions}) => {
     return <div className="form-group react-multiselect-checkbox">
         <label htmlFor="sector-filter">{gettext("Sectors")}</label>
         <CheckboxedMultiSelect
-            value={store.filters.sectors}
+            value={store.filters.idaa_sectors}
             options={filterOptions}
-            onChange={(e) => store.changeFilter('sectors', e)}
+            onChange={(e) => store.changeFilter('idaa_sectors', e)}
             placeholder={gettext("None Selected")}
             id="sector-filter" />
     </div>
@@ -151,7 +151,7 @@ export const IndexView = observer(
         const allCountryOptions = sortObjectListByValue(Object.entries(store.allCountries).map(([id, country]) => ({value: country.id, label: country.name})))
         const countryFilterOptions = sortObjectListByValue(Object.entries(store.countries).map(([id, country]) => ({value: country.id, label: country.name})))
         const organizationFilterOptions = sortObjectListByValue(Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name})))
-        const sectorFilterOptions = sortObjectListByValue(store.sectors.map(x => ({value: x.id, label: x.name})))
+        const idaaSectorFilterOptions = sortObjectListByValue(store.idaa_sectors.map(x => ({value: x.id, label: x.name})));
         const programFilterOptions = sortObjectListByValue(Object.entries(store.programFilterPrograms).map(([id, program]) => ({value: program.id, label: program.name})))
         const userFilterOptions = sortObjectListByValue(Object.entries(store.users).map(([id, user]) => ({value: user.id, label: user.name})))
         const bulkProgramStatusOptions = [
@@ -193,7 +193,7 @@ export const IndexView = observer(
                     <CountryFilter store={store} filterOptions={countryFilterOptions} />
                     <UserFilter store={store} filterOptions={userFilterOptions} />
                     <OrganizationFilter store={store} filterOptions={organizationFilterOptions} />
-                    <SectorFilter store={store} filterOptions={sectorFilterOptions} />
+                    <SectorFilter store={store} filterOptions={idaaSectorFilterOptions} />
                     <ProgramStatusFilter store={store} />
                 </div>
                 <div className="filter-section filter-buttons">
@@ -252,7 +252,7 @@ export const IndexView = observer(
                                                             program_data={data}
                                                             onUpdate={(id, data) => store.updateProgram(id, data)}
                                                             onCreate={(new_program_data) => store.saveNewProgram(new_program_data)}
-                                                            sectorOptions={sectorFilterOptions}
+                                                            idaaSectorOptions={idaaSectorFilterOptions}
                                                             countryOptions={allCountryOptions}
                                                             errors={store.editing_errors} />
                                                 </LoadingSpinner>

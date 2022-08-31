@@ -37,6 +37,7 @@ from rest_framework import viewsets, pagination, status, permissions
 from django.contrib.auth.models import User
 
 from workflow.models import (
+    IDAASector,
     TolaUser,
     Organization,
     Program,
@@ -201,6 +202,13 @@ def get_program_page_context(request):
         } for sector in Sector.objects.all() if sector.sector
     ]
 
+    idaa_sectors = [
+        {
+            'id': sector.id,
+            'name': sector.sector
+        } for sector in IDAASector.objects.all() if sector.sector
+    ]
+
     users = {
         user.id: {
             'id': user.id,
@@ -215,6 +223,7 @@ def get_program_page_context(request):
         'users': users,
         'programFilterPrograms': programs,
         'sectors': sectors,
+        'idaa_sectors': idaa_sectors,
         'country_filter': country_filter,
         'organization_filter': organization_filter,
         'users_filter': users_filter,

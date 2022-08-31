@@ -36,7 +36,8 @@ from workflow.models import (
     ProgramAccess,
     CountryAccess,
     GaitID,
-    FundCode
+    FundCode,
+    IDAASector
 )
 
 from indicators.models import (
@@ -222,12 +223,12 @@ class Paginator(pagination.PageNumberPagination):
         return response
 
 
-class NestedSectorSerializer(Serializer):
+class NestedIDAASectorSerializer(Serializer):
     def to_representation(self, sector):
         return sector.id
 
     def to_internal_value(self, data):
-        sector = Sector.objects.get(pk=data)
+        sector = IDAASector.objects.get(pk=data)
         return sector
 
 
@@ -261,7 +262,11 @@ class NestedIDAAOutcomeThemeSerializer(Serializer):
         return [outcome_theme.id, outcome_theme.name]
 
     def to_internal_value(self, data):
-        idaa_outcome_theme = IDAAOutcomeTheme.objects.get(pk=data)
+        if type(data) is list:
+            pk = data[0]
+        else:
+            pk = data
+        idaa_outcome_theme = IDAAOutcomeTheme.objects.get(pk=pk)
         return idaa_outcome_theme
 
 
@@ -273,7 +278,7 @@ class ProgramAdminSerializer(ModelSerializer):
     gaitid = NestedGaitIDSerializer(required=True, many=True)
     fundCode = CharField(required=False, allow_blank=True, allow_null=True, source='cost_center')
     description = CharField(allow_null=True, allow_blank=True)
-    sector = NestedSectorSerializer(required=True, many=True)
+    idaa_sector = NestedIDAASectorSerializer(required=True, many=True)
     country = NestedCountrySerializer(required=True, many=True)
     auto_number_indicators = BooleanField(required=False)
     #organizations = IntegerField(source='organization_count', read_only=True)
@@ -303,7 +308,7 @@ class ProgramAdminSerializer(ModelSerializer):
             'gaitid',
             'fundCode',
             'description',
-            'sector',
+            'idaa_sector',
             'country',
             'organizations',
             'program_users',
@@ -418,8 +423,8 @@ class ProgramAdminSerializer(ModelSerializer):
         added_countries = [x for x in incoming_countries if x not in original_countries]
         removed_countries = [x for x in original_countries if x not in incoming_countries]
 
-        original_sectors = instance.sector.all()
-        incoming_sectors = validated_data.pop('sector')
+        original_sectors = instance.idaa_sector.all()
+        incoming_sectors = validated_data.pop('idaa_sector')
         added_sectors = [x for x in incoming_sectors if x not in original_sectors]
         removed_sectors = [x for x in original_sectors if x not in incoming_sectors]
 
@@ -449,8 +454,8 @@ class ProgramAdminSerializer(ModelSerializer):
 
         instance.country.remove(*removed_countries)
         instance.country.add(*added_countries)
-        instance.sector.remove(*removed_sectors)
-        instance.sector.add(*added_sectors)
+        instance.idaa_sector.remove(*removed_sectors)
+        instance.idaa_sector.add(*added_sectors)
         instance.idaa_outcome_theme.remove(*removed_outcome_theme)
         instance.idaa_outcome_theme.add(*added_outcome_theme)
 
@@ -570,6 +575,10 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 queryset=IDAAOutcomeTheme.objects.select_related(None).order_by().only('id', 'name')
             ),
             models.Prefetch(
+                'idaa_sector',
+                queryset=IDAASector.objects.select_related(None).order_by().only('id')
+            ),
+            models.Prefetch(
                 'country',
                 queryset=Country.objects.select_related(None).order_by().only('id')
             ),
@@ -628,9 +637,9 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         if countryFilter:
             queryset = queryset.filter(country__in=countryFilter)
 
-        sectorFilter = params.getlist('sectors[]')
+        sectorFilter = params.getlist('idaa_sectors[]')
         if sectorFilter:
-            queryset = queryset.filter(sector__in=sectorFilter)
+            queryset = queryset.filter(idaa_sector__in=sectorFilter)
 
         usersFilter = params.getlist('users[]')
         if usersFilter:

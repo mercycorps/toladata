@@ -21,6 +21,7 @@ const {
     users,
     programFilterPrograms,
     sectors,
+    idaa_sectors,
 } = jsContext
 
 /* formatting filters to be used by the ProgramStore */
@@ -41,7 +42,8 @@ const initialData = {
     programFilterPrograms,
     sectors,
     filters,
-    users
+    users,
+    idaa_sectors
 }
 const store = new ProgramStore(
     api,
