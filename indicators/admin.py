@@ -438,6 +438,7 @@ class LevelTierAdmin(admin.ModelAdmin):
     autocomplete_fields = ('program',)
     list_display = ('name', 'program', 'tier_depth', 'create_date', 'edit_date')
     search_fields = ('name', 'program__name',)
+    list_filter = (ProgramFilter, 'tier_depth')
 
 
 @admin.register(LevelTierTemplate)
