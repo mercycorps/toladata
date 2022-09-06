@@ -121,7 +121,8 @@ export default class EditUserProfile extends React.Component {
     }
 
     resetForm() {
-        const selected_organization = this.state.organization_listing.find(o => o.value == this.state.original_user_data.organization_id)
+        // For ticket #1445 reseting the organization_id to null will display the placeholder for react-select
+        const selected_organization = this.state.original_user_data.organization_id == null ? null : this.state.organization_listing.find(o => o.value == this.state.original_user_data.organization_id);
         this.setState({
             managed_user_data: this.state.original_user_data,
             selected_organization
