@@ -28,6 +28,7 @@ from workflow.models import (
     Program,
     CountryAccess,
     ProgramAccess,
+    IDAASector,
     GaitID,
     PROGRAM_ROLE_CHOICES,
     COUNTRY_ROLE_CHOICES
@@ -353,6 +354,13 @@ class SectorFactory(DjangoModelFactory):
         model = Sector
 
     sector = Sequence(lambda n: 'Sector {0}'.format(n))
+
+
+class IDAASectorFactory(DjangoModelFactory):
+    class Meta:
+        model = IDAASector
+
+    sector = Sequence(lambda n: f'Sector {n}')
 
 
 class ProfileType(DjangoModelFactory):
