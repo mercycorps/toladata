@@ -45,7 +45,8 @@ const initialData = {
     idaa_sectors,
     idaa_outcome_themes,
     filters,
-    users
+    users,
+    idaa_sectors
 }
 const store = new ProgramStore(
     api,

@@ -10,6 +10,7 @@ export class ProgramStore {
     @observable organizations = {}
     @observable users = {}
     @observable sectors = []
+    @observable idaa_sectors = []
 
     @observable idaa_sectors = []
     @observable idaa_outcome_themes = []
@@ -18,6 +19,7 @@ export class ProgramStore {
         countries: [],
         organizations: [],
         sectors: [],
+        idaa_sectors: [],
         programStatus: null,
         programs: [],
         users: []
@@ -256,7 +258,7 @@ export class ProgramStore {
                 funding_status: "Funded",
                 description: "",
                 country: [],
-                sector: [],
+                idaa_sector: [],
                 idaa_outcome_theme: [],
             }
             this.programs.unshift(new_program_data)

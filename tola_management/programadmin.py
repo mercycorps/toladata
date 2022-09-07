@@ -284,7 +284,11 @@ class NestedIDAAOutcomeThemeSerializer(Serializer):
         return [outcome_theme.id, outcome_theme.name]
 
     def to_internal_value(self, data):
-        idaa_outcome_theme = IDAAOutcomeTheme.objects.get(pk=data)
+        if type(data) is list:
+            pk = data[0]
+        else:
+            pk = data
+        idaa_outcome_theme = IDAAOutcomeTheme.objects.get(pk=pk)
         return idaa_outcome_theme
 
 
@@ -455,7 +459,7 @@ class ProgramAdminSerializer(ModelSerializer):
         added_countries = [x for x in incoming_countries if x not in original_countries]
         removed_countries = [x for x in original_countries if x not in incoming_countries]
 
-        original_sectors = instance.sector.all()
+        original_sectors = instance.idaa_sector.all()
         incoming_sectors = validated_data.pop('idaa_sector')
         added_sectors = [x for x in incoming_sectors if x not in original_sectors]
         removed_sectors = [x for x in original_sectors if x not in incoming_sectors]
@@ -669,7 +673,7 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         if countryFilter:
             queryset = queryset.filter(country__in=countryFilter)
 
-        sectorFilter = params.getlist('sectors[]')
+        sectorFilter = params.getlist('idaa_sectors[]')
         if sectorFilter:
             queryset = queryset.filter(idaa_sector__in=sectorFilter)
 
