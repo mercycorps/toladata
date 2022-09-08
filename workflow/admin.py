@@ -5,6 +5,8 @@ from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 
+from admin_auto_filters.filters import AutocompleteFilterFactory
+
 #from tola.util import getCountry, get_GAIT_data
 from tola import util
 from .models import (
@@ -121,7 +123,7 @@ class SiteProfileAdmin(ImportExportModelAdmin):
 class ProgramAdmin(admin.ModelAdmin):
     list_display = ('name', 'countries', 'gaitids', 'budget_check', 'funding_status', 'gaitids')
     search_fields = ('name', 'gaitid__gaitid')
-    list_filter = ('funding_status', 'country', 'budget_check', 'funding_status')
+    list_filter = ('funding_status', 'country', 'budget_check', 'funding_status', 'sector')
     readonly_fields = ('start_date', 'end_date', 'reporting_period_start', 'reporting_period_end', 'gaitids')
     inlines = (ProgramAccessInline,)
     autocomplete_fields = ('sector', 'idaa_sector', 'idaa_outcome_theme', 'country')
@@ -178,6 +180,7 @@ class GaitIDAdmin(admin.ModelAdmin):
     list_display = ('gaitid', 'program', 'create_date', 'edit_date')
     search_fields = ('gaitid', 'program__name',)
     autocomplete_fields = ('program',)
+    list_filter = (AutocompleteFilterFactory('Program', 'program'),)
 
 
 @admin.register(FundCode)
@@ -185,6 +188,7 @@ class FundCodeAdmin(admin.ModelAdmin):
     list_display = ('fund_code', 'gaitid', 'program', 'create_date', 'edit_date')
     readonly_fields = ('program',)
     autocomplete_fields = ('gaitid',)
-    search_fields = ('fund_code', 'gaitid__gaitid') # TODO: add program property
+    search_fields = ('fund_code', 'gaitid__gaitid')
+    list_filter = (AutocompleteFilterFactory('Program', 'gaitid__program'),)
 
 
