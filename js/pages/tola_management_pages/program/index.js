@@ -22,6 +22,7 @@ const {
     programFilterPrograms,
     sectors,
     idaa_sectors,
+    idaa_outcome_themes,
 } = jsContext
 
 /* formatting filters to be used by the ProgramStore */
@@ -41,6 +42,8 @@ const initialData = {
     organizations,
     programFilterPrograms,
     sectors,
+    idaa_sectors,
+    idaa_outcome_themes,
     filters,
     users,
     idaa_sectors

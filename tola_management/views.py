@@ -49,7 +49,7 @@ from workflow.models import (
     COUNTRY_ROLE_CHOICES,
     PROGRAM_ROLE_CHOICES
 )
-
+from indicators.models import IDAAOutcomeTheme
 from tola_management.models import (
     UserManagementAuditLog,
     OrganizationAdminAuditLog
@@ -209,6 +209,13 @@ def get_program_page_context(request):
         } for sector in IDAASector.objects.all() if sector.sector
     ]
 
+    idaa_outcome_themes = [
+        {
+            'id': outcome_theme.id,
+            'name': outcome_theme.name
+        } for outcome_theme in IDAAOutcomeTheme.objects.all() if outcome_theme.name
+    ]
+
     users = {
         user.id: {
             'id': user.id,
@@ -224,6 +231,7 @@ def get_program_page_context(request):
         'programFilterPrograms': programs,
         'sectors': sectors,
         'idaa_sectors': idaa_sectors,
+        'idaa_outcome_themes': idaa_outcome_themes,
         'country_filter': country_filter,
         'organization_filter': organization_filter,
         'users_filter': users_filter,

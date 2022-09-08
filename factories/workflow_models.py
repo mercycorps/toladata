@@ -20,6 +20,7 @@ from factory import (
 from factories.django_models import UserFactory, UserOnlyFactory
 from workflow.models import (
     Country,
+    IDAASector,
     Organization,
     ProfileType,
     Sector,

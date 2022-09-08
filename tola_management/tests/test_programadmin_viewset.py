@@ -42,7 +42,6 @@ class TestProgramBaseFields(test.TestCase):
         self.assertEqual(data['name'], SPECIAL_CHARS)
         self.assertEqual(data['funding_status'], 'funded')
         self.assertEqual(data['gaitid'][0]['gaitid'], 123456)
-        self.assertEqual(data['description'], 'A description')
         self.assertEqual(data['id'], program.pk)
 
     def test_program_sector_info(self):

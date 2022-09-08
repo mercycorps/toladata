@@ -717,8 +717,8 @@ class Program(models.Model):
             'funding_status': self.funding_status,
             'cost_center': self.cost_center,
             'description': self.description,
-            'sectors': ','.join([s.sector for s in self.sector.all()]),
-            'countries': ','.join([c.country for c in self.country.all()])
+            'sectors': ','.join(sorted([s.sector for s in self.sector.all()])),
+            'countries': ','.join(sorted([c.country for c in self.country.all()]))
         }
 
     @property
@@ -733,9 +733,9 @@ class Program(models.Model):
             "external_program_id": self.external_program_id,
             "start_date": str(self.start_date),
             "end_date": str(self.end_date),
-            "sectors": ','.join([s.sector for s in self.idaa_sector.all()]),
-            'countries': ','.join([c.country for c in self.country.all()]),
-            'outcome_themes': ','.join([ot.name for ot in self.idaa_outcome_theme.all()])
+            "sectors": ','.join(sorted([s.sector for s in self.idaa_sector.all()])),
+            'countries': ','.join(sorted([c.country for c in self.country.all()])),
+            'outcome_themes': ','.join(sorted([ot.name for ot in self.idaa_outcome_theme.all()]))
         }
 
     @property
