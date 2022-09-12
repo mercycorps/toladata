@@ -295,9 +295,9 @@ class ProgramValidation(ProgramDiscrepancies):
         if valid_gaitids:
             has_duplicates = self.has_duplicated_gaitids()
         
-        matching_countries = self.matching_countries()
+        self.matching_countries()
 
-        return not missing_fields and valid_gaitids and matching_countries and not has_duplicates
+        return not missing_fields and valid_gaitids and not has_duplicates and not self.has_discrepancy('Country')
 
     def matching_countries(self):
         """
@@ -309,7 +309,15 @@ class ProgramValidation(ProgramDiscrepancies):
         matching = True
 
         if self.tola_program_exists:
-            tola_program_country_codes = [country.code for country in self.tola_program.country.all()]
+            if isinstance(self.tola_program, QuerySet):
+                tola_program_country_codes = []
+                for tola_program in self.tola_program:
+                    tola_program_country_codes.extend([country.code for country in tola_program.country.all()])
+            else:
+                tola_program_country_codes = [country.code for country in self.tola_program.country.all()]
+
+            # Convert to a set to remove duplicated codes in the cases of mulitple_programs
+            tola_program_country_codes = set(tola_program_country_codes)
 
         if len(tola_program_country_codes) == 0 and self.tola_program_exists:
             self.add_discrepancy(discrepancy)
@@ -344,9 +352,9 @@ class ProgramValidation(ProgramDiscrepancies):
         Validation for tola programs
         - countries match
         """
-        return self.matching_countries()
+        self.matching_countries()
 
-    def valid_tracking_dates(self):
+    def valid_tracking_dates(self, tola_program):
         """
         Called from update in the case of a Tola program updating the start and or end dates.
         Checks if the programs editable dates (reporting_period_) falls in the range of the uneditable dates
@@ -354,8 +362,8 @@ class ProgramValidation(ProgramDiscrepancies):
         valid = False
 
         try:
-            if (self.tola_program.start_date <= self.tola_program.reporting_period_start <= self.tola_program.end_date) \
-                and (self.tola_program.start_date <= self.tola_program.reporting_period_end <= self.tola_program.end_date):
+            if (tola_program.start_date <= tola_program.reporting_period_start <= tola_program.end_date) \
+                and (tola_program.start_date <= tola_program.reporting_period_end <= tola_program.end_date):
 
                 valid = True
         except TypeError:
@@ -380,7 +388,7 @@ class ProgramValidation(ProgramDiscrepancies):
             return False
 
         # These discrepancies can come up while trying to retrieve the Tola program
-        if self.has_discrepancy('multiple_programs') or self.has_discrepancy('gaitid'):
+        if self.has_discrepancy('gaitid'):
             self.has_duplicated_gaitids()
             return False
 
@@ -388,11 +396,11 @@ class ProgramValidation(ProgramDiscrepancies):
 
         # Validate the Tola program if one exists
         if self.tola_program_exists:
-            valid_tola_program = self.valid_tola_program()
+            self.valid_tola_program()
 
-            self._validated = valid_idaa_program and valid_tola_program
+            self._validated = valid_idaa_program
 
-            return valid_idaa_program and valid_tola_program
+            return valid_idaa_program
 
         self._validated = valid_idaa_program
 
@@ -417,6 +425,10 @@ class ProgramUpload(ProgramValidation):
     @property
     def new_upload(self):
         return not self.tola_program_exists
+
+    @property
+    def multiple_tola_programs(self):
+        return isinstance(self.tola_program, QuerySet)
 
     def get_country_admin_emails(self, program):
         """
@@ -475,11 +487,10 @@ class ProgramUpload(ProgramValidation):
             return None
 
     @transaction.atomic
-    def update(self):
+    def update(self, tola_program):
         """
         Updates an existing Tola program with data from IDAA
         """
-        program_updated = False
         program_fields = [
             {'idaa': 'ProgramName', 'tola': 'name'},
             {'idaa': 'id', 'tola': 'external_program_id'},
@@ -488,9 +499,10 @@ class ProgramUpload(ProgramValidation):
             {'idaa': 'ProgramEndDate', 'tola': 'end_date'}
         ]
         idaa_gaitids = self.compressed_idaa_gaitids()
-        program_before_update = self.tola_program.idaa_logged_fields
+        program_before_update = tola_program.idaa_logged_fields
         # Boolean to track if the program in TolaData had updates to either the start_date or end_date
         updated_dates = False
+        program_updated = False
 
         for program_field in program_fields:
             idaa_value = self.idaa_program[program_field['idaa']]
@@ -498,19 +510,19 @@ class ProgramUpload(ProgramValidation):
             if program_field['idaa'] == 'ProgramStartDate' or program_field['idaa'] == 'ProgramEndDate':
                 idaa_value = datetime.datetime.strptime(idaa_value, '%Y-%m-%dT%H:%M:%SZ').date()
 
-            tola_value = getattr(self.tola_program, program_field['tola'])
+            tola_value = getattr(tola_program, program_field['tola'])
 
             if str(tola_value) != str(idaa_value):
-                setattr(self.tola_program, program_field['tola'], idaa_value)
+                setattr(tola_program, program_field['tola'], idaa_value)
                 program_updated = True
 
-                self.tola_program.save()
+                tola_program.save()
 
                 if isinstance(tola_value, datetime.date):
                     updated_dates = True
 
         if updated_dates:
-            self.valid_tracking_dates()
+            self.valid_tracking_dates(tola_program)
 
         if 'Sector' in self.idaa_program:
             idaa_sectors = [sector['LookupValue'] for sector in self.idaa_program['Sector']]
@@ -519,13 +531,13 @@ class ProgramUpload(ProgramValidation):
             for sector in idaa_sectors:
                 sector_obj, _ = models.IDAASector.objects.get_or_create(sector=sector)
 
-                if sector_obj not in self.tola_program.idaa_sector.all():
-                    self.tola_program.idaa_sector.add(sector_obj.id)
+                if sector_obj not in tola_program.idaa_sector.all():
+                    tola_program.idaa_sector.add(sector_obj.id)
                     program_updated = True
 
             # Tola program has more sectors than the idaa program. Need to delete the extra from the Tola program
-            if self.tola_program.idaa_sector.all().count() > len(idaa_sectors):
-                for tola_sector in self.tola_program.idaa_sector.all():
+            if tola_program.idaa_sector.all().count() > len(idaa_sectors):
+                for tola_sector in tola_program.idaa_sector.all():
                     if tola_sector.sector not in idaa_sectors:
                         tola_sector.delete()
                         program_updated = True
@@ -536,11 +548,11 @@ class ProgramUpload(ProgramValidation):
             for outcome_theme in idaa_outcome_themes:
                 outcome_theme_obj, _ = IDAAOutcomeTheme.objects.get_or_create(name=outcome_theme)
 
-                if outcome_theme_obj not in self.tola_program.idaa_outcome_theme.all():
-                    self.tola_program.idaa_outcome_theme.add(outcome_theme_obj.id)
+                if outcome_theme_obj not in tola_program.idaa_outcome_theme.all():
+                    tola_program.idaa_outcome_theme.add(outcome_theme_obj.id)
                     program_updated = True
 
-            tola_outcome_themes = self.tola_program.idaa_outcome_theme.all()
+            tola_outcome_themes = tola_program.idaa_outcome_theme.all()
 
             # Tola program has more outcome themes than the idaa program. Need to delete the extra from the Tola program
             if tola_outcome_themes.count() > len(idaa_outcome_themes):
@@ -549,19 +561,10 @@ class ProgramUpload(ProgramValidation):
                         tola_outcome_theme.delete()
                         program_updated = True
 
-        idaa_countries = [country['LookupValue'] for country in self.idaa_program['Country']]
-
-        for idaa_country in idaa_countries:
-            country = self.get_tola_country(idaa_country, self.msr_country_codes_list)
-
-            if country and country not in self.tola_program.country.all():
-                self.tola_program.country.add(country)
-                program_updated = True
-
         for idaa_gaitid in idaa_gaitids:
             gaitid_details = get_gaitid_details(idaa_gaitid, self.msr_gaitid_list)
 
-            gaitid_obj, created = models.GaitID.objects.get_or_create(gaitid=idaa_gaitid, program=self.tola_program)
+            gaitid_obj, created = models.GaitID.objects.get_or_create(gaitid=idaa_gaitid, program=tola_program)
 
             if created:
                 program_updated = True
@@ -588,7 +591,7 @@ class ProgramUpload(ProgramValidation):
                         logger.exception(f'Recieved invalid fundcode {fund_code}. IDAA program id {self.idaa_program["id"]}')
 
         # Compare gaitids between Tola and IDAA
-        for tola_gaitid in self.tola_program.gaitid.all():
+        for tola_gaitid in tola_program.gaitid.all():
             # Tola gaitid is not in idaa_gaitids delete the tola gaitid
             if str(tola_gaitid.gaitid) not in idaa_gaitids:
                 # Need to delete gaitid
@@ -598,7 +601,7 @@ class ProgramUpload(ProgramValidation):
         program_discrepancies = self.get_program_discrepancies()
 
         # Check valid_tracking_dates for cases where the program has the discrepancy, but the tracking dates were manually updated
-        if program_discrepancies and self.valid_tracking_dates():
+        if program_discrepancies and self.valid_tracking_dates(tola_program):
             program_discrepancies.delete()
 
         if updated_dates:
@@ -606,27 +609,27 @@ class ProgramUpload(ProgramValidation):
             # plain_message shows if the browser/email client does not support html
             plain_message = (
                 "Dear TolaData Country Administrator,\n"
-                f"The official program dates of {self.tola_program.name} were updated based on new information from the Identification Assignment Assistant (IDAA). As a result, the Indicator Tracking Period may need to be updated too. Please coordinate with the program team members to review and update the Indicator Tracking Period, if necessary.\n"
+                f"The official program dates of {tola_program.name} were updated based on new information from the Identification Assignment Assistant (IDAA). As a result, the Indicator Tracking Period may need to be updated too. Please coordinate with the program team members to review and update the Indicator Tracking Period, if necessary.\n"
                 "For instructions on how to perform Country Administrator functions, please visit the TolaData User Guide. https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide \n\n"
                 "Cher administrateur de pays TolaData,\n"
-                f"Les dates officielles du programme {self.tola_program.name} ont été mises à jour sur la base de nouvelles informations provenant de l'Assistant pour l'Attribution de l'Identification (IDAA). Par conséquent, il se peut que la Période de Suivi des Indicateurs doive également être mise à jour. Veuillez vous coordonner avec les membres de l'équipe du programme pour revoir et mettre à jour la Période de Suivi des Indicateurs, si nécessaire.\n"
+                f"Les dates officielles du programme {tola_program.name} ont été mises à jour sur la base de nouvelles informations provenant de l'Assistant pour l'Attribution de l'Identification (IDAA). Par conséquent, il se peut que la Période de Suivi des Indicateurs doive également être mise à jour. Veuillez vous coordonner avec les membres de l'équipe du programme pour revoir et mettre à jour la Période de Suivi des Indicateurs, si nécessaire.\n"
                 "Pour obtenir des instructions sur la façon d'exécuter les fonctions de l'administrateur de pays, veuillez consulter le Guide de l'Utilisateur de TolaData. https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide \n\n"
                 "Estimado Administrador de País de TolaData,\n"
-                f"Las fechas oficiales del programa {self.tola_program.name} fueron actualizadas en base a la nueva información del Asistente de Asignación de Identificación (IDAA). Como resultado, el Período de Seguimiento del Indicador puede necesitar ser actualizado también. Por favor, coordine con los miembros del equipo del programa para revisar y actualizar el Período de Seguimiento del Indicador, si es necesario.\n"
+                f"Las fechas oficiales del programa {tola_program.name} fueron actualizadas en base a la nueva información del Asistente de Asignación de Identificación (IDAA). Como resultado, el Período de Seguimiento del Indicador puede necesitar ser actualizado también. Por favor, coordine con los miembros del equipo del programa para revisar y actualizar el Período de Seguimiento del Indicador, si es necesario.\n"
                 "Para obtener instrucciones sobre cómo realizar las funciones de Administrador del País, por favor visite la Guía del Usuario de TolaData. https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide"
             )
             html_message = (
                 "<p>Dear TolaData Country Administrator,</p>"
-                f"<p>The official program dates of {self.tola_program.name} were updated based on new information from the Identification Assignment Assistant (IDAA). As a result, the Indicator Tracking Period may need to be updated too. Please coordinate with the program team members to review and update the Indicator Tracking Period, if necessary.</p>"
+                f"<p>The official program dates of {tola_program.name} were updated based on new information from the Identification Assignment Assistant (IDAA). As a result, the Indicator Tracking Period may need to be updated too. Please coordinate with the program team members to review and update the Indicator Tracking Period, if necessary.</p>"
                 "<p>For instructions on how to perform Country Administrator functions, please visit the <a href='https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide'>TolaData User Guide.</a></p>"
                 "<p style='margin-top:36px'>Cher administrateur de pays TolaData,</p>"
-                f"<p>Les dates officielles du programme {self.tola_program.name} ont été mises à jour sur la base de nouvelles informations provenant de l'Assistant pour l'Attribution de l'Identification (IDAA). Par conséquent, il se peut que la Période de Suivi des Indicateurs doive également être mise à jour. Veuillez vous coordonner avec les membres de l'équipe du programme pour revoir et mettre à jour la Période de Suivi des Indicateurs, si nécessaire.</p>"
+                f"<p>Les dates officielles du programme {tola_program.name} ont été mises à jour sur la base de nouvelles informations provenant de l'Assistant pour l'Attribution de l'Identification (IDAA). Par conséquent, il se peut que la Période de Suivi des Indicateurs doive également être mise à jour. Veuillez vous coordonner avec les membres de l'équipe du programme pour revoir et mettre à jour la Période de Suivi des Indicateurs, si nécessaire.</p>"
                 "<p>Pour obtenir des instructions sur la façon d'exécuter les fonctions de l'administrateur de pays, veuillez consulter <a href='https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide'>le Guide de l'Utilisateur de TolaData.</a></p>"
                 "<p style='margin-top:36px'>Estimado Administrador de País de TolaData,</p>"
-                f"<p>Las fechas oficiales del programa {self.tola_program.name} fueron actualizadas en base a la nueva información del Asistente de Asignación de Identificación (IDAA). Como resultado, el Período de Seguimiento del Indicador puede necesitar ser actualizado también. Por favor, coordine con los miembros del equipo del programa para revisar y actualizar el Período de Seguimiento del Indicador, si es necesario.</p>"
+                f"<p>Las fechas oficiales del programa {tola_program.name} fueron actualizadas en base a la nueva información del Asistente de Asignación de Identificación (IDAA). Como resultado, el Período de Seguimiento del Indicador puede necesitar ser actualizado también. Por favor, coordine con los miembros del equipo del programa para revisar y actualizar el Período de Seguimiento del Indicador, si es necesario.</p>"
                 "<p>Para obtener instrucciones sobre cómo realizar las funciones de Administrador del País, por favor visite <a href='https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide'>la Guía del Usuario de TolaData.</a></p>"
             )
-            admin_emails = self.get_country_admin_emails(self.tola_program)
+            admin_emails = self.get_country_admin_emails(tola_program)
             if len(admin_emails) > 0:
                 try:
                     if not settings.SKIP_USER_EMAILS:
@@ -635,15 +638,20 @@ class ProgramUpload(ProgramValidation):
                         # For QA log the email
                         logger.info(f"To:{admin_emails}\n{subject_line}\n{plain_message}")
                 except SMTPException as e:
-                    logger.exception(f"Unknown Error When Sending Email for Updated Dates.\nTolaData Program ID: {self.tola_program.id}\nReciepent List: {admin_emails}\nException: {e}")
+                    logger.exception(f"Unknown Error When Sending Email for Updated Dates.\nTolaData Program ID: {tola_program.id}\nReciepent List: {admin_emails}\nException: {e}")
             else:
-                logger.exception(f"{subject_line}\n{plain_message}\nNo Basic Administrators are assigned to {self.tola_program.countries}. Please assign a Basic Administrator(s) to this country.")
+                logger.exception(f"{subject_line}\n{plain_message}\nNo Basic Administrators are assigned to {tola_program.countries}. Please assign a Basic Administrator(s) to this country.")
 
         if program_updated:
             idaa_user = self.get_idaa_user()
-            ProgramAdminAuditLog.updated(self.tola_program, idaa_user, program_before_update, self.tola_program.idaa_logged_fields)
+            ProgramAdminAuditLog.updated(tola_program, idaa_user, program_before_update, tola_program.idaa_logged_fields)
 
-        self.program_updated = program_updated
+        if not self.program_updated:
+            self.program_updated = program_updated
+
+    def bulk_update(self):
+        for tola_program in self.tola_program:
+            self.update(tola_program)
 
     @transaction.atomic
     def create(self):
@@ -798,4 +806,7 @@ class ProgramUpload(ProgramValidation):
         if self.new_upload:
             self.create()
         else:
-            self.update()
+            if self.multiple_tola_programs:
+                self.bulk_update()
+            else:
+                self.update(self.tola_program)
