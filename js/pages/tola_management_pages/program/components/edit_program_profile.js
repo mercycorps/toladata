@@ -1,9 +1,14 @@
-import React from 'react'
-import Select from 'react-select'
-import { observer } from "mobx-react"
-import CheckboxedMultiSelect from 'components/checkboxed-multi-select'
-import classNames from 'classnames'
-import HelpPopover from '../../../../components/helpPopover.js'
+import React, { useState } from 'react';
+import Select, { NonceProvider } from 'react-select';
+import { observer } from "mobx-react";
+import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
+import classNames from 'classnames';
+import HelpPopover from '../../../../components/helpPopover.js';
+import Datepicker, {registerLocale} from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
+import es from 'date-fns/locale/es';
+registerLocale('es', es)
+import ReactDatepicker from "../../../../components/ReactDatepicker.js";
 
 
 const ErrorFeedback = observer(({errorMessages}) => {
@@ -159,15 +164,17 @@ export default class EditProgramProfile extends React.Component {
                     </div>
                     <div className="form-group">
                         <label htmlFor="program-start-date">{gettext("Program start date")}</label>
-                        <input
-                            type="text"
-                            id="program-start-date"
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('start-date') })}
-                            disabled={!this.state.formEditable}
-                            value={formdata.start_date}
-                            onChange={(e) => this.updateFormField('start-date', e.target.value) }
+                        <ReactDatepicker
+                            dateFormat="yyyy-MM-dd"
+                            customDatesSelector={false}
+                            locale={window.userLang}
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('start-date') })}                
+                            date={formdata.start_date}
+                            minDate={new Date().setFullYear(new Date().getFullYear() - 10)}
+                            maxDate={window.localDateFromISOStr(formdata.end_date)}
+                            onChange={(date) => this.updateFormField('start_date', `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`) }
                         />
-                        <ErrorFeedback errorMessages={this.formErrors('start-date')} />
+                        <ErrorFeedback errorMessages={this.formErrors('start_date')} />
                     </div>
                     <div className="form-group">
                         <label htmlFor="program-end-date">{gettext("Program end date")}</label>
