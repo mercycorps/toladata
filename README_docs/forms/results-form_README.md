@@ -20,7 +20,7 @@
 - Fiscal year
 - Outcome theme
 - Actual value
-    --Direct
+    - Direct
         - without double counting
         - with double counting
     - Indirect
