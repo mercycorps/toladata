@@ -386,6 +386,18 @@ LOGGING = {
             'filename': 'django_info.log',
             'formatter': 'standard'
         },
+        'sharepoint_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'sharepoint_info.log',
+            'formatter': 'standard'
+        },
+        'program_upload': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'program_upload.log',
+            'formatter': 'standard'
+        },
         'admin_email': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
@@ -402,6 +414,16 @@ LOGGING = {
             'handlers': ['file', 'admin_email'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        'workflow.utils': {
+            'handlers': ['sharepoint_file'],
+            'level': 'INFO',
+            'propagate': True
+        },
+        'workflow.management.commands.upload_IDAA_programs': {
+            'handlers': ['program_upload'],
+            'level': 'INFO',
+            'propagate': True
         },
         'indicators': {
             'handlers': ['file', 'admin_email'],

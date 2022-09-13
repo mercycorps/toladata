@@ -15,7 +15,15 @@ class AccessMSR:
         login_url = f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token'
         data = {'grant_type': 'client_credentials', 'scope': 'https://graph.microsoft.com/.default',
                 'client_id': client_id, 'client_secret': client_secret}
-        access_token = requests.post(login_url, data=data).json()['access_token']
+        access_token = requests.post(login_url, data=data)
+
+        logger.info(f'Access Token. Status Code: {access_token.status_code}. Response Time: {access_token.elapsed}')
+        try:
+            access_token.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            logger.exception(f'Failed SharePoint request when retrieving the Access Token. Error: {e}')
+
+        access_token = access_token.json()['access_token']
         msrcomms_id = settings.MSRCOMMS_ID
         base_url = f'https://graph.microsoft.com/v1.0/sites/{msrcomms_id}/lists/'
         sharepoint_url = base_url + f'{list_id}/items'
@@ -23,13 +31,25 @@ class AccessMSR:
                   'Content_Type': 'application/json;odata=verbose'}
         headers = {'Authorization': 'Bearer {}'.format(access_token)}
         response = requests.get(sharepoint_url, headers=headers, params=params)
+
+        self.log_list_request(list_id, response)
+
         json_data = response.json()['value']
         next_url = response.json()['@odata.nextLink']
         while next_url:
             response = requests.get(next_url, headers=headers, params=params)
+            self.log_list_request(list_id, response)
             json_data += response.json()['value']
             next_url = response.json()['@odata.nextLink'] if '@odata.nextLink' in response.json() else None
         return json_data
+
+    @staticmethod
+    def log_list_request(list_id, response):
+        logger.info(f'List ID: {list_id}. Status Code: {response.status_code}. Response Time: {response.elapsed}')
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            logger.exception(f'Failed SharePoint request when retrieving list ID: {list_id}. Error: {e}')
 
     def gaitid_list(self):
         gaitid_list_id = settings.GAITID_LIST_ID
