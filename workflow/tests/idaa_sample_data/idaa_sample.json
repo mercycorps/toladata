@@ -116,6 +116,25 @@
                 "_x0032_030OutcomeTheme": ["new", "program"],
                 "Sector": []
             }
+        },
+        {
+            "fields": {
+                "id": 9720,
+                "ProgramName": "Test idaa program to multiple",
+                "GaitIDs": [
+                    {"LookupValue": "8425.0000000000"},
+                    {"LookupValue": "10726.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": [
+                    {"LookupValue": "HQ"}
+                ],
+                "Region": "HQ Managed",
+                "ProgramStartDate": "2023-04-29T07:00:00Z",
+                "ProgramEndDate": "2025-09-29T07:00:00Z",
+                "_x0032_030OutcomeTheme": ["new", "program"],
+                "Sector": []
+            }
         }
     ]
 }

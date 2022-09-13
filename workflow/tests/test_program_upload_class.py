@@ -153,12 +153,43 @@ class TestProgramUpload(test.TestCase):
         upload_program = program.ProgramUpload(idaa_program=idaa_program,
             msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
         )
-
-        self.assertFalse(upload_program.is_valid())
+        self.assertTrue(upload_program.is_valid())
         self.assertTrue(upload_program.tola_program_exists)
         self.assertEquals(upload_program.discrepancy_count, expected_discrepancies)
         self.assertTrue(upload_program.has_discrepancy('countries'))
 
+    def test_one_idaa_to_multiple_tola_programs(self):
+        """
+        Test validation when an IDAA program matches to multiple TolaData programs
+        """
+        idaa_index = 7
+        expected_discrepancies = 1
+
+        idaa_program = self.idaa_json['value'][idaa_index]['fields']
+
+        for x in range(2):
+            self._create_tola_program(idaa_program, fields={
+                "name": f"multiple toladata program {x}",
+                "funding_status": idaa_program['ProgramStatus'],
+                "start_date": program.convert_date(idaa_program['ProgramStartDate']),
+                "end_date": program.convert_date(idaa_program['ProgramEndDate']),
+            }, create_country=True)
+
+        upload_program = program.ProgramUpload(idaa_program=idaa_program,
+            msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
+        )
+
+        self.assertTrue(upload_program.is_valid())
+        upload_program.upload()
+        self.assertTrue(upload_program.tola_program_exists)
+        self.assertTrue(upload_program.multiple_tola_programs)
+        self.assertEqual(upload_program.discrepancy_count, expected_discrepancies)
+        self.assertTrue(upload_program.has_discrepancy('multiple_programs'))
+
+        tola_programs = upload_program.get_tola_programs()
+
+        for tola_program in tola_programs:
+            self.assertEqual(tola_program.name, idaa_program['ProgramName'])
 
     def test_invalid_gaitid_idaa_program(self):
         """

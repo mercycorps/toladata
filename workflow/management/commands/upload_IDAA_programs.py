@@ -69,8 +69,13 @@ class Command(BaseCommand):
                     uploaded_programs['created'].append(upload_program.get_tola_programs())
                     action = 'created'
                 elif upload_program.program_updated:
-                    counts['updated'] += 1
-                    uploaded_programs['updated'].append(upload_program.tola_program)
+                    if upload_program.multiple_tola_programs:
+                        for updated_program in upload_program.tola_program:
+                            counts['updated'] += 1
+                            uploaded_programs['updated'].append(updated_program)
+                    else:
+                        counts['updated'] += 1
+                        uploaded_programs['updated'].append(upload_program.tola_program)
                     action = 'updated'
             else:
                 counts['invalid'] += 1
