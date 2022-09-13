@@ -75,7 +75,13 @@ class TestDiscrepancyReport(test.TestCase):
                 msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
             )
 
-            self.assertFalse(upload_program.is_valid())
+            valid_program = upload_program.is_valid()
+
+            # multiple_programs and countries discrepancies are still valid since we are going to update everything but the programs country
+            if upload_program.has_discrepancy('multiple_programs') or upload_program.has_discrepancy('countries'):
+                self.assertTrue(valid_program)
+            else:
+                self.assertFalse(valid_program)
 
             upload_program.create_discrepancies()
 
