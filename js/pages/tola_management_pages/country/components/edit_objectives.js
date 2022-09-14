@@ -118,7 +118,7 @@ class StrategicObjectiveForm extends React.Component {
                             {objective.id=='new' && (
                                 <div className="form-group btn-row">
                                     <button className="btn btn-primary" type="button" onClick={() => createObjective(managed_data)}>{gettext("Save Changes")}</button>
-                                    <button className="btn btn-reset" type="button" onClick={()=> this.resetForm()}>{gettext("Reset")}</button>
+                                    <button className="btn btn-reset" type="button" onClick={()=> this.resetForm()}>{gettext("Cancel changes")}</button>
                                 </div>
                             )}
                             {objective.id!='new' && (
