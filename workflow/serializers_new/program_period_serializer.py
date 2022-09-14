@@ -98,8 +98,8 @@ class ProgramPeriodSerializerRead(serializers.ModelSerializer):
         ]
 
     def __init__(self, *args, **kwargs):
-        self.read_only = kwargs.pop('read_only')
+        self.readonly = kwargs.pop('read_only')
         super().__init__(*args, **kwargs)
 
     def get_readonly(self, obj):
-        return self.read_only
+        return self.readonly
