@@ -135,15 +135,6 @@ class ProgramAdmin(admin.ModelAdmin):
         request._obj_ = obj
         return super(ProgramAdmin, self).get_form(request, obj, **kwargs)
 
-    # Non-destructively save the GAIT start and end dates based on the value entered in the ID field.
-    # Non-destructively populate the reporting start and end dates based on the GAIT dates.
-    def save_model(self, request, obj, form, change):
-        message = util.append_GAIT_dates(obj)
-        if message:
-            messages.add_message(request, messages.ERROR, message)
-
-        super(ProgramAdmin, self).save_model(request, obj, form, change)
-
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
