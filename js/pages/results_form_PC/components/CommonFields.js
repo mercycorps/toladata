@@ -19,19 +19,19 @@ const CommonFields = ({ commonFieldsInput, setCommonFieldsInput, outcomeThemesDa
             let maxResultDate = commonFieldsInput.program_end_date < commonFieldsInput.pt_end_date ? commonFieldsInput.program_end_date : commonFieldsInput.pt_end_date;
             let minResultDate = commonFieldsInput.program_start_date > commonFieldsInput.pt_start_date ? commonFieldsInput.program_start_date : commonFieldsInput.pt_start_date;
             
-            $('.datepicker').datepicker({
+            $('#id_date_collected--pc').datepicker({
                 dateFormat: "yy-mm-dd",
                 maxDate: formatDate(localdate()) < maxResultDate ? formatDate(localdate()) : maxResultDate, // Only allow results for the past so if the current date is less than the maxResultDate, use the current date as the max date allowed.
                 minDate: minResultDate,
             });
             if (commonFieldsInput.date_collected) {
-                $('.datepicker').datepicker("setDate", commonFieldsInput.date_collected);
+                $('#id_date_collected--pc').datepicker("setDate", commonFieldsInput.date_collected);
                 setSelectedDate(commonFieldsInput.date_collected);
             }
             // Capture the value of the datepicker and triggers an update of state
-            $('.datepicker').on('change', () => {
+            $('#id_date_collected--pc').on('change', () => {
                 setWasUpdated(true);
-                var date = $('.datepicker').datepicker('getDate');
+                var date = $('#id_date_collected--pc').datepicker('getDate');
                 setSelectedDate(date);
             })
         })
