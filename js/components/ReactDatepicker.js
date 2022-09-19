@@ -1,30 +1,42 @@
 import React, { useState } from 'react';
 import Datepicker, {registerLocale} from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
-import es from 'date-fns/locale/es';
+import {es, fr} from 'date-fns/locale';
 registerLocale('es', es)
+registerLocale('fr', fr)
 
-// const years = range(1990, getYear(new Date()) + 1, 1);
-const years = [2015,2016,2018,2019,2020,2021,2022];
 const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  gettext("January"),
+  gettext("March"),
+  gettext("February"),
+  gettext("April"),
+  gettext("May"),
+  gettext("June"),
+  gettext("July"),
+  gettext("August"),
+  gettext("September"),
+  gettext("October"),
+  gettext("November"),
+  gettext("December"),
 ];
+
+const yearRangeOptions = (startRange = 10, endRange = 10, step = 1) => {
+    // TODO: Account for the max and min dates
+    let output = [];
+    let today = new Date().getFullYear();
+    console.log("today", today)
+    for (let i = (today - startRange); i < (today + endRange + 1); i += step) {
+        output.push(i);
+    }
+    return output;
+}
 
 
 const ReactDatepicker = ({
-    dateFormat,
+    dateFormat, // Default format is "yyyy-MM-dd" if not specified.
     locale,
+    yearRangeStart, // Number (integer) of years back from current year to start the year's range for selection. Default is 10 years if not specified.
+    yearRangeEnd, // Number (integer) of years forward from current year to end the year's range for selection. Default is 10 years if not specified.
     className,
     date,
     minDate,
@@ -32,6 +44,7 @@ const ReactDatepicker = ({
     onChange,
     customDatesSelector
     }) => {
+        let years = yearRangeOptions(yearRangeStart, yearRangeEnd)
         console.log(date)
         console.log(window.localDateFromISOStr(date).getMonth())
         let selectedDate = window.localDateFromISOStr(date);

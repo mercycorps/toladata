@@ -156,8 +156,9 @@ export default class EditProgramProfile extends React.Component {
                             className={classNames('form-control', { 'is-invalid': this.formErrors('external_program_id') })}
                             maxLength={4}
                             required
+                            placeholder={gettext("None")}
                             disabled={!this.state.formEditable}
-                            value={formdata.external_program_id || ''}
+                            value={formdata.external_program_id || ""}
                             onChange={(e) => this.updateFormField('external_program_id', e.target.value.replace(/[^0-9]/g, "")) }
                         />
                         <ErrorFeedback errorMessages={this.formErrors('external_program_id')} />
@@ -165,9 +166,7 @@ export default class EditProgramProfile extends React.Component {
                     <div className="form-group">
                         <label htmlFor="program-start-date">{gettext("Program start date")}</label>
                         <ReactDatepicker
-                            dateFormat="yyyy-MM-dd"
                             customDatesSelector={false}
-                            locale={window.userLang}
                             className={classNames('form-control', { 'is-invalid': this.formErrors('start-date') })}                
                             date={formdata.start_date}
                             minDate={new Date().setFullYear(new Date().getFullYear() - 10)}
@@ -178,13 +177,14 @@ export default class EditProgramProfile extends React.Component {
                     </div>
                     <div className="form-group">
                         <label htmlFor="program-end-date">{gettext("Program end date")}</label>
-                        <input
-                            type="text"
+                        <ReactDatepicker
                             id="program-end-date"
-                            className={classNames('form-control', { 'is-invalid': this.formErrors('end-date') })}
-                            disabled={!this.state.formEditable}
-                            value={formdata.end_date}
-                            onChange={(e) => this.updateFormField('end-date', e.target.value) }
+                            customDatesSelector={false}
+                            className={classNames('form-control', { 'is-invalid': this.formErrors('end-date') })}                
+                            date={formdata.end_date}
+                            minDate={window.localDateFromISOStr(formdata.start_date)}
+                            maxDate={new Date().setFullYear(new Date().getFullYear() + 10)}
+                            onChange={(date) => this.updateFormField('end_date', `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`) }
                         />
                         <ErrorFeedback errorMessages={this.formErrors('end-date')} />
                     </div>
