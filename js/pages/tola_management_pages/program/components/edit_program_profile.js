@@ -230,7 +230,8 @@ export default class EditProgramProfile extends React.Component {
                         </div>
                     </div>
                     {sectionGaitFundDonor.map((gaitRow) => {
-                        let donorText = gaitRow.donor || null + gaitRow.donor_dept || null;
+                        let donorText = gaitRow.donor || "";
+                        donorText = gaitRow.donor_dept ? donorText + " " + gaitRow.donor_dept : donorText;
                         return(
                             <div key={gaitRow.gaitid} className="profile__table">
                                     <div className="profile-table__column--left">
