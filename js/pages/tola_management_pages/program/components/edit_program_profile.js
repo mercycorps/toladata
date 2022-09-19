@@ -118,6 +118,7 @@ export default class EditProgramProfile extends React.Component {
         const formdata = this.state.managed_data;
         const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
         const selectedSectors = formdata.idaa_sector.map(x=>this.props.sectorOptions.find(y=>y.value==x));
+        const selectedIDAASectors = formdata.idaa_sector.map(x=>this.props.idaaSectorOptions.find(y=>y.value==x))
         const fundingStatusOptions = [{value: 0, label: gettext("Funded")}, {value: 1, label: gettext("Completed")}];
         // let sectionGaitFundDonor = this.state.formEditable || formdata.gaitid.length === 0 ? Array(5).fill({gaitid: null, fund_code: null, donor: null, donor_dept: null}) : formdata.gaitid;
         let sectionGaitFundDonor = this.state.formEditable || formdata.gaitid.length === 0 ? [{gaitid: null, fund_code: null, donor: null, donor_dept: null}] : formdata.gaitid;
@@ -158,7 +159,7 @@ export default class EditProgramProfile extends React.Component {
                             required
                             placeholder={gettext("None")}
                             disabled={!this.state.formEditable}
-                            value={formdata.external_program_id || ""}
+                            value={formdata.external_program_id || "None"}
                             onChange={(e) => this.updateFormField('external_program_id', e.target.value.replace(/[^0-9]/g, "")) }
                         />
                         <ErrorFeedback errorMessages={this.formErrors('external_program_id')} />
@@ -222,12 +223,12 @@ export default class EditProgramProfile extends React.Component {
                         }
                         <ErrorFeedback errorMessages={this.formErrors('country')} />
                     </div>
-                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedSectors)}>
+                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedIDAASectors)}>
                         <label htmlFor="program-sectors-input">{gettext("Sectors")}</label>
                         {!this.state.formEditable ? 
                             <input
                                 type="text"                      
-                                value={this.createDisplayList(selectedSectors) || gettext("None Selected")}
+                                value={this.createDisplayList(selectedIDAASectors) || gettext("None Selected")}
                                 className={classNames('form-control', { 'is-invalid': this.formErrors('sector') })}
                                 id="program-sector-input"
                                 readOnly
@@ -280,7 +281,8 @@ export default class EditProgramProfile extends React.Component {
                         </div>
                         {/* {sectionGaitFundDonor.map((gaitRow) => { */}
                         {(formdata.gaitid.length > 0 ? formdata.gaitid : [{gaitid: "", fund_code: " ", donor: ""}]).map((gaitRow, index) => {
-                            let donorText = gaitRow.donor || null + gaitRow.donor_dept || null;
+                            let donorText = gaitRow.donor || "";
+                            donorText = gaitRow.donor_dept ? donorText + " " + gaitRow.donor_dept : donorText;
                             return(
                                 <div key={index} className="profile__table">
                                         <div className="profile-table__column--left">

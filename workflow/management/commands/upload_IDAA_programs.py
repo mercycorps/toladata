@@ -5,6 +5,10 @@ from django.conf import settings
 from workflow.program import ProgramUpload
 from workflow.discrepancy_report import GenerateDiscrepancyReport
 from workflow.utils import AccessMSR, check_IDAA_duplicates
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -51,10 +55,11 @@ class Command(BaseCommand):
             'total': len(idaa_programs)
         }
 
-        for program in idaa_programs:
+        for index, program in enumerate(idaa_programs):
             upload_program = ProgramUpload(
                 program['fields'], msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=duplicated_gaitids
             )
+            action = ''
 
             if upload_program.is_valid():
                 if options['upload']:
@@ -62,13 +67,23 @@ class Command(BaseCommand):
                 if upload_program.new_upload:
                     counts['created'] += 1
                     uploaded_programs['created'].append(upload_program.get_tola_programs())
+                    action = 'created'
                 elif upload_program.program_updated:
-                    counts['updated'] += 1
-                    uploaded_programs['updated'].append(upload_program.tola_program)
+                    if upload_program.multiple_tola_programs:
+                        for updated_program in upload_program.tola_program:
+                            counts['updated'] += 1
+                            uploaded_programs['updated'].append(updated_program)
+                    else:
+                        counts['updated'] += 1
+                        uploaded_programs['updated'].append(upload_program.tola_program)
+                    action = 'updated'
             else:
                 counts['invalid'] += 1
+                action = 'invalid'
             if self.report_date() or options['create_discrepancies']:
                 upload_program.create_discrepancies()
+
+            logger.info(f"({index + 1}/{len(idaa_programs)}) {action} program {program['fields']['ProgramName']}. Program ID: {program['fields']['id']}")
 
         if self.report_date() or options['create_report']:
             report = GenerateDiscrepancyReport()
@@ -93,7 +108,7 @@ class Command(BaseCommand):
     @staticmethod
     def email_notifications(today, start_time, end_time, counts, uploaded_programs):
         created_programs = '\n'.join([created.name for created in uploaded_programs['created']])
-        updated_programs = '\n'.join([updated.name for updated in uploaded_programs['created']])
+        updated_programs = '\n'.join([updated.name for updated in uploaded_programs['updated']])
         message = (f"Start time: {start_time}\n"
                    f"End time: {end_time}\n"
                    f"Total IDAA programs: {counts['total']}\n"

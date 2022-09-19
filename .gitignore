@@ -1,65 +1,87 @@
+# OS generated files
+####################
+.DS_Store
+
+# Log files
+###########
 *.log
 login.log.*
 *.pot
-*.pyc
-# Python bytecode:
-*.py[co]
+error.log
 
-# Packaging files:
-*.egg*
-
-# Editor temp files:
+# Editor configuration & temp files
+###################################
+.idea/
+.vscode/
+.nova/
 *.swp
 *.swo
 *~
+.eslintrc.yml
 
-# SQLite3 database files:
+# Python Temp files
+###################
+*.py[co]
+*.pyc
+__pycache__
+
+# Python packages
+#################
+*.egg* # unused?
+
+# Local database
+################
 *.db
 
-# Logs:
-*.log
-
-#allvritualenv
+# Virtual environments
+######################
 .env/
 venv/
 venv-ta/
+.vagrant # unused?
 
+# Non-production config & secrets
+#################################
 conf
 conf/awstats.conf
-
-#Misc.
-.idea/
-.vscode/
-.DS_Store
-media/
 client_secrets.json
 tola/settings/local_secret.py
-*.crt
-*.key
-error.log
-*.secret
 settings.secret.yml
-assets/
-templates/links.html
+tola/settings/test_local.py
+*.key
+*.secret
+*.crt
+
+# Django collected static files
+###############################
+media/
+
+# Frontend assets
+#################
+node_modules
+*.css.map
+webpack-stats-local.json
+webpack-stats-vagrant.json # unused?
+
+# temp files in bulk import dir, which will always start with yyyymmdd
+######################################################################
+indicators/bulk_import_files/[0-9]*
+
+# Are we sure we want to ignore these?
+######################################
+requirements.txt 
+
+# Probably related to automated tests we no longer use
+######################################################
 coverage_html
 .coverage
 coverage/
-tola/settings/test_local.py
-log_convert_lop_to_numeric
-
-# SASS Source Map
-*.css.map
-
-# node modules
-node_modules
-
-webpack-stats-local.json
-webpack-stats-vagrant.json
-.vagrant
-site.retry
-.eslintrc.yml
-requirements.txt
 htmlcov
 
-# ingore temp files in bulk import dir, which will always start with yyyymmdd
-indicators/bulk_import_files/[0-9]*
+# ??? #
+#######
+assets/
+templates/links.html
+log_convert_lop_to_numeric
+site.retry # ansible?
+

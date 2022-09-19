@@ -29,6 +29,7 @@ from workflow.models import (
     Program,
     CountryAccess,
     ProgramAccess,
+    IDAASector,
     GaitID,
     PROGRAM_ROLE_CHOICES,
     COUNTRY_ROLE_CHOICES

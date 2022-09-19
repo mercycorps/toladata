@@ -511,6 +511,8 @@ const CONTROL_CHARACTER_KEYCODES = [
     46, //delete
 ]
 
+const NUMPAD_CHARACTER_KEYCODE = 110;
+
 const SPANISH = 'es';
 const FRENCH = 'fr';
 const ENGLISH = 'en';
@@ -540,6 +542,10 @@ function getValidatedNumericInput(selector) {
             (e.ctrlKey === true || e.metaKey === true)
            ) {
             // don't do anything (allow key to be used as normal)
+            return;
+        }
+        // allow the numpad decimal key
+        if(e.keyCode == NUMPAD_CHARACTER_KEYCODE){
             return;
         }
         // if decimal point/comma, and already 2 digits to the right of it, and cursor is to the right of it, prevent:

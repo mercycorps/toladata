@@ -625,6 +625,14 @@ class Program(models.Model):
         return list(self.gaitid.values_list('gaitid', flat=True))
 
     @property
+    def donors(self):
+        return list(self.gaitid.values_list('donor', flat=True))
+
+    @property
+    def donor_depts(self):
+        return list(self.gaitid.values_list('donor_dept', flat=True))
+
+    @property
     def fund_codes(self):
         return list(self.gaitid.values_list('fundcode__fund_code', flat=True))
 
@@ -717,6 +725,8 @@ class Program(models.Model):
     def idaa_logged_fields(self):
         return {
             "gaitid": self.gaitids,
+            "donors": self.donors,
+            "donor_depts": self.donor_depts,
             "name": self.name,
             "funding_status": self.funding_status,
             "fund_codes": self.fund_codes,
