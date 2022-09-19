@@ -101,7 +101,7 @@ class Command(BaseCommand):
                 indicator_factory.create_standard_indicators(personal_indicator=True)
 
             if options['named_only']:
-                self.assign_permissions(named_testers, options['named_only'], tolaland)
+                self.assign_permissions(all_countries, named_testers, options['named_only'], tolaland)
                 return
 
             program_name = 'QA program -- Multi-country Program'
