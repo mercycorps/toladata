@@ -625,6 +625,14 @@ class Program(models.Model):
         return list(self.gaitid.values_list('gaitid', flat=True))
 
     @property
+    def donors(self):
+        return list(self.gaitid.values_list('donor', flat=True))
+
+    @property
+    def donor_depts(self):
+        return list(self.gaitid.values_list('donor_dept', flat=True))
+
+    @property
     def fund_codes(self):
         return list(self.gaitid.values_list('fundcode__fund_code', flat=True))
 
@@ -709,23 +717,25 @@ class Program(models.Model):
             'funding_status': self.funding_status,
             'cost_center': self.cost_center,
             'description': self.description,
-            'sectors': ','.join([s.sector for s in self.sector.all()]),
-            'countries': ','.join([c.country for c in self.country.all()])
+            'sectors': ','.join(sorted([s.sector for s in self.sector.all()])),
+            'countries': ','.join(sorted([c.country for c in self.country.all()]))
         }
 
     @property
     def idaa_logged_fields(self):
         return {
             "gaitid": self.gaitids,
+            "donors": self.donors,
+            "donor_depts": self.donor_depts,
             "name": self.name,
             "funding_status": self.funding_status,
             "fund_codes": self.fund_codes,
             "external_program_id": self.external_program_id,
             "start_date": str(self.start_date),
             "end_date": str(self.end_date),
-            "sectors": ','.join([s.sector for s in self.idaa_sector.all()]),
-            'countries': ','.join([c.country for c in self.country.all()]),
-            'outcome_themes': ','.join([ot.name for ot in self.idaa_outcome_theme.all()])
+            "sectors": ','.join(sorted([s.sector for s in self.idaa_sector.all()])),
+            'countries': ','.join(sorted([c.country for c in self.country.all()])),
+            'outcome_themes': ','.join(sorted([ot.name for ot in self.idaa_outcome_theme.all()]))
         }
 
     @property

@@ -30,6 +30,8 @@ from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
+from admin_auto_filters.filters import AutocompleteFilter, AutocompleteFilterFactory
+
 
 DISAG_COUNTRY_ONLY = DisaggregationType.DISAG_COUNTRY_ONLY
 DISAG_GLOBAL = DisaggregationType.DISAG_GLOBAL
@@ -86,8 +88,11 @@ class ArchivedFilter(BooleanListFilterWithDefault):
         return 0
 
 
-class IndicatorListFilter(admin.SimpleListFilter):
-    title = "Program"
+class ProgramByUserFilter(admin.SimpleListFilter):
+    """
+    Creates a list filter for Programs in the active user's country
+    """
+    title = "Program (in your country)"
     parameter_name = 'program'
 
     def lookups(self, request, model_admin):
@@ -124,6 +129,21 @@ class CountryFilter(admin.SimpleListFilter):
                 queryset = queryset.filter(country=self.value())
         return queryset
 
+
+# Autocomplete filters
+class ProgramFilter(AutocompleteFilter):
+    title = 'Program'
+    field_name = 'program'
+
+
+class ApprovedByFilter(AutocompleteFilter):
+    title = 'Originator'
+    field_name = 'approved_by'
+
+
+class IndicatorFilter(AutocompleteFilter):
+    title = 'Indicator'
+    field_name = 'indicator'
 
 
 ###########
@@ -165,10 +185,16 @@ class ResultResource(resources.ModelResource):
 
 @admin.register(Indicator)
 class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    autocomplete_fields = ('program',)
     resource_class = IndicatorResource
-    list_display = ('indicator_types', 'name', 'sector')
+    list_display = ('name', 'indicator_types', 'sector')
     search_fields = ('name', 'number', 'program__name')
-    list_filter = (IndicatorListFilter, 'sector')
+    list_filter = (
+        ProgramFilter,
+        ProgramByUserFilter, 
+        'indicator_type',
+        'sector'
+    )
     filter_horizontal = ('objectives', 'strategic_objectives', 'disaggregation')
 
     def get_queryset(self, request):
@@ -193,16 +219,21 @@ class ExternalServiceRecordAdmin(admin.ModelAdmin):
 
 @admin.register(PeriodicTarget)
 class PeriodicTargetAdmin(admin.ModelAdmin):
-    list_display = ('period', 'target', 'customsort',)
-    list_filter = ('period',)
-    search_fields = ('indicator',)
+    autocomplete_fields = ('indicator',)
+    list_display = ('period', 'target', 'customsort', 'indicator')
+    search_fields = ('indicator', 'period',)
+    list_filter = (
+        IndicatorFilter,
+        AutocompleteFilterFactory('Program', 'indicator__program')
+    )
 
 
 @admin.register(Objective)
 class ObjectiveAdmin(admin.ModelAdmin):
-    list_display = ('program', 'name')
+    autocomplete_fields = ('program',)
+    list_display = ('name', 'program')
     search_fields = ('name', 'program__name')
-    list_filter = (CountryFilter,)   # ('program__country__country',)
+    list_filter = (ProgramFilter, CountryFilter) 
 
     def get_queryset(self, request):
         queryset = super(ObjectiveAdmin, self).get_queryset(request)
@@ -244,7 +275,12 @@ class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         'program__name',
         'periodic_target__period',
     )
-    list_filter = ('indicator__program__country__country',)
+    list_filter = (
+        ProgramFilter, 
+        IndicatorFilter,
+        ApprovedByFilter,
+        'indicator__program__country__country', 
+    )
     readonly_fields = ('create_date', 'edit_date')
     autocomplete_fields = (
         'periodic_target', 
@@ -256,7 +292,6 @@ class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     )
     date_hierarchy = 'date_collected'
     
-
 
 @admin.register(OutcomeTheme)
 class OutcomeThemeAdmin(admin.ModelAdmin):
@@ -406,6 +441,7 @@ class LevelAdmin(admin.ModelAdmin):
     list_display = ('name', 'parent', 'program', 'customsort', 'create_date', 'edit_date')
     autocomplete_fields = ('parent', 'program')
     search_fields = ('name', 'parent__name', 'program__name')
+    list_filter = (ProgramFilter,)
 
 
 @admin.register(DataCollectionFrequency)
@@ -432,6 +468,7 @@ class LevelTierAdmin(admin.ModelAdmin):
     autocomplete_fields = ('program',)
     list_display = ('name', 'program', 'tier_depth', 'create_date', 'edit_date')
     search_fields = ('name', 'program__name',)
+    list_filter = (ProgramFilter, 'tier_depth')
 
 
 @admin.register(LevelTierTemplate)

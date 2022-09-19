@@ -285,7 +285,7 @@ class TestProgramFieldsStressTest(test.TestCase):
         client = test.Client()
         client.force_login(user=self.superusers[0].user)
         response = client.get(
-            f'/api/tola_management/program/?page=1&sectors[]={self.in_sector1.pk}&sectors[]={self.in_sector2.pk}')
+            f'/api/tola_management/program/?page=1&idaa_sectors[]={self.in_sector1.pk}&idaa_sectors[]={self.in_sector2.pk}')
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
         self.assertEqual(response_json['count'], 4)
