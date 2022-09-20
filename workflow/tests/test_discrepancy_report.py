@@ -16,7 +16,7 @@ except AttributeError:
     pass
 
 
-# @skip('Tests will fail on GitHub without the secret_keys')
+@skip('Tests will fail on GitHub without the secret_keys')
 class TestDiscrepancyReport(test.TestCase):
     idaa_sample_data_path = 'workflow/tests/idaa_sample_data/idaa_invalid_sample.json'
     discrepancy_report_path = f'workflow/discrepancy_report_{date.today().isoformat()}.xlsx'
