@@ -115,7 +115,9 @@ class ProgramDiscrepancies:
         """
         Add a discrepancy to the objects set
         """
-        self._discrepancies.add(discrepancy)
+        # Programs with the discrepancy mulitple_programs should not have any other discrepancies attached
+        if not self.has_discrepancy('multiple_programs'):
+            self._discrepancies.add(discrepancy)
 
     def get_program_discrepancies(self):
         """
@@ -459,8 +461,10 @@ class ProgramUpload(ProgramValidation):
         Queries the Program table for Tola programs that have the IDAA program gait ids
         """
         gaitids = self.compressed_idaa_gaitids()
+        # Exclude programs in the Countries TolaLand and Xanadu
+        excluded_country_codes = ['TT', 'XU']
         try:
-            program = models.Program.objects.filter(gaitid__gaitid__in=gaitids).distinct()
+            program = models.Program.objects.filter(gaitid__gaitid__in=gaitids).exclude(country__code__in=excluded_country_codes).distinct()
 
             if program.count() == 0:
                 return None
