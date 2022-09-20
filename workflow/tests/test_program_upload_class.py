@@ -189,7 +189,7 @@ class TestProgramUpload(test.TestCase):
         tola_programs = upload_program.get_tola_programs()
 
         for tola_program in tola_programs:
-            self.assertEqual(tola_program.name, idaa_program['ProgramName'])
+            self.assertNotEqual(tola_program.name, idaa_program['ProgramName'])
 
     def test_invalid_gaitid_idaa_program(self):
         """

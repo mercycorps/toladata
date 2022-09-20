@@ -16,7 +16,7 @@ except AttributeError:
     pass
 
 
-@skip('Tests will fail on GitHub without the secret_keys')
+# @skip('Tests will fail on GitHub without the secret_keys')
 class TestDiscrepancyReport(test.TestCase):
     idaa_sample_data_path = 'workflow/tests/idaa_sample_data/idaa_invalid_sample.json'
     discrepancy_report_path = f'workflow/discrepancy_report_{date.today().isoformat()}.xlsx'
@@ -93,7 +93,7 @@ class TestDiscrepancyReport(test.TestCase):
 
     def assert_workbook(self, workbook):
         worksheets = [
-            {'class': discrepancy_report.OverviewTab, 'expected_rows': 18, 'id_col': None, 'expected_ids': None},
+            {'class': discrepancy_report.OverviewTab, 'expected_rows': 20, 'id_col': None, 'expected_ids': None},
             {'class': discrepancy_report.MultipleProgramsTab, 'expected_rows': 3, 'id_col': 'F', 'expected_ids': [3, 3]},
             {'class': discrepancy_report.MismatchingFieldsTab, 'expected_rows': 3, 'id_col': 'K', 'expected_ids': [2, 4]},
             {'class': discrepancy_report.IDAAInvalidFieldsTab, 'expected_rows': 4, 'id_col': 'C', 'expected_ids': [1, 5, 6]},
