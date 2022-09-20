@@ -509,6 +509,9 @@ class ProgramUpload(ProgramValidation):
 
             if program_field['idaa'] == 'ProgramStartDate' or program_field['idaa'] == 'ProgramEndDate':
                 idaa_value = datetime.datetime.strptime(idaa_value, '%Y-%m-%dT%H:%M:%SZ').date()
+            elif program_field['idaa'] == 'ProgramName' and self.multiple_tola_programs:
+                # In the case of 1 IDAA program to multiple TolaData programs we do not want to update the program name in TolaData
+                continue
 
             tola_value = getattr(tola_program, program_field['tola'])
 
