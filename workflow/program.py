@@ -593,6 +593,12 @@ class ProgramUpload(ProgramValidation):
                     except ValueError:
                         logger.exception(f'Recieved invalid fundcode {fund_code}. IDAA program id {self.idaa_program["id"]}')
 
+            else:
+                # If FundCode is not in gaitid_details delete any fundcodes attached to the gaitid in TolaData
+                for tola_fund_code in gaitid_obj.fundcode_set.all():
+                    tola_fund_code.delete()
+                    program_updated = True
+
         # Compare gaitids between Tola and IDAA
         for tola_gaitid in tola_program.gaitid.all():
             # Tola gaitid is not in idaa_gaitids delete the tola gaitid
