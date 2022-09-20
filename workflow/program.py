@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from smtplib import SMTPException, SMTPRecipientsRefused
 from django.conf import settings
 import datetime
+import calendar
 import re
 import logging
 
@@ -360,10 +361,14 @@ class ProgramValidation(ProgramDiscrepancies):
         Checks if the programs editable dates (reporting_period_) falls in the range of the uneditable dates
         """
         valid = False
+        first_day = 1
+        last_day = calendar.monthrange(tola_program.end_date.year, tola_program.end_date.month)[1]
+        first_of_month = datetime.date(tola_program.start_date.year, tola_program.start_date.month, first_day)
+        last_of_month = datetime.date(tola_program.end_date.year, tola_program.end_date.month, last_day)
 
         try:
-            if (tola_program.start_date <= tola_program.reporting_period_start <= tola_program.end_date) \
-                and (tola_program.start_date <= tola_program.reporting_period_end <= tola_program.end_date):
+            if (first_of_month <= tola_program.reporting_period_start <= last_of_month) \
+                and (first_of_month <= tola_program.reporting_period_end <= last_of_month):
 
                 valid = True
         except TypeError:
