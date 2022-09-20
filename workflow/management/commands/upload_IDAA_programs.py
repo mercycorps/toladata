@@ -83,7 +83,10 @@ class Command(BaseCommand):
             if self.report_date() or options['create_discrepancies']:
                 upload_program.create_discrepancies()
 
-            logger.info(f"({index + 1}/{len(idaa_programs)}) {action} program {program['fields']['ProgramName']}. Program ID: {program['fields']['id']}")
+            # Invalid programs in IDAA might not have a ProgramName
+            program_name = program['fields']['ProgramName'] if 'ProgramName' in program['fields'] else 'N/A'
+
+            logger.info(f"({index + 1}/{len(idaa_programs)}) {action} program {program_name}. Program ID: {program['fields']['id']}")
 
         if self.report_date() or options['create_report']:
             report = GenerateDiscrepancyReport()

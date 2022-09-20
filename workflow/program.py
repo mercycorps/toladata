@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from smtplib import SMTPException, SMTPRecipientsRefused
 from django.conf import settings
 import datetime
+import calendar
 import re
 import logging
 
@@ -114,7 +115,9 @@ class ProgramDiscrepancies:
         """
         Add a discrepancy to the objects set
         """
-        self._discrepancies.add(discrepancy)
+        # Programs with the discrepancy mulitple_programs should not have any other discrepancies attached
+        if not self.has_discrepancy('multiple_programs'):
+            self._discrepancies.add(discrepancy)
 
     def get_program_discrepancies(self):
         """
@@ -360,10 +363,14 @@ class ProgramValidation(ProgramDiscrepancies):
         Checks if the programs editable dates (reporting_period_) falls in the range of the uneditable dates
         """
         valid = False
+        first_day = 1
+        last_day = calendar.monthrange(tola_program.end_date.year, tola_program.end_date.month)[1]
+        first_of_month = datetime.date(tola_program.start_date.year, tola_program.start_date.month, first_day)
+        last_of_month = datetime.date(tola_program.end_date.year, tola_program.end_date.month, last_day)
 
         try:
-            if (tola_program.start_date <= tola_program.reporting_period_start <= tola_program.end_date) \
-                and (tola_program.start_date <= tola_program.reporting_period_end <= tola_program.end_date):
+            if (first_of_month <= tola_program.reporting_period_start <= last_of_month) \
+                and (first_of_month <= tola_program.reporting_period_end <= last_of_month):
 
                 valid = True
         except TypeError:
@@ -390,7 +397,6 @@ class ProgramValidation(ProgramDiscrepancies):
         # These discrepancies can come up while trying to retrieve the Tola program
         if self.has_discrepancy('gaitid'):
             self.has_duplicated_gaitids()
-            return False
 
         valid_idaa_program = self.valid_idaa_program()
 
@@ -454,8 +460,13 @@ class ProgramUpload(ProgramValidation):
         Queries the Program table for Tola programs that have the IDAA program gait ids
         """
         gaitids = self.compressed_idaa_gaitids()
+        # Exclude programs in the Countries TolaLand and Xanadu
+        excluded_country_codes = ['TT', 'XU']
         try:
-            program = models.Program.objects.filter(gaitid__gaitid__in=gaitids).distinct()
+            program = models.Program.objects.filter(gaitid__gaitid__in=gaitids).exclude(country__code__in=excluded_country_codes).distinct()
+
+            if len(gaitids) == 0:
+                self.add_discrepancy('gaitid')
 
             if program.count() == 0:
                 return None
@@ -509,6 +520,9 @@ class ProgramUpload(ProgramValidation):
 
             if program_field['idaa'] == 'ProgramStartDate' or program_field['idaa'] == 'ProgramEndDate':
                 idaa_value = datetime.datetime.strptime(idaa_value, '%Y-%m-%dT%H:%M:%SZ').date()
+            elif program_field['idaa'] == 'ProgramName' and self.multiple_tola_programs:
+                # In the case of 1 IDAA program to multiple TolaData programs we do not want to update the program name in TolaData
+                continue
 
             tola_value = getattr(tola_program, program_field['tola'])
 
@@ -589,6 +603,12 @@ class ProgramUpload(ProgramValidation):
                             program_updated = True
                     except ValueError:
                         logger.exception(f'Recieved invalid fundcode {fund_code}. IDAA program id {self.idaa_program["id"]}')
+
+            else:
+                # If FundCode is not in gaitid_details delete any fundcodes attached to the gaitid in TolaData
+                for tola_fund_code in gaitid_obj.fundcode_set.all():
+                    tola_fund_code.delete()
+                    program_updated = True
 
         # Compare gaitids between Tola and IDAA
         for tola_gaitid in tola_program.gaitid.all():
