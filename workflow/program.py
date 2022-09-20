@@ -397,7 +397,6 @@ class ProgramValidation(ProgramDiscrepancies):
         # These discrepancies can come up while trying to retrieve the Tola program
         if self.has_discrepancy('gaitid'):
             self.has_duplicated_gaitids()
-            return False
 
         valid_idaa_program = self.valid_idaa_program()
 
@@ -465,6 +464,9 @@ class ProgramUpload(ProgramValidation):
         excluded_country_codes = ['TT', 'XU']
         try:
             program = models.Program.objects.filter(gaitid__gaitid__in=gaitids).exclude(country__code__in=excluded_country_codes).distinct()
+
+            if len(gaitids) == 0:
+                self.add_discrepancy('gaitid')
 
             if program.count() == 0:
                 return None
