@@ -77,3 +77,30 @@ class TestProgramUpload(test.TestCase):
 
     def test_validates_csv_file_structure(self):
         pass
+
+
+class TestXanaduPermissions(test.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.mc_organization = w_factories.OrganizationFactory(pk=1, name='Mercy Corps')
+        cls.non_mc_organization = w_factories.OrganizationFactory()
+        cls.homecountry = w_factories.CountryFactory(country="USA", code="US")
+        cls.xanadu = w_factories.CountryFactory(country="Xanadu", code="XA")
+        cls.mc_tolauser = w_factories.TolaUserFactory(organization=cls.mc_organization)
+        w_factories.CountryAccessFactory(tolauser=cls.mc_tolauser, country=cls.homecountry, role='basic_admin')
+        cls.non_mc_tolauser = w_factories.TolaUserFactory(organization=cls.non_mc_organization)
+
+    def test_access_to_xanadu(self):
+        # Test that mc_tolauser initially has one managed country, non_mc_tolauser has none
+        self.assertEqual(len(self.mc_tolauser.managed_countries), 1)
+        self.assertEqual(len(self.non_mc_tolauser.managed_countries), 0)
+        output = StringIO()
+        call_command('Xanadu_permissions', verbosity=0, stdout=output)
+        # Test that after management command mc_tolauser has Xanadu added as managed country, non_mc_tolauser has not
+        self.assertEqual(len(self.mc_tolauser.managed_countries), 2)
+        xa = self.mc_tolauser.countries.filter(country="Xanadu").exists()
+        self.assertEqual(xa, True)
+        self.assertEqual(len(self.non_mc_tolauser.managed_countries), 0)
+
