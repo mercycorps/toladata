@@ -973,3 +973,14 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
                 "new": json.loads(self.new_entry)['disaggregation_type']
             })
         return diffs
+
+    @classmethod
+    def created(cls, created_by, country):
+        new_entry = json.dumps(country.admin_logged_fields)
+        entry = cls(
+            admin_user=created_by,
+            new_entry=new_entry,
+            country=country,
+            change_type='Country created'
+        )
+        entry.save()
