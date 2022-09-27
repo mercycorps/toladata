@@ -221,7 +221,7 @@ class ExternalServiceRecordAdmin(admin.ModelAdmin):
 class PeriodicTargetAdmin(admin.ModelAdmin):
     autocomplete_fields = ('indicator',)
     list_display = ('period', 'target', 'customsort', 'indicator')
-    search_fields = ('indicator', 'period',)
+    search_fields = ('indicator__name', 'period',)
     list_filter = (
         IndicatorFilter,
         AutocompleteFilterFactory('Program', 'indicator__program')
