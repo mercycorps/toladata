@@ -135,6 +135,23 @@
                 "_x0032_030OutcomeTheme": ["new", "program"],
                 "Sector": []
             }
+        },
+        {
+            "fields": {
+                "id": 9172,
+                "ProgramName": "Test new country created",
+                "GaitIDs": [
+                    {"LookupValue": "10521.0000000000"}
+                ],
+                "ProgramStatus": "Funded",
+                "Country": [
+                    {"LookupValue": "Yemen"}
+                ],
+                "ProgramStartDate": "2023-04-29T07:00:00Z",
+                "ProgramEndDate": "2025-09-29T07:00:00Z",
+                "_x0032_030OutcomeTheme": [],
+                "Sector": []
+            }
         }
     ]
 }

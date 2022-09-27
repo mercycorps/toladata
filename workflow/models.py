@@ -152,6 +152,13 @@ class Country(models.Model):
         return self.country
 
     @property
+    def admin_logged_fields(self):
+        return {
+            "Country name": self.country,
+            "Country code": self.code
+        }
+
+    @property
     def name(self):
         """Standardize Object.name as returning the object's name for all models"""
         return self.country
