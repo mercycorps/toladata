@@ -629,7 +629,7 @@ class ProgramUpload(ProgramValidation):
             if tola_program.idaa_sector.all().count() > len(idaa_sectors):
                 for tola_sector in tola_program.idaa_sector.all():
                     if tola_sector.sector not in idaa_sectors:
-                        tola_sector.delete()
+                        tola_program.idaa_sector.remove(tola_sector)
                         program_updated = True
 
         if '_x0032_030OutcomeTheme' in self.idaa_program:
@@ -648,7 +648,7 @@ class ProgramUpload(ProgramValidation):
             if tola_outcome_themes.count() > len(idaa_outcome_themes):
                 for tola_outcome_theme in tola_outcome_themes:
                     if tola_outcome_theme.name not in idaa_outcome_themes:
-                        tola_outcome_theme.delete()
+                        tola_program.idaa_outcome_theme.remove(tola_outcome_theme)
                         program_updated = True
 
         for idaa_gaitid in idaa_gaitids:
