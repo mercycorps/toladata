@@ -394,10 +394,11 @@ class DisaggregationTypeAdmin(admin.ModelAdmin):
 
 @admin.register(GlobalDisaggregation)
 class GlobalDisaggregationAdmin(DisaggregationAdmin):
-    list_display = ('disaggregation_type', 'global_type', 'pretty_archived', 'program_count', 'categories')
+    list_display = ('disaggregation_type', 'global_type', 'pretty_archived', 'program_count', 'categories', 'create_date', 'edit_date',)
     list_filter = (ArchivedFilter,)
     sortable_by = ('disaggregation_type', 'program_count')
-    exclude = ('create_date', 'edit_date', 'country')
+    exclude = ('country',) # not applicable to global disaggregations
+    readonly_fields = ('create_date', 'edit_date',)
     GLOBAL_TYPES = [DISAG_GLOBAL, DISAG_PARTICIPANT_COUNT]
     COLUMN_WIDTH = 70 # width of the "categories list" column before truncation
 
@@ -415,10 +416,11 @@ class CountryDisaggregation(DisaggregationType):
 
 @admin.register(CountryDisaggregation)
 class CountryDisaggregationAdmin(DisaggregationAdmin):
-    list_display = ('disaggregation_type', 'country', 'pretty_archived', 'program_count', 'categories')
+    list_display = ('disaggregation_type', 'country', 'pretty_archived', 'program_count', 'categories', 'create_date', 'edit_date',)
     list_filter = (ArchivedFilter, 'country')
     sortable_by = ('disaggregation_type', 'program_count', 'country')
-    exclude = ('create_date', 'edit_date', 'global_type',)
+    exclude = ('global_type',) # not applicable to country disaggregations
+    readonly_fields = ('create_date', 'edit_date',)
     GLOBAL_TYPES = [DISAG_COUNTRY_ONLY]
     COLUMN_WIDTH = 50
 
