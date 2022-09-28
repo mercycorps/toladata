@@ -51,12 +51,12 @@ class Sector(models.Model):
 
 
 class IDAASector(models.Model):
-    sector = models.CharField(_("Sector Name"), max_length=255)
+    sector = models.CharField(_("Sector Name"), unique=True, max_length=255)
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("IDAA Sector") 
+        verbose_name = _("IDAA Sector")
         ordering = ('sector',)
 
     def __str__(self):
@@ -520,12 +520,12 @@ class Program(models.Model):
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
     idaa_sector = models.ManyToManyField(
-            IDAASector, 
-            blank=True, 
+            IDAASector,
+            blank=True,
             verbose_name=_('IDAA Sector'))
     # NOTE: Participant Count "sectors" do not refer to either of these sector fields, but are actually disaggregation categories (DisaggregationLabel)
     idaa_outcome_theme = models.ManyToManyField(
-            'indicators.IDAAOutcomeTheme', 
+            'indicators.IDAAOutcomeTheme',
             blank=True,
             verbose_name=_('IDAA Outcome Theme')
             )
