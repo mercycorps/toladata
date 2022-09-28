@@ -468,6 +468,7 @@ class ReportingFrequencyAdmin(admin.ModelAdmin):
 class PinnedReportAdmin(admin.ModelAdmin):
     list_display = ('name', 'tola_user', 'program', 'creation_date')
     autocomplete_fields = ('tola_user', 'program')
+    readonly_fields = ('creation_date',)
 
 
 @admin.register(LevelTier)
