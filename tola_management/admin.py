@@ -46,7 +46,6 @@ class UserManagementAuditLogAdmin(admin.ModelAdmin):
     list_display = ('date', 'admin_user', 'modified_user', 'change_type')
     search_fields = ('admin_user', 'modified_user')
     list_filter = ('change_type', AdminUserFilter, ModifiedUserFilter)
-    date_hierarchy = 'date'
 
 
 @admin.register(ProgramAuditLog)
@@ -56,7 +55,6 @@ class ProgramAuditLogAdmin(admin.ModelAdmin):
     list_display = ('date', 'change_type', 'user', 'program', 'indicator', 'level')
     search_fields = ('user__name', 'program__name', 'indicator__name', 'level__name')
     list_filter = ('change_type', UserFilter, ProgramFilter)
-    date_hierarchy = 'date'
 
 
 @admin.register(ProgramAdminAuditLog)
@@ -66,8 +64,7 @@ class ProgramAdminAuditLogAdmin(admin.ModelAdmin):
     list_display = ('date', 'admin_user', 'program', 'change_type')
     search_fields = ('admin_user__name', 'program__name',)
     list_filter = ('change_type', AdminUserFilter, ProgramFilter)
-    date_hierarchy = 'date'
-    
+
 
 @admin.register(OrganizationAdminAuditLog)
 class OrganizationAdminAuditLogAdmin(admin.ModelAdmin):
@@ -76,7 +73,6 @@ class OrganizationAdminAuditLogAdmin(admin.ModelAdmin):
     list_display = ('date', 'admin_user', 'organization', 'change_type')
     search_fields = ('admin_user__name',)
     list_filter = ('change_type', AdminUserFilter, 'organization__name')
-    date_hierarchy = 'date'
 
 
 @admin.register(CountryAdminAuditLog)
@@ -86,4 +82,3 @@ class CountryAdminAuditLogAdmin(admin.ModelAdmin):
     list_display = ('date', 'admin_user', 'country', 'change_type')
     search_fields = ('admin_user__name', 'disaggregation_type__disaggregation_type')
     list_filter = ('change_type', AdminUserFilter, 'country')
-    date_hierarchy = 'date'
