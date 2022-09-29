@@ -123,12 +123,32 @@ class SiteProfileAdmin(ImportExportModelAdmin):
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = ('name', 'countries', 'gaitids', 'budget_check', 'funding_status', 'gaitids', 'create_date', 'edit_date',)
+    list_display = (
+        'name', 
+        'countries', 
+        'gaitids', 
+        'budget_check', 
+        'funding_status', 
+        'gaitids', 
+        'create_date', 
+        'edit_date',
+    )
     search_fields = ('name', 'gaitid__gaitid')
     list_filter = ('funding_status', 'country', 'budget_check', 'funding_status', 'sector')
     inlines = (ProgramAccessInline,)
     autocomplete_fields = ('sector', 'idaa_sector', 'idaa_outcome_theme', 'country')
-    readonly_fields = ('start_date', 'end_date', 'reporting_period_start', 'reporting_period_end', 'gaitids', 'create_date', 'edit_date',)
+    readonly_fields = (
+        # Deprecated fields:
+        'legacy_gaitid',
+        'cost_center', # legacy Fund Code field
+        'description',
+        'sector', # legacy (non-IDAA) sector
+        'budget_check', # aka Enable approval authority
+        'public_dashboard', 
+        # non-editable date fields:
+        'create_date', 
+        'edit_date',
+    )
 
     #we need a reference for the inline to limit country choices properly
     def get_form(self, request, obj=None, **kwargs):
