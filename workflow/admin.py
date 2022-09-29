@@ -85,6 +85,11 @@ class ProgramAccessInline(admin.TabularInline):
         return field
 
 
+class GaitIDInlineAdmin(admin.TabularInline):
+    model = GaitID
+    extra = 0
+
+
 #########################
 # Customized model admins
 #########################
@@ -135,7 +140,7 @@ class ProgramAdmin(admin.ModelAdmin):
     )
     search_fields = ('name', 'gaitid__gaitid')
     list_filter = ('funding_status', 'country', 'budget_check', 'funding_status', 'sector')
-    inlines = (ProgramAccessInline,)
+    inlines = (GaitIDInlineAdmin, ProgramAccessInline,)
     fieldsets = (
         ('Program profile', {
             'fields': (
