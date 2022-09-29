@@ -72,6 +72,7 @@ class CountryInLineAdmin(admin.StackedInline):
 
 class ProgramAccessInline(admin.TabularInline):
     model = ProgramAccess
+    autocomplete_fields = ('tolauser',)
 
     #the goal here is to limit the valid country choices to those associated with the related program
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
@@ -147,6 +148,8 @@ class ProgramAdmin(admin.ModelAdmin):
                 'idaa_sector',
                 'idaa_outcome_theme',
                 'gaitids',
+                'fund_codes',
+                'donors',
             )
         }),
         ('Program settings', {
@@ -167,7 +170,7 @@ class ProgramAdmin(admin.ModelAdmin):
                 'public_dashboard',
             )
         }),
-        (None, {
+        ('Change history', {
             'fields': (
                 'create_date',
                 'edit_date',
@@ -178,6 +181,8 @@ class ProgramAdmin(admin.ModelAdmin):
     readonly_fields = (
         # property fields:
         'gaitids',
+        'fund_codes',
+        'donors',
         # Deprecated fields:
         'legacy_gaitid',
         'cost_center', # legacy Fund Code field
