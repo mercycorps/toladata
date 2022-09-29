@@ -152,9 +152,6 @@ class ProgramAdmin(admin.ModelAdmin):
                 'country',
                 'idaa_sector',
                 'idaa_outcome_theme',
-                'gaitids',
-                'fund_codes',
-                'donors',
             )
         }),
         ('Program settings', {
@@ -184,10 +181,6 @@ class ProgramAdmin(admin.ModelAdmin):
     )
     autocomplete_fields = ('sector', 'idaa_sector', 'idaa_outcome_theme', 'country')
     readonly_fields = (
-        # property fields:
-        'gaitids',
-        'fund_codes',
-        'donors',
         # Deprecated fields:
         'legacy_gaitid',
         'cost_center', # legacy Fund Code field
