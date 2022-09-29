@@ -187,7 +187,7 @@ class ResultResource(resources.ModelResource):
 class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     autocomplete_fields = ('program',)
     resource_class = IndicatorResource
-    list_display = ('name', 'indicator_types', 'sector')
+    list_display = ('name', 'indicator_types', 'sector', 'create_date', 'edit_date',)
     search_fields = ('name', 'number', 'program__name')
     list_filter = (
         ProgramFilter,
@@ -196,6 +196,7 @@ class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         'sector'
     )
     filter_horizontal = ('objectives', 'strategic_objectives', 'disaggregation')
+    readonly_fields = ('create_date', 'edit_date',)
 
     def get_queryset(self, request):
         queryset = super(IndicatorAdmin, self).get_queryset(request)
@@ -209,31 +210,34 @@ class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 @admin.register(ExternalService)
 class ExternalServiceAdmin(admin.ModelAdmin):
     list_display = ('name', 'url', 'feed_url', 'create_date', 'edit_date')
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(ExternalServiceRecord)
 class ExternalServiceRecordAdmin(admin.ModelAdmin):
-    list_display = ('external_service', 'full_url', 'record_id', 'create_date',
-                    'edit_date')
+    list_display = ('external_service', 'full_url', 'record_id', 'create_date', 'edit_date')
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(PeriodicTarget)
 class PeriodicTargetAdmin(admin.ModelAdmin):
     autocomplete_fields = ('indicator',)
-    list_display = ('period', 'target', 'customsort', 'indicator')
+    list_display = ('period', 'target', 'customsort', 'indicator', 'create_date', 'edit_date',)
     search_fields = ('indicator__name', 'period',)
     list_filter = (
         IndicatorFilter,
         AutocompleteFilterFactory('Program', 'indicator__program')
     )
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(Objective)
 class ObjectiveAdmin(admin.ModelAdmin):
     autocomplete_fields = ('program',)
-    list_display = ('name', 'program')
+    list_display = ('name', 'program', 'create_date', 'edit_date',)
     search_fields = ('name', 'program__name')
     list_filter = (ProgramFilter, CountryFilter) 
+    readonly_fields = ('create_date', 'edit_date',)
 
     def get_queryset(self, request):
         queryset = super(ObjectiveAdmin, self).get_queryset(request)
@@ -247,9 +251,10 @@ class ObjectiveAdmin(admin.ModelAdmin):
 
 @admin.register(StrategicObjective)
 class StrategicObjectiveAdmin(admin.ModelAdmin):
-    list_display = ('country', 'name')
+    list_display = ('country', 'name', 'create_date', 'edit_date',)
     search_fields = ('country__country', 'name')
     list_filter = (CountryFilter,)  # ('country__country',)
+    readonly_fields = ('create_date', 'edit_date',)
 
     def get_queryset(self, request):
         queryset = super(StrategicObjectiveAdmin, self).get_queryset(request)
@@ -380,19 +385,20 @@ class GlobalDisaggregation(DisaggregationType):
 
 @admin.register(DisaggregationType)
 class DisaggregationTypeAdmin(admin.ModelAdmin):
-    readonly_fields = ('create_date', 'edit_date')
     list_display = ('disaggregation_type', 'country', 'create_date', 'edit_date')
     list_filter = ('global_type', 'is_archived', 'country')
     search_fields = ('disaggregation_type', 'country__country')
+    readonly_fields = ('create_date', 'edit_date')
 
 
 
 @admin.register(GlobalDisaggregation)
 class GlobalDisaggregationAdmin(DisaggregationAdmin):
-    list_display = ('disaggregation_type', 'global_type', 'pretty_archived', 'program_count', 'categories')
+    list_display = ('disaggregation_type', 'global_type', 'pretty_archived', 'program_count', 'categories', 'create_date', 'edit_date',)
     list_filter = (ArchivedFilter,)
     sortable_by = ('disaggregation_type', 'program_count')
-    exclude = ('create_date', 'edit_date', 'country')
+    exclude = ('country',) # not applicable to global disaggregations
+    readonly_fields = ('create_date', 'edit_date',)
     GLOBAL_TYPES = [DISAG_GLOBAL, DISAG_PARTICIPANT_COUNT]
     COLUMN_WIDTH = 70 # width of the "categories list" column before truncation
 
@@ -410,10 +416,11 @@ class CountryDisaggregation(DisaggregationType):
 
 @admin.register(CountryDisaggregation)
 class CountryDisaggregationAdmin(DisaggregationAdmin):
-    list_display = ('disaggregation_type', 'country', 'pretty_archived', 'program_count', 'categories')
+    list_display = ('disaggregation_type', 'country', 'pretty_archived', 'program_count', 'categories', 'create_date', 'edit_date',)
     list_filter = (ArchivedFilter, 'country')
     sortable_by = ('disaggregation_type', 'program_count', 'country')
-    exclude = ('create_date', 'edit_date', 'global_type',)
+    exclude = ('global_type',) # not applicable to country disaggregations
+    readonly_fields = ('create_date', 'edit_date',)
     GLOBAL_TYPES = [DISAG_COUNTRY_ONLY]
     COLUMN_WIDTH = 50
 
@@ -427,63 +434,65 @@ class IDAAOutcomeThemeAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active', 'create_date')
     list_filter = ('is_active',)
     search_fields = ('name',)
+    readonly_fields = ('create_date',)
 
 
 @admin.register(IndicatorType)
 class IndicatorTypeAdmin(admin.ModelAdmin):
-    exclude = ('create_date', 'edit_date')
     list_display = ('indicator_type', 'create_date', 'edit_date')
+    readonly_fields = ('create_date', 'edit_date')
 
 
 @admin.register(Level)
 class LevelAdmin(admin.ModelAdmin):
-    exclude = ('create_date', 'edit_date')
     list_display = ('name', 'parent', 'program', 'customsort', 'create_date', 'edit_date')
     autocomplete_fields = ('parent', 'program')
     search_fields = ('name', 'parent__name', 'program__name')
     list_filter = (ProgramFilter,)
+    readonly_fields = ('create_date', 'edit_date')
 
 
 @admin.register(DataCollectionFrequency)
 class DataCollectionFrequencyAdmin(admin.ModelAdmin):
-    exclude = ('create_date', 'edit_date')
     list_display = ('frequency', 'description', 'sort_order', 'create_date', 'edit_date')
+    readonly_fields = ('create_date', 'edit_date')
 
 
 @admin.register(ReportingFrequency)
 class ReportingFrequencyAdmin(admin.ModelAdmin):
-    exclude = ('create_date', 'edit_date')
     list_display = ('frequency', 'description', 'sort_order', 'create_date', 'edit_date')
+    readonly_fields = ('create_date', 'edit_date')
 
 
 @admin.register(PinnedReport)
 class PinnedReportAdmin(admin.ModelAdmin):
     list_display = ('name', 'tola_user', 'program', 'creation_date')
     autocomplete_fields = ('tola_user', 'program')
+    readonly_fields = ('creation_date',)
 
 
 @admin.register(LevelTier)
 class LevelTierAdmin(admin.ModelAdmin):
-    exclude = ('create_date', 'edit_date')
     autocomplete_fields = ('program',)
     list_display = ('name', 'program', 'tier_depth', 'create_date', 'edit_date')
     search_fields = ('name', 'program__name',)
     list_filter = (ProgramFilter, 'tier_depth')
+    readonly_fields = ('create_date', 'edit_date')
 
 
 @admin.register(LevelTierTemplate)
 class LevelTierTemplateAdmin(admin.ModelAdmin):
-    exclude = ('create_date', 'edit_date')
     autocomplete_fields = ('program',)
     list_display = ('names', 'program', 'create_date', 'edit_date')
     search_fields = ('names', 'program__name',)
+    readonly_fields = ('create_date', 'edit_date')
 
 
 @admin.register(BulkIndicatorImportFile)
 class BulkIndicatorImportFileAdmin(admin.ModelAdmin):
     autocomplete_fields = ('program', 'user')
-    exclude = ('create_date',)
-    list_display = ('file_name', 'file_type', 'program', 'create_date')
+    list_display = ('file_name', 'file_type', 'program', 'create_date',)
     search_fields = ('file_name', 'program__name',)
     list_filter = ('file_type',)
+    readonly_fields = ('create_date',)
 
