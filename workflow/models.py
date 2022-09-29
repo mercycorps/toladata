@@ -835,11 +835,12 @@ class ProgramDiscrepancy(models.Model):
 
     @property
     def idaa_program_name(self):
-        result = self.idaa_json['ProgramName']
+        result = self.idaa_json.get('ProgramName', None)
         return result if result else _('(None)')
 
     def __str__(self):
-        return self.idaa_json['ProgramName']
+        # Without str(_('')) this throws a TypeError when ProgramName is not found
+        return self.idaa_json.get('ProgramName', str(_('(None)')))
 
 
 class GaitID(models.Model):
