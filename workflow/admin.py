@@ -129,15 +129,55 @@ class ProgramAdmin(admin.ModelAdmin):
         'gaitids', 
         'budget_check', 
         'funding_status', 
-        'gaitids', 
         'create_date', 
         'edit_date',
     )
     search_fields = ('name', 'gaitid__gaitid')
     list_filter = ('funding_status', 'country', 'budget_check', 'funding_status', 'sector')
     inlines = (ProgramAccessInline,)
+    fieldsets = (
+        ('Program profile', {
+            'fields': (
+                'name',
+                'external_program_id',
+                'start_date',
+                'end_date',
+                'funding_status',
+                'country',
+                'idaa_sector',
+                'idaa_outcome_theme',
+                'gaitids',
+            )
+        }),
+        ('Program settings', {
+            'fields': (
+                'reporting_period_start',
+                'reporting_period_end',
+                'auto_number_indicators',
+                '_using_results_framework',
+            )
+        }),
+        ('Legacy', {
+            'fields': (
+                'legacy_gaitid',
+                'cost_center',
+                'description',
+                'sector',
+                'budget_check',
+                'public_dashboard',
+            )
+        }),
+        (None, {
+            'fields': (
+                'create_date',
+                'edit_date',
+            )
+        }),
+    )
     autocomplete_fields = ('sector', 'idaa_sector', 'idaa_outcome_theme', 'country')
     readonly_fields = (
+        # property fields:
+        'gaitids',
         # Deprecated fields:
         'legacy_gaitid',
         'cost_center', # legacy Fund Code field
