@@ -69,6 +69,7 @@ class IndicatorType(models.Model):
 
     class Meta:
         verbose_name = _("Indicator Type")
+        verbose_name_plural = _("Indicator Types")
 
     def __str__(self):
         return self.indicator_type
@@ -83,7 +84,8 @@ class StrategicObjective(SafeDeleteModel):
     edit_date = models.DateTimeField(_("Edit date"), null=True, blank=True)
 
     class Meta:
-        verbose_name = _("Country Strategic Objectives")
+        verbose_name = _("Country Strategic Objective")
+        verbose_name_plural = _("Country Strategic Objectives")
         ordering = ('country', 'name')
 
     def __str__(self):
@@ -105,6 +107,7 @@ class Objective(models.Model):
 
     class Meta:
         verbose_name = _("Program Objective")
+        verbose_name_plural = _("Program Objectives")
         ordering = ('program', 'name')
 
     def __str__(self):
@@ -129,6 +132,7 @@ class Level(models.Model):
     class Meta:
         ordering = ('customsort', )
         verbose_name = _("Level")
+        verbose_name_plural = _("Levels")
         unique_together = ('parent', 'customsort')
 
     def __str__(self):
@@ -404,6 +408,7 @@ class LevelTier(models.Model):
         ordering = ('tier_depth', )
         # Translators: Indicators are assigned to Levels.  Levels are organized in a hierarchy of Tiers.
         verbose_name = _("Level Tier")
+        verbose_name_plural = _("Level Tiers")
         unique_together = (('name', 'program'), ('program', 'tier_depth'))
 
     def __str__(self):
@@ -511,7 +516,7 @@ class DisaggregationType(models.Model):
     disaggregation_type = models.CharField(_("Disaggregation"), max_length=135)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Country")
     global_type = models.IntegerField(
-        default=DISAG_COUNTRY_ONLY, choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global disaggregation"))
+        default=DISAG_COUNTRY_ONLY, choices=GLOBAL_TYPE_CHOICES, verbose_name=_("Global Disaggregation"))
     is_archived = models.BooleanField(default=False, verbose_name=_("Archived"))
     selected_by_default = models.BooleanField(default=False)
     create_date = models.DateTimeField(_("Create date"), null=True, blank=True)
@@ -521,6 +526,8 @@ class DisaggregationType(models.Model):
 
     class Meta:
         unique_together = ['disaggregation_type', 'country']
+        verbose_name = _("Disaggregation Type")
+        verbose_name_plural = _("Disaggregation Types")
 
     def __str__(self):
         return self.disaggregation_type
@@ -621,6 +628,8 @@ class DisaggregationLabel(models.Model):
     class Meta:
         ordering = ['customsort']
         unique_together = ['disaggregation_type', 'label']
+        verbose_name = _("Disaggregation Label")
+        verbose_name_plural = _("Disaggregation Labels")
 
     def save(self, *args, **kwargs):
         if self.create_date is None:
@@ -651,6 +660,8 @@ class DisaggregatedValue(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['result', 'category'], name='unique_disaggregation_per_result')
         ]
+        verbose_name = _("Disaggregated Value")
+        verbose_name_plural = _("Disaggregated Values")
 
 
 class ReportingFrequency(models.Model):
@@ -696,6 +707,10 @@ class OutcomeTheme(models.Model):
     is_active = models.BooleanField(verbose_name=_('Active?'))
     create_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Creation date'))
 
+    class Meta:
+        verbose_name = _('Outcome Theme')
+        verbose_name_plural = _('Outcome Themes')
+
 
 class IDAAOutcomeTheme(models.Model):
     name = models.CharField(max_length=256, unique=True, verbose_name=_('Outcome theme name'))
@@ -705,6 +720,7 @@ class IDAAOutcomeTheme(models.Model):
     class Meta:
         ordering = ('name',)
         verbose_name = _('IDAA Outcome Theme')
+        verbose_name_plural = _('IDAA Outcome Themes')
 
     def __str__(self):
         return self.name
@@ -719,6 +735,7 @@ class ExternalService(models.Model):
 
     class Meta:
         verbose_name = _("External Service")
+        verbose_name_plural = _("External Services")
 
     def __str__(self):
         return self.name
@@ -735,6 +752,7 @@ class ExternalServiceRecord(models.Model):
 
     class Meta:
         verbose_name = _("External Service Record")
+        verbose_name_plural = _("External Service Records")
 
     def __str__(self):
         return self.full_url
@@ -1553,6 +1571,7 @@ class Indicator(SafeDeleteModel):
     class Meta:
         ordering = ('create_date',)
         verbose_name = _("Indicator")
+        verbose_name_plural = _("Indicators")
         unique_together = ['level', 'level_order', 'deleted']
 
     def __str__(self):
@@ -1963,6 +1982,10 @@ class BulkIndicatorImportFile(models.Model):
         TolaUser, on_delete=models.SET_NULL, related_name='bulk_indicator_import_files', null=True)
     create_date = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = _("Bulk Indicator Import File")
+        verbose_name_plural = _("Bulk Indicator Import Files")
+
     @classmethod
     def get_file_path(cls, file_name):
         return os.path.join(settings.SITE_ROOT, cls.FILE_STORAGE_PATH, file_name)
@@ -2016,6 +2039,7 @@ class PeriodicTarget(models.Model):
     class Meta:
         ordering = ('customsort', '-create_date')
         verbose_name = _("Periodic Target")
+        verbose_name_plural = _("Periodic Targets")
         unique_together = (('indicator', 'customsort'),)
 
     @property
@@ -2257,6 +2281,10 @@ class ResultManager(models.Manager):
             'site'
         ).select_related('program', 'indicator')
 
+    class Meta:
+        verbose_name = _("Result Manager")
+        verbose_name_plural = _("Result Managers")
+
 
 class Result(models.Model):
     data_key = models.UUIDField(
@@ -2304,7 +2332,8 @@ class Result(models.Model):
 
     class Meta:
         ordering = ('indicator', 'date_collected')
-        verbose_name_plural = "Indicator Output/Outcome Result"
+        verbose_name = _("Indicator Result")
+        verbose_name_plural = _("Indicator Results")
 
     def __str__(self):
         return u'{}: {}'.format(self.indicator, self.periodic_target)
@@ -2407,6 +2436,8 @@ class PinnedReport(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['name', 'tola_user', 'program'], name='unique_pinned_report_name')
         ]
+        verbose_name = _("Pinned Report")
+        verbose_name_plural = _("Pinned Reports")
 
     def parse_query_string(self):
         return QueryDict(self.query_string)

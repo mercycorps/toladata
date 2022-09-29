@@ -7,23 +7,23 @@ from django.utils.html import format_html
 from indicators.models import (
     BulkIndicatorImportFile,
     DataCollectionFrequency,
-    DisaggregationLabel, 
-    DisaggregationType, 
-    ExternalService, 
-    ExternalServiceRecord, 
+    DisaggregationLabel,
+    DisaggregationType,
+    ExternalService,
+    ExternalServiceRecord,
     IDAAOutcomeTheme,
-    Indicator, 
-    IndicatorType, 
+    Indicator,
+    IndicatorType,
     Level,
     LevelTier,
     LevelTierTemplate,
-    Objective, 
+    Objective,
     OutcomeTheme,
-    PeriodicTarget, 
+    PeriodicTarget,
     PinnedReport,
     ReportingFrequency,
-    Result, 
-    StrategicObjective, 
+    Result,
+    StrategicObjective,
 )
 from workflow.models import Sector, Program, Country
 from import_export import resources, fields
@@ -191,7 +191,7 @@ class IndicatorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     search_fields = ('name', 'number', 'program__name')
     list_filter = (
         ProgramFilter,
-        ProgramByUserFilter, 
+        ProgramByUserFilter,
         'indicator_type',
         'sector'
     )
@@ -233,7 +233,7 @@ class ObjectiveAdmin(admin.ModelAdmin):
     autocomplete_fields = ('program',)
     list_display = ('name', 'program')
     search_fields = ('name', 'program__name')
-    list_filter = (ProgramFilter, CountryFilter) 
+    list_filter = (ProgramFilter, CountryFilter)
 
     def get_queryset(self, request):
         queryset = super(ObjectiveAdmin, self).get_queryset(request)
@@ -265,33 +265,33 @@ class ResultAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_display = (
         'indicator',
         'date_collected',
-        'program', 
-        'achieved', 
-        'create_date', 
+        'program',
+        'achieved',
+        'create_date',
         'edit_date'
     )
     search_fields = (
-        'indicator__name', 
+        'indicator__name',
         'program__name',
         'periodic_target__period',
     )
     list_filter = (
-        ProgramFilter, 
+        ProgramFilter,
         IndicatorFilter,
         ApprovedByFilter,
-        'indicator__program__country__country', 
+        'indicator__program__country__country',
     )
     readonly_fields = ('create_date', 'edit_date')
     autocomplete_fields = (
-        'periodic_target', 
+        'periodic_target',
         'approved_by',
-        'indicator', 
-        'program', 
+        'indicator',
+        'program',
         'outcome_themes',
         'site',
     )
     date_hierarchy = 'date_collected'
-    
+
 
 @admin.register(OutcomeTheme)
 class OutcomeThemeAdmin(admin.ModelAdmin):
@@ -376,6 +376,8 @@ class GlobalDisaggregation(DisaggregationType):
     """Proxy model to allow for two admins for one model (disaggregation)"""
     class Meta:
         proxy = True
+        verbose_name = _("Global Disaggregation")
+        verbose_name_plural = _("Global Disaggregations")
 
 
 @admin.register(DisaggregationType)
@@ -406,6 +408,8 @@ class CountryDisaggregation(DisaggregationType):
     """Proxy model to allow for two admins for one model (disaggregation)"""
     class Meta:
         proxy = True
+        verbose_name = _("Country Disaggregation")
+        verbose_name_plural = _("Country Disaggregations")
 
 
 @admin.register(CountryDisaggregation)
