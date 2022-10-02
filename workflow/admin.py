@@ -85,7 +85,7 @@ class ProgramAccessInline(admin.TabularInline):
         return field
 
 
-class GaitIDInlineAdmin(admin.TabularInline):
+class GaitIDInlineAdmin(admin.StackedInline):
     model = GaitID
     extra = 0
 
