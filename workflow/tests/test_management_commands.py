@@ -8,6 +8,7 @@ from django.core.management import call_command
 from unittest import skip
 from factories import workflow_models as w_factories
 from workflow.management.commands.upload_programs import process_file
+from django.contrib.auth.models import User
 
 
 @skip('Tests will fail on GitHub without the secret_keys')
@@ -104,3 +105,22 @@ class TestXanaduPermissions(test.TestCase):
         self.assertEqual(xa, True)
         self.assertEqual(len(self.non_mc_tolauser.managed_countries), 0)
 
+
+class TestAliasUserEmails(test.TestCase):
+    alias = 'tola+'
+    users_to_create = 5
+
+    def setUp(self):
+        organization = w_factories.OrganizationFactory(pk=1, name='Mercy Corps')
+
+        for _ in range(self.users_to_create):
+            w_factories.TolaUserFactory(organization=organization)
+
+    def test_command(self):
+        call_command('alias_user_emails', execute=True)
+
+        users = User.objects.all()
+
+        for user in users:
+            self.assertEqual(user.email[0:len(self.alias)], self.alias)
+            self.assertTrue(user.email.endswith('@mercycorps.org'))
