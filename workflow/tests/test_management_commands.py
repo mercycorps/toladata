@@ -8,7 +8,7 @@ from django.core.management import call_command
 from unittest import skip
 from factories import workflow_models as w_factories
 from workflow.management.commands.upload_programs import process_file
-from workflow.models import CountryAccess
+from django.contrib.auth.models import User
 
 
 @skip('Tests will fail on GitHub without the secret_keys')
@@ -106,34 +106,21 @@ class TestXanaduPermissions(test.TestCase):
         self.assertEqual(len(self.non_mc_tolauser.managed_countries), 0)
 
 
-class TestAliasCountryAdminEmails(test.TestCase):
+class TestAliasUserEmails(test.TestCase):
     alias = 'tola+'
     users_to_create = 5
 
     def setUp(self):
         organization = w_factories.OrganizationFactory(pk=1, name='Mercy Corps')
-        country = w_factories.CountryFactory(country="Colombia", code="CO")
 
-        # basic_admin emails should be aliased
         for _ in range(self.users_to_create):
-            tolauser = w_factories.TolaUserFactory(organization=organization)
-            w_factories.CountryAccessFactory(tolauser=tolauser, country=country, role='basic_admin')
-
-        # Not a basic_admin emails should not be aliased
-        for _ in range(self.users_to_create):
-            tolauser = w_factories.TolaUserFactory(organization=organization)
-            w_factories.CountryAccessFactory(tolauser=tolauser, country=country, role='user')
+            w_factories.TolaUserFactory(organization=organization)
 
     def test_command(self):
-        call_command('alias_country_admin_emails', execute=True)
+        call_command('alias_user_emails', execute=True)
 
-        basic_admins = CountryAccess.objects.filter(role='basic_admin')
-        users = CountryAccess.objects.filter(role='user')
-
-        for basic_admin in basic_admins:
-            user = basic_admin.tolauser.user
-            self.assertEqual(user.email[0:len(self.alias)], self.alias)
-            self.assertTrue(user.email.endswith('@mercycorps.org'))
+        users = User.objects.all()
 
         for user in users:
-            self.assertNotEqual(user.tolauser.user.email[0:len(self.alias)], self.alias)
+            self.assertEqual(user.email[0:len(self.alias)], self.alias)
+            self.assertTrue(user.email.endswith('@mercycorps.org'))
