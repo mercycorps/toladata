@@ -99,13 +99,13 @@ class DiscrepancyReportTab:
 class IDAAInvalidFieldsTab(DiscrepancyReportTab):
     discrepancies = ["ProgramName", "id", "ProgramStartDate", "ProgramEndDate", "Country", "ProgramStatus", "funded", "gaitid"]
     columns = [
-        "Discrepancy Reasons", "IDAA Program Name", "IDAA Program ID", "IDAA Gait IDs", "IDAA Countries", "IDAA Start Date", 
+        "Discrepancy Reasons", "IDAA Program Name", "IDAA Program ID", "IDAA GAIT IDs", "IDAA Countries", "IDAA Start Date", 
         "IDAA End Date", "IDAA Program Status", "Notes"
     ]
     title = "IDAA Program Has Missing Data"
     discrepancy_to_columns = [
         {"discrepancy": "funded", "columns": ['IDAA Program Status']},
-        {"discrepancy": "gaitid", "columns": ['IDAA Gait IDs']},
+        {"discrepancy": "gaitid", "columns": ['IDAA GAIT IDs']},
         {"discrepancy": "ProgramName", "columns": ['IDAA Program Name']},
         {"discrepancy": "ID", "columns": ["IDAA Program ID"]},
         {"discrepancy": "ProgramStartDate", "columns": ['IDAA Start Date']},
@@ -133,9 +133,9 @@ class IDAAInvalidFieldsTab(DiscrepancyReportTab):
 class MismatchingFieldsTab(DiscrepancyReportTab):
     discrepancies = ["funding_status", "end_date", "start_date", "countries", "out_of_bounds_tracking_dates"]
     columns = [
-        "Discrepancy Reasons", "TolaData Program Name", "TolaData Gait IDs", "TolaData Countries", "TolaData Start Date", "TolaData End Date",
+        "Discrepancy Reasons", "TolaData Program Name", "TolaData GAIT IDs", "TolaData Countries", "TolaData Start Date", "TolaData End Date",
         "TolaData Indicator Tracking Start Date", "TolaData Indicator Tracking End Date", "TolaData Funding Status", "IDAA Program Name", "IDAA Program ID", 
-        "IDAA Gait IDs", "IDAA Countries", "IDAA Start Date", "IDAA End Date", "IDAA Program Status", "Notes"
+        "IDAA GAIT IDs", "IDAA Countries", "IDAA Start Date", "IDAA End Date", "IDAA Program Status", "Notes"
     ]
     title = "MisMatching Fields"
     discrepancy_to_columns = [
@@ -182,8 +182,8 @@ class MismatchingFieldsTab(DiscrepancyReportTab):
 class MultipleProgramsTab(DiscrepancyReportTab):
     discrepancies = ["multiple_programs"]
     columns = [
-        "TolaData Program Name", "TolaData Gait IDs", "TolaData Countries", "TolaData Funding Status", 
-        "IDAA Program Name", "IDAA Program ID", "IDAA Gait IDS", "IDAA Countries", "IDAA Funding Status", "Notes"
+        "TolaData Program Name", "TolaData GAIT IDs", "TolaData Countries", "TolaData Funding Status", 
+        "IDAA Program Name", "IDAA Program ID", "IDAA GAIT IDs", "IDAA Countries", "IDAA Funding Status", "Notes"
     ]
     title = "IDAA Program to Multiple TolaDa"  # Max character length of 31
 
@@ -203,7 +203,7 @@ class MultipleProgramsTab(DiscrepancyReportTab):
 
 class DuplicateIDAAProgramsTab(DiscrepancyReportTab):
     columns = [
-        "IDAA Program Name", "IDAA Program ID", "IDAA Gait IDs", "IDAA Countries", "IDAA Start Date", 
+        "IDAA Program Name", "IDAA Program ID", "IDAA GAIT IDs", "IDAA Countries", "IDAA Start Date", 
         "IDAA End Date", "IDAA Program Status", "Notes"
     ]
     title = "Duplicate IDAA Programs"
@@ -221,7 +221,7 @@ class DuplicateIDAAProgramsTab(DiscrepancyReportTab):
         """
         sorted_programs = []
         checked_ids = []
-        gaitid_key = self.columns.index('IDAA Gait IDs')
+        gaitid_key = self.columns.index('IDAA GAIT IDs')
         id_key = self.columns.index('IDAA Program ID')
         for program in programs:
             gaitids = [int(gaitid) for gaitid in program[gaitid_key].split(',')]
@@ -250,18 +250,18 @@ class OverviewTab(DiscrepancyReportTab):
             "header": "ORIENTATION",
             "body": [
                 "The Discrepancy Report is divided into 5 tabs:",
-                "The first tab, titled Discrepancy Report Overview, provides explanation and instruction on what this Discrepancy Report is and how to use this to improve program data quality and consistency in TolaData ( and IDAA)."
+                "The first tab, titled Discrepancy Report Overview, provides explanation and instruction on what this Discrepancy Report is and how to use this to improve program data quality and consistency in TolaData (and IDAA).",
                 "The second tab, titled IDAA Program to Multiple TolaData, identifies duplicated programs in TolaData, where there is one program in IDAA but this single program is broken out into multiple programs in TolaData. This often happens with multi-country programs, where each individual country decided to make their own version of the program in TolaData.",
-                "The third tab, titled MisMatching Fields, identifies existing programs in TolaData whose countries, dates and/or funding status do not match the data and information in IDAA. These discrepancies are not automatically corrected by the system given their sensitive nature. As a result, these discrepancies must be dealt with manually on a case-by-case basis.",
+                "The third tab, titled MisMatching Fields, identifies existing programs in TolaData whose Countries and/or Indicator Tracking dates do not match the data and information in IDAA. These discrepancies are not automatically corrected by the system given their sensitive nature. As a result, these discrepancies must be dealt with manually on a case-by-case basis.",
                 "The fourth tab, titled IDAA Program Has Missing Data, identifies programs in IDAA, which cannot be added or updated in TolaData due to data quality issues. These issues need to be addressed directly in IDAA before these programs can be added or updated in TolaData.",
-                "The fifth tab, titled Duplicate IDAA Programs, identifies programs in IDAA that have the same GAIT ID(s) assigned to them. A GAIT ID should only ever be assigned to one program. A single program may have multiple GAIT IDs associated to it, but a single GAIT ID should never be assigned to multiple programs. This check also attempts to address or prevent two possible undesireable scenarios: 1) many IDAA programs to one TolaData program and 2) many IDAA programs to many TolaData programs."
+                "The fifth tab, titled Duplicate IDAA Programs, identifies programs in IDAA that have the same GAIT ID(s) assigned to them. A GAIT ID should only ever be assigned to one program. A single program may have multiple GAIT IDs associated to it, but a single GAIT ID should never be assigned to multiple programs. This check also attempts to address or prevent two possible undesirable scenarios: 1) many IDAA programs to one TolaData program and 2) many IDAA programs to many TolaData programs."
             ]
         },
         {
             "header": "PURPOSE & USE",
             "body": [
                 "The purpose of this Discrepancy Report is to provide HQ and Regional MEL/PAQ/Standards Advisors, Regional Program Team (RPT) members, and Country and Program Teams with data and information regarding discrepancies found across IDAA and TolaData with the goal of correcting these discrepancies.",
-                "Most discrepancies between IDAA and TolaData will be addressed by the systems automatically, but there are a handful of sensitive issues that merit special review and handling by people, not systems. This report attempts to identify those issues that require manual review and correction by team members. For example, the countries assigned to a program in TolaData determines in which country portfolio the program appears and, as a result, which users see and have access to that program. Changing Indicator Tracking Dates impacts time-based indicators with periodic targets and any results associated with periodic targets. Therefore, updating these dates should only be done by or with authorization from the program team. Changing the funding status currently impacts enduser permission levels, such as whether a program is viewable and accessible by endusers. Many programs continue to enter and update program data and information even after the program end date.",
+                "Most discrepancies between IDAA and TolaData will be addressed by the systems automatically, but there are a handful of sensitive issues that merit special review and handling by people, not systems. This report attempts to identify those issues that require manual review and correction by team members. For example, the countries assigned to a program in TolaData determines in which country portfolio the program appears and, as a result, which users see and have access to that program. Changing Indicator Tracking Dates impacts time-based indicators with periodic targets and any results associated with periodic targets. Therefore, updating these dates should only be done by or with authorization from the program team.",
                 "The Discrepancy Report is generated by the TolaData Development Team at the beginning and middle of every month and is shared with the HQ MEL and Standards Teams for communication and dissemination to the relevant teams. Issues in TolaData may be addressed by anyone with authority and authorization to do so, such as the Country or Program Teams with support from the HQ and Regional MEL Advisors. Issues in IDAA will need to be addressed by those responsible for data entry and maintenance in that system, namely the RPT and/or the Country or Program Teams with support from the HQ Standards Advisors and IDAA Product Owner. It is ultimately up to these respective teams on when, how, and if these issues are addressed."
             ]
         }

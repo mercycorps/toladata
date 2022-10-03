@@ -125,6 +125,8 @@ class UserManagementAuditLog(models.Model, DiffableLog):
                 ),
             )
         ]
+        verbose_name = _("User Management Audit Log")
+        verbose_name_plural = _("User Management Audit Logs")
 
     @property
     def field_map(self):
@@ -336,6 +338,10 @@ class AuditLogRationaleSelection(models.Model):
     # Translators: this is one option in a dropdown list of reasons to change a program's details while in progress
     implementation_delays = models.BooleanField(_('Implementation delays'), default=False)
 
+    class Meta:
+        verbose_name = _("Audit Log Rationale Selection")
+        verbose_name_plural = _("Audit Log Rationale Selections")
+
     @classmethod
     def ordered_options(cls):
         """orders options by translated name, OTHER last"""
@@ -387,6 +393,10 @@ class ProgramAuditLog(models.Model, DiffableLog):
     new_entry = models.TextField(null=True, blank=True)
     rationale = models.TextField(null=True)
     rationale_selections = models.OneToOneField(AuditLogRationaleSelection, null=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        verbose_name = _("Program Audit Log")
+        verbose_name_plural = _("Program Audit Logs")
 
     @property
     def field_map(self):
@@ -804,6 +814,10 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
     previous_entry = models.TextField()
     new_entry = models.TextField()
 
+    class Meta:
+        verbose_name = _("Program Admin Audit Log")
+        verbose_name_plural = _("Program Admin Audit Logs")
+
     @property
     def field_map(self):
         return {
@@ -860,6 +874,10 @@ class OrganizationAdminAuditLog(models.Model, DiffableLog):
     change_type = models.CharField(_('Modification type'), max_length=255)
     previous_entry = models.TextField()
     new_entry = models.TextField()
+
+    class Meta:
+        verbose_name = _("Organization Admin Audit Log")
+        verbose_name_plural = _("Organization Admin Audit Logs")
 
     @property
     def field_map(self):
@@ -920,6 +938,10 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
     previous_entry = models.TextField()
     new_entry = models.TextField()
 
+    class Meta:
+        verbose_name = _("Country Admin Audit Log")
+        verbose_name_plural = _("Country Admin Audit Logs")
+
     @property
     def field_map(self):
         return {
@@ -973,3 +995,14 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
                 "new": json.loads(self.new_entry)['disaggregation_type']
             })
         return diffs
+
+    @classmethod
+    def created(cls, created_by, country):
+        new_entry = json.dumps(country.admin_logged_fields)
+        entry = cls(
+            admin_user=created_by,
+            new_entry=new_entry,
+            country=country,
+            change_type='Country created'
+        )
+        entry.save()

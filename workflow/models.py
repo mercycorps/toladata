@@ -36,6 +36,7 @@ class Sector(models.Model):
 
     class Meta:
         verbose_name = _("Sector")
+        verbose_name_plural = _("Sectors")
         ordering = ('sector',)
 
     # on save add create date or update edit date
@@ -51,12 +52,13 @@ class Sector(models.Model):
 
 
 class IDAASector(models.Model):
-    sector = models.CharField(_("Sector Name"), max_length=255)
+    sector = models.CharField(_("Sector Name"), unique=True, max_length=255)
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("IDAA Sector") 
+        verbose_name = _("IDAA Sector")
+        verbose_name_plural = _("IDAA Sectors")
         ordering = ('sector',)
 
     def __str__(self):
@@ -81,6 +83,7 @@ class Organization(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = _("Organization")
         verbose_name_plural = _("Organizations")
         app_label = 'workflow'
 
@@ -118,6 +121,10 @@ class Region(models.Model):
     name = models.CharField(_("Region Name"), max_length=255)
     gait_region_id = models.PositiveIntegerField(blank=True, null=True)
 
+    class Meta:
+        verbose_name = _("Region")
+        verbose_name_plural = _("Regions")
+
     def __str__(self):
         return self.name
 
@@ -137,6 +144,7 @@ class Country(models.Model):
 
     class Meta:
         ordering = ('country',)
+        verbose_name = _("Country")
         verbose_name_plural = _("Countries")
         app_label = 'workflow'
 
@@ -150,6 +158,13 @@ class Country(models.Model):
     # displayed in admin templates
     def __str__(self):
         return self.country
+
+    @property
+    def admin_logged_fields(self):
+        return {
+            "Country name": self.country,
+            "Country code": self.code
+        }
 
     @property
     def name(self):
@@ -194,6 +209,7 @@ class TolaUser(models.Model):
 
     class Meta:
         verbose_name = _("Tola User")
+        verbose_name_plural = _("Tola Users")
         ordering = ('name',)
 
     def __str__(self):
@@ -513,12 +529,12 @@ class Program(models.Model):
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
     idaa_sector = models.ManyToManyField(
-            IDAASector, 
-            blank=True, 
+            IDAASector,
+            blank=True,
             verbose_name=_('IDAA Sector'))
     # NOTE: Participant Count "sectors" do not refer to either of these sector fields, but are actually disaggregation categories (DisaggregationLabel)
     idaa_outcome_theme = models.ManyToManyField(
-            'indicators.IDAAOutcomeTheme', 
+            'indicators.IDAAOutcomeTheme',
             blank=True,
             verbose_name=_('IDAA Outcome Theme')
             )
@@ -559,6 +575,7 @@ class Program(models.Model):
 
     class Meta:
         verbose_name = _("Program")
+        verbose_name_plural = _("Programs")
         ordering = ('name',)
 
     # on save add create date or update edit date
@@ -813,16 +830,17 @@ class ProgramDiscrepancy(models.Model):
     edit_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _('Program discrepancy')
-        verbose_name_plural = _('Program discrepancies')
+        verbose_name = _('Program Discrepancy')
+        verbose_name_plural = _('Program Discrepancies')
 
     @property
     def idaa_program_name(self):
-        result = self.idaa_json['ProgramName']
+        result = self.idaa_json.get('ProgramName', None)
         return result if result else _('(None)')
 
     def __str__(self):
-        return self.idaa_json['ProgramName']
+        # Without str(_('')) this throws a TypeError when ProgramName is not found
+        return self.idaa_json.get('ProgramName', str(_('(None)')))
 
 
 class GaitID(models.Model):
@@ -835,8 +853,8 @@ class GaitID(models.Model):
 
     class Meta:
         unique_together = ['gaitid', 'program']
-        verbose_name = 'GAIT ID'
-        verbose_name_plural = 'GAIT IDs'
+        verbose_name = _('GAIT ID')
+        verbose_name_plural = _('GAIT IDs')
 
     def fund_codes(self):
         return list(self.fund_code.values_list('fund_code', flat=True))
@@ -857,6 +875,8 @@ class FundCode(models.Model):
 
     class Meta:
         unique_together = ['fund_code', 'gaitid']
+        verbose_name = _("Fund Code")
+        verbose_name_plural = _("Fund Codes")
 
     def __str__(self):
         return str(self.fund_code)
@@ -887,6 +907,8 @@ class ProgramAccess(models.Model):
     class Meta:
         db_table = 'workflow_program_user_access'
         unique_together = ('program', 'tolauser', 'country')
+        verbose_name = _('Program Access')
+        verbose_name_plural = _('Program Access') # Same as singular
 
 
 class ProfileType(models.Model):
@@ -896,6 +918,7 @@ class ProfileType(models.Model):
 
     class Meta:
         verbose_name = _("Profile Type")
+        verbose_name_plural = _("Profile Types")
         ordering = ('profile',)
 
     # on save add create date or update edit date
@@ -1013,7 +1036,8 @@ class SiteProfile(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name_plural = "Site Profiles"
+        verbose_name = _("Site Profile")
+        verbose_name_plural = _("Site Profiles")
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):

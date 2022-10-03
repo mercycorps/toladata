@@ -4,12 +4,13 @@ from django.db.models.query import QuerySet
 from django.template import loader
 from tola import util
 from workflow import models
-from tola_management.models import ProgramAdminAuditLog
+from tola_management.models import ProgramAdminAuditLog, CountryAdminAuditLog
 from indicators.models import IDAAOutcomeTheme
 from django.core.mail import send_mail
 from smtplib import SMTPException, SMTPRecipientsRefused
 from django.conf import settings
 import datetime
+import calendar
 import re
 import logging
 
@@ -114,7 +115,9 @@ class ProgramDiscrepancies:
         """
         Add a discrepancy to the objects set
         """
-        self._discrepancies.add(discrepancy)
+        # Programs with the discrepancy mulitple_programs should not have any other discrepancies attached
+        if not self.has_discrepancy('multiple_programs'):
+            self._discrepancies.add(discrepancy)
 
     def get_program_discrepancies(self):
         """
@@ -180,38 +183,11 @@ class ProgramValidation(ProgramDiscrepancies):
         """
         return self._validated
 
-    def get_tola_country(self, idaa_country, country_codes_list):
-        """
-        Attempts to find a matching Tola country for the idaa country
-        """
-        additional_countries = [
-            {
-                'idaa_name': 'HQ',
-                'country_code': 'HQ'
-            },
-            {
-                'idaa_name': 'Mercy Corps NW',
-                'country_code': 'US'
-            }
-        ]
-
-        for country in additional_countries:
-            if idaa_country == country['idaa_name']:
-                return models.Country.objects.get(code=country['country_code'])
-
-        country_codes = self.get_country_code(idaa_country, country_codes_list)
-
-        for index, country_code in enumerate(country_codes):
-            try:
-                return models.Country.objects.get(code=country_code)
-            except models.Country.DoesNotExist:
-                if index == len(country_codes) - 1:
-                    logger.exception(f'IDAA country {idaa_country} not found.')
-
-        return None
-
     def compressed_idaa_gaitids(self):
-        return [clean_idaa_gaitid(gaitid['LookupValue']) for gaitid in self.idaa_program['GaitIDs']]
+        try:
+            return [clean_idaa_gaitid(gaitid['LookupValue']) for gaitid in self.idaa_program['GaitIDs']]
+        except KeyError:
+            return []
 
     def program_is_funded(self):
         """
@@ -287,9 +263,6 @@ class ProgramValidation(ProgramDiscrepancies):
         """
         missing_fields = self.missing_fields()
 
-        if missing_fields:
-            return False
-
         valid_gaitids = self.valid_gaitids()
         # Check duplicated gaitids
         if valid_gaitids:
@@ -324,8 +297,7 @@ class ProgramValidation(ProgramDiscrepancies):
             matching = False
         else:
             for idaa_country in idaa_countries:
-                tola_country_obj = self.get_tola_country(idaa_country, self.msr_country_codes_list)
-
+                tola_country_obj = self.get_tola_country(idaa_country)
                 if tola_country_obj:
                     if self.tola_program_exists:
                         if tola_country_obj.code in tola_program_country_codes:
@@ -360,10 +332,14 @@ class ProgramValidation(ProgramDiscrepancies):
         Checks if the programs editable dates (reporting_period_) falls in the range of the uneditable dates
         """
         valid = False
+        first_day = 1
+        last_day = calendar.monthrange(tola_program.end_date.year, tola_program.end_date.month)[1]
+        first_of_month = datetime.date(tola_program.start_date.year, tola_program.start_date.month, first_day)
+        last_of_month = datetime.date(tola_program.end_date.year, tola_program.end_date.month, last_day)
 
         try:
-            if (tola_program.start_date <= tola_program.reporting_period_start <= tola_program.end_date) \
-                and (tola_program.start_date <= tola_program.reporting_period_end <= tola_program.end_date):
+            if (first_of_month <= tola_program.reporting_period_start <= last_of_month) \
+                and (first_of_month <= tola_program.reporting_period_end <= last_of_month):
 
                 valid = True
         except TypeError:
@@ -390,7 +366,6 @@ class ProgramValidation(ProgramDiscrepancies):
         # These discrepancies can come up while trying to retrieve the Tola program
         if self.has_discrepancy('gaitid'):
             self.has_duplicated_gaitids()
-            return False
 
         valid_idaa_program = self.valid_idaa_program()
 
@@ -417,10 +392,14 @@ class ProgramUpload(ProgramValidation):
 
         self.duplicated_gaitids = duplicated_gaitids
 
-        super().__init__(idaa_program, msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=duplicated_gaitids)
+        super().__init__(
+            idaa_program, msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, 
+            duplicated_gaitids=duplicated_gaitids
+        )
 
         self.tola_program = self.get_tola_programs()
         self.program_updated = False
+        self._created_countries = set()
 
     @property
     def new_upload(self):
@@ -429,6 +408,97 @@ class ProgramUpload(ProgramValidation):
     @property
     def multiple_tola_programs(self):
         return isinstance(self.tola_program, QuerySet)
+
+    @property
+    def created_countries(self):
+        return self._created_countries
+
+    def get_region(self, idaa_region_numeric):
+        """
+        Returns the matching TolaData Region based on the IDAA RegionNumeric
+
+        Params:
+            idaa_region_numeric: The RegionNumeric value from self.msr_country_codes_list
+
+        Returns:
+            Either None if a matching Region was not found else the Region object
+        """
+        no_region_assigned_id = 0
+
+        if idaa_region_numeric == no_region_assigned_id:
+            return None
+
+        try:
+            return models.Region.objects.get(gait_region_id=idaa_region_numeric)
+        except models.Region.DoesNotExist:
+            logger.exception(f'Could not find matching Region in TolaData. IDAA RegionID={idaa_region_numeric}')
+
+        return None
+
+    def create_tola_country(self, country_name, country_code, idaa_region_numeric):
+        """
+        Creates the country in TolaData after creating the country log the country in CountryAdminAuditLog
+
+        Params:
+            country_name: country name as string
+            country_code: Alpha 2 country code
+            idaa_region_numeric: The RegionNumeric value from self.msr_country_codes_list
+
+        Returns:
+            None if the country was not created else the country object
+        """
+        region_object = self.get_region(idaa_region_numeric)
+
+        if not region_object:
+            return None
+
+        country = models.Country(country=country_name, region=region_object, code=country_code, organization_id=models.Organization.MERCY_CORPS_ID)
+        country.save()
+
+        idaa_user = self.get_idaa_user()
+
+        CountryAdminAuditLog.created(created_by=idaa_user, country=country)
+
+        self._created_countries.add(country)
+
+        return country
+
+    def get_tola_country(self, idaa_country):
+        """
+        Attempts to find a matching Tola country for the idaa country.
+        If a matching country was not found then calls self.create_tola_country
+        """
+        additional_countries = [
+            {
+                'idaa_name': 'HQ',
+                'country_code': 'HQ'
+            },
+            {
+                'idaa_name': 'Mercy Corps NW',
+                'country_code': 'US'
+            },
+            {
+                'idaa_name': 'United Kingdom of Great Britain and Northern Ireland (the)',
+                'country_code': 'UK'
+            }
+        ]
+
+        for country in additional_countries:
+            if idaa_country == country['idaa_name']:
+                return models.Country.objects.get(code=country['country_code'])
+
+        idaa_country_object = self.get_idaa_country_object(idaa_country)
+
+        if idaa_country_object is None:
+            return None
+
+        country_code = idaa_country_object['field_2']
+
+        try:
+            return models.Country.objects.get(code=country_code)
+        except models.Country.DoesNotExist:
+            region_id = int(idaa_country_object['RegionNumeric'])
+            return self.create_tola_country(idaa_country, country_code, region_id)
 
     def get_country_admin_emails(self, program):
         """
@@ -454,8 +524,13 @@ class ProgramUpload(ProgramValidation):
         Queries the Program table for Tola programs that have the IDAA program gait ids
         """
         gaitids = self.compressed_idaa_gaitids()
+        # Exclude programs in the Countries TolaLand and Xanadu
+        excluded_country_codes = ['TT', 'XU']
         try:
-            program = models.Program.objects.filter(gaitid__gaitid__in=gaitids).distinct()
+            program = models.Program.objects.filter(gaitid__gaitid__in=gaitids).exclude(country__code__in=excluded_country_codes).distinct()
+
+            if len(gaitids) == 0:
+                self.add_discrepancy('gaitid')
 
             if program.count() == 0:
                 return None
@@ -478,6 +553,18 @@ class ProgramUpload(ProgramValidation):
                 country_code_3 = entry['fields']['field_3']
                 return country_code_2, country_code_3
         return None, None
+
+    def get_idaa_country_object(self, country):
+        """
+        Returns the IDAA country object from self.msr_country_codes_list
+
+        Params
+            country: IDAA country name as a string
+        """
+        for entry in self.msr_country_codes_list:
+            if entry['fields']['CountryDisplay'] == country or entry['fields']['field_1'] == country:
+                return entry['fields']
+        return None
 
     def get_idaa_user(self):
         try:
@@ -509,6 +596,9 @@ class ProgramUpload(ProgramValidation):
 
             if program_field['idaa'] == 'ProgramStartDate' or program_field['idaa'] == 'ProgramEndDate':
                 idaa_value = datetime.datetime.strptime(idaa_value, '%Y-%m-%dT%H:%M:%SZ').date()
+            elif program_field['idaa'] == 'ProgramName' and self.multiple_tola_programs:
+                # In the case of 1 IDAA program to multiple TolaData programs we do not want to update the program name in TolaData
+                continue
 
             tola_value = getattr(tola_program, program_field['tola'])
 
@@ -539,7 +629,7 @@ class ProgramUpload(ProgramValidation):
             if tola_program.idaa_sector.all().count() > len(idaa_sectors):
                 for tola_sector in tola_program.idaa_sector.all():
                     if tola_sector.sector not in idaa_sectors:
-                        tola_sector.delete()
+                        tola_program.idaa_sector.remove(tola_sector)
                         program_updated = True
 
         if '_x0032_030OutcomeTheme' in self.idaa_program:
@@ -558,7 +648,7 @@ class ProgramUpload(ProgramValidation):
             if tola_outcome_themes.count() > len(idaa_outcome_themes):
                 for tola_outcome_theme in tola_outcome_themes:
                     if tola_outcome_theme.name not in idaa_outcome_themes:
-                        tola_outcome_theme.delete()
+                        tola_program.idaa_outcome_theme.remove(tola_outcome_theme)
                         program_updated = True
 
         for idaa_gaitid in idaa_gaitids:
@@ -589,6 +679,12 @@ class ProgramUpload(ProgramValidation):
                             program_updated = True
                     except ValueError:
                         logger.exception(f'Recieved invalid fundcode {fund_code}. IDAA program id {self.idaa_program["id"]}')
+
+            else:
+                # If FundCode is not in gaitid_details delete any fundcodes attached to the gaitid in TolaData
+                for tola_fund_code in gaitid_obj.fundcode_set.all():
+                    tola_fund_code.delete()
+                    program_updated = True
 
         # Compare gaitids between Tola and IDAA
         for tola_gaitid in tola_program.gaitid.all():
@@ -713,7 +809,7 @@ class ProgramUpload(ProgramValidation):
         idaa_countries = [country['LookupValue'] for country in self.idaa_program['Country']]
         # Try and find country in Tola
         for idaa_country in idaa_countries:
-            country = self.get_tola_country(idaa_country, self.msr_country_codes_list)
+            country = self.get_tola_country(idaa_country)
 
             if country:
                 new_tola_program.country.add(country)
