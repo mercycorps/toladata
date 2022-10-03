@@ -587,6 +587,8 @@ class ProgramUpload(ProgramValidation):
         ]
         idaa_gaitids = self.compressed_idaa_gaitids()
         program_before_update = tola_program.idaa_logged_fields
+        program_before_update_old_sectors = tola_program.admin_logged_fields
+        idaa_user = self.get_idaa_user()
         # Boolean to track if the program in TolaData had updates to either the start_date or end_date
         updated_dates = False
         program_updated = False
@@ -613,6 +615,11 @@ class ProgramUpload(ProgramValidation):
 
         if updated_dates:
             self.valid_tracking_dates(tola_program)
+
+        # Remove old sectors from the tola_program and log the change in the ProgramAdminAuditLog (Status & History Log)
+        if tola_program.sector.all():
+            tola_program.sector.clear()
+            ProgramAdminAuditLog.updated(tola_program, idaa_user, program_before_update_old_sectors, tola_program.admin_logged_fields)
 
         if 'Sector' in self.idaa_program:
             idaa_sectors = [sector['LookupValue'] for sector in self.idaa_program['Sector']]
@@ -739,7 +746,6 @@ class ProgramUpload(ProgramValidation):
                 logger.exception(f"{subject_line}\n{plain_message}\nNo Basic Administrators are assigned to {tola_program.countries}. Please assign a Basic Administrator(s) to this country.")
 
         if program_updated:
-            idaa_user = self.get_idaa_user()
             ProgramAdminAuditLog.updated(tola_program, idaa_user, program_before_update, tola_program.idaa_logged_fields)
 
         if not self.program_updated:
