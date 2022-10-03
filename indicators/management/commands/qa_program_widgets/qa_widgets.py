@@ -717,8 +717,8 @@ user_profiles = {
         'email': 'demo1@example.com',
         'accessible_countries': ['Ethiopia'],
         'permission_level': 'low',
-        'home_country': 'Ethiopia',
-        'org': MC_ORG,
+        'home_country': None,
+        'org': TEST_ORG,
     },
     'demo2': {
         'first_last': ['demo', 'two'],

@@ -148,8 +148,11 @@ class Command(BaseCommand):
 
             program_name = 'QA program -- Ghost of Programs Past'
             print(f'Creating {program_name}')
-            passed_end_date = program_factory.default_start_date - timedelta(days=1)
-            passed_start_date = (passed_end_date + relativedelta(months=-19)).replace(day=1)
+            # Hard code dates so no pc indicator will be created.
+            passed_start_date = date(2019, 2, 1)
+            passed_end_date = date(2021, 5, 31)
+            # passed_end_date = program_factory.default_start_date - timedelta(days=1)
+            # passed_start_date = (passed_end_date + relativedelta(months=-19)).replace(day=1)
             program = program_factory.create_program(
                 program_name, start_date=passed_start_date, end_date=passed_end_date)
             indicator_factory = IndicatorFactory(program, tolaland)
@@ -191,11 +194,13 @@ class Command(BaseCommand):
             indicator_factory.create_standard_indicators(indicator_suffix='moar2')
             indicator_factory.create_standard_indicators(indicator_suffix='moar3')
 
-            program_name = 'QA program --- Pre-Satsuma'
-            print(f'Creating {program_name}')
-            program = program_factory.create_program(program_name, post_satsuma=False)
-            indicator_factory = IndicatorFactory(program, tolaland)
-            indicator_factory.create_standard_indicators(apply_skips=False, apply_satsuma_skips=True)
+
+            # Not longer useful since we cannot create programs without rf
+            # program_name = 'QA program --- Pre-Satsuma'
+            # print(f'Creating {program_name}')
+            # program = program_factory.create_program(program_name, post_satsuma=False)
+            # indicator_factory = IndicatorFactory(program, tolaland)
+            # indicator_factory.create_standard_indicators(apply_skips=False, apply_satsuma_skips=True)
 
             # Create programs with various levels of no data indicators
             program_name = 'QA program --- No Indicators Here'
