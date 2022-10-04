@@ -253,13 +253,15 @@ export class ProgramStore {
             let new_program_data = {
                 id: "new",
                 name: "",
-                gaitid: "",
-                fundcode: "",
+                external_program_id: "",
+                start_date: "",
+                end_date: "",
                 funding_status: "Funded",
-                description: "",
                 country: [],
                 idaa_sector: [],
                 idaa_outcome_theme: [],
+                gaitid: [],
+                description: "",
             }
             this.programs.unshift(new_program_data)
             this.editing_target = 'new'
@@ -307,11 +309,12 @@ export class ProgramStore {
     saveNewProgram(program_data) {
         program_data.id = null
         this.saving = true
-        this.validateGaitId(
-            program_data
-        ).then(() => {
+        // this.validateGaitId(
+        //     program_data
+        // ).then(() => {
             // create program
-            return this.api.createProgram(program_data).catch(error => {
+            this.api.createProgram(program_data).catch(error => {
+                console.log("Error api:", error.response)
                 // form validation error handling
                 if (error.response) {
                     runInAction(() => {
@@ -321,7 +324,7 @@ export class ProgramStore {
 
                 // propagate error to avoid trying to continue
                 return Promise.reject('program creation failed')
-            })
+            // })
         }).then(response => {
             // now pull history data of newly created program
             return Promise.all([response, this.api.fetchProgramHistory(response.data.id)])

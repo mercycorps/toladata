@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Datepicker, {registerLocale} from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 import {es, fr} from 'date-fns/locale';
@@ -20,23 +20,10 @@ const months = [
   gettext("December"),
 ];
 
-const yearRangeOptions = (startRange = 10, endRange = 10, step = 1) => {
-    // TODO: Account for the max and min dates
-    let output = [];
-    let today = new Date().getFullYear();
-    console.log("today", today)
-    for (let i = (today - startRange); i < (today + endRange + 1); i += step) {
-        output.push(i);
-    }
-    return output;
-}
-
 
 const ReactDatepicker = ({
     dateFormat, // Default format is "yyyy-MM-dd" if not specified.
     locale,
-    yearRangeStart, // Number (integer) of years back from current year to start the year's range for selection. Default is 10 years if not specified.
-    yearRangeEnd, // Number (integer) of years forward from current year to end the year's range for selection. Default is 10 years if not specified.
     className,
     date,
     minDate,
@@ -44,22 +31,41 @@ const ReactDatepicker = ({
     onChange,
     customDatesSelector
     }) => {
-        let years = yearRangeOptions(yearRangeStart, yearRangeEnd)
-        console.log(date)
-        console.log(window.localDateFromISOStr(date).getMonth())
-        let selectedDate = window.localDateFromISOStr(date);
-        console.log("selectedDate", months[selectedDate.getMonth()]);
+
+        // Function to set up the range for the year picker
+        const yearRangeOptions = (minDate, maxDate) => {
+            let output = [];
+            let startYear = minDate.getFullYear()
+            let endYear = maxDate.getFullYear() + 1;
+            for (let i = startYear; i < endYear; i++) output.push(i);
+            return output;
+        }
+
+        // Function to convert a valid string date to an ISO formatted date.
+        const formatDate = (date) => {
+            if (!date) return "";
+            try { return window.localDateFromISOStr(date); }
+            catch { return date; }
+        }
+
+        // Component Variables
+        let today = new Date();
+        let selectedDate = formatDate(date) || today;
+        let selectedMinDate = formatDate(minDate) || new Date(`${today.getFullYear() - 10}`, `${today.getMonth()}`, `${today.getDate()}`)
+        let selectedMaxDate = formatDate(maxDate) || new Date(`${today.getFullYear() + 10}`, `${today.getMonth()}`, `${today.getDate()}`)
+        let years = yearRangeOptions(selectedMinDate, selectedMaxDate)
+
     return (
+        // TODO: Handle null dates
         <Datepicker
             dateFormat={dateFormat || "yyyy-MM-dd"}
             locale={locale || window.userLang}
             className={className}
-            selected={window.localDateFromISOStr(date)}
-            minDate={minDate}
-            maxDate={maxDate}
+            selected={formatDate(date) || ""}
+            minDate={selectedMinDate}
+            maxDate={selectedMaxDate}
             onChange={onChange}
             renderCustomHeader={({
-                date,
                 changeYear,
                 changeMonth,
                 decreaseMonth,
