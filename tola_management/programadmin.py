@@ -277,7 +277,7 @@ class NestedGaitIDSerializer(ModelSerializer):
 class NestedIDAAOutcomeThemeSerializer(Serializer):
 
     def to_representation(self, outcome_theme):
-        return [outcome_theme.id, outcome_theme.name]
+        return outcome_theme.id
 
     def to_internal_value(self, data):
         if type(data) is list:
