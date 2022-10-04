@@ -72,6 +72,7 @@ class CountryInLineAdmin(admin.StackedInline):
 
 class ProgramAccessInline(admin.TabularInline):
     model = ProgramAccess
+    autocomplete_fields = ('tolauser',)
 
     #the goal here is to limit the valid country choices to those associated with the related program
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
@@ -82,6 +83,11 @@ class ProgramAccessInline(admin.TabularInline):
                 field.queryset = field.queryset.filter(id__in = request._obj_.country.all().values('id'))
 
         return field
+
+
+class GaitIDInlineAdmin(admin.StackedInline):
+    model = GaitID
+    extra = 0
 
 
 #########################
@@ -123,12 +129,69 @@ class SiteProfileAdmin(ImportExportModelAdmin):
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = ('name', 'countries', 'gaitids', 'budget_check', 'funding_status', 'gaitids', 'create_date', 'edit_date',)
+    list_display = (
+        'name', 
+        'countries', 
+        'gaitids', 
+        'budget_check', 
+        'funding_status', 
+        'create_date', 
+        'edit_date',
+    )
     search_fields = ('name', 'gaitid__gaitid')
     list_filter = ('funding_status', 'country', 'budget_check', 'funding_status', 'sector')
-    inlines = (ProgramAccessInline,)
+    inlines = (GaitIDInlineAdmin, ProgramAccessInline,)
+    fieldsets = (
+        ('Program profile', {
+            'fields': (
+                'name',
+                'external_program_id',
+                'start_date',
+                'end_date',
+                'funding_status',
+                'country',
+                'idaa_sector',
+                'idaa_outcome_theme',
+            )
+        }),
+        ('Program settings', {
+            'fields': (
+                'reporting_period_start',
+                'reporting_period_end',
+                'auto_number_indicators',
+                '_using_results_framework',
+            )
+        }),
+        ('Legacy', {
+            'fields': (
+                'legacy_gaitid',
+                'cost_center',
+                'description',
+                'sector',
+                'budget_check',
+                'public_dashboard',
+            )
+        }),
+        ('Change history', {
+            'fields': (
+                'create_date',
+                'edit_date',
+            )
+        }),
+    )
     autocomplete_fields = ('sector', 'idaa_sector', 'idaa_outcome_theme', 'country')
-    readonly_fields = ('start_date', 'end_date', 'reporting_period_start', 'reporting_period_end', 'gaitids', 'create_date', 'edit_date',)
+    readonly_fields = (
+        # Deprecated fields:
+        'legacy_gaitid',
+        'cost_center', # legacy Fund Code field
+        'description',
+        'sector', # legacy (non-IDAA) sector
+        'budget_check', # aka Enable approval authority
+        'public_dashboard', 
+        # non-editable date fields:
+        'create_date', 
+        'edit_date',
+    )
 
     #we need a reference for the inline to limit country choices properly
     def get_form(self, request, obj=None, **kwargs):

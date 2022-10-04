@@ -523,8 +523,8 @@ class Program(models.Model):
 
     legacy_gaitid = models.CharField(_("Legacy GAIT ID"), max_length=255, null=True, blank=True)
     external_program_id = models.IntegerField(_('External program id'), null=True, blank=False)
-    name = models.CharField(_("Program Name"), max_length=255, blank=True)
-    funding_status = models.CharField(_("Funding Status"), max_length=255, blank=True)
+    name = models.CharField(_("Program Name"), max_length=255, blank=False)
+    funding_status = models.CharField(_("Funding Status"), max_length=255, blank=False)
     cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)  # Deprecated use program.gaitid.fund_code
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
@@ -550,8 +550,8 @@ class Program(models.Model):
         through_fields=('program', 'tolauser')
     )
     public_dashboard = models.BooleanField(_("Enable Public Dashboard"), default=False)
-    start_date = models.DateField(_("Program Start Date"), null=True, blank=True)
-    end_date = models.DateField(_("Program End Date"), null=True, blank=True)
+    start_date = models.DateField(_("Program Start Date"), null=True, blank=False)
+    end_date = models.DateField(_("Program End Date"), null=True, blank=False)
     reporting_period_start = models.DateField(_("Reporting Period Start Date"), null=True, blank=True)
     reporting_period_end = models.DateField(_("Reporting Period End Date"), null=True, blank=True)
     auto_number_indicators = models.BooleanField(
