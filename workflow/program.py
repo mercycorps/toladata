@@ -361,6 +361,14 @@ class ProgramValidation(ProgramDiscrepancies):
             # Clear all discrepancies just in case.
             self.clear_discrepancies()
             self.has_duplicated_gaitids()
+
+            # If a program was Funded with discrepancies then updated to a non funded status the discrepancies will continue to show up in the report
+            # To prevent that check if non-funded programs have a discrepancy and delete
+            discrepancies = self.get_program_discrepancies()
+
+            if discrepancies:
+                discrepancies.delete()
+
             return False
 
         # These discrepancies can come up while trying to retrieve the Tola program
