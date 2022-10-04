@@ -626,14 +626,15 @@ class Cleaner:
                 print('\nPrograms not deleted')
 
 
-standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States - MCNW']
+# standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States - MCNW']
+all_countries = True
 TEST_ORG, created = Organization.objects.get_or_create(name='Test')
 MC_ORG = Organization.objects.get(name='Mercy Corps')
 user_profiles = {
     'mc-low': {
         'first_last': ['mc-low-first', 'mc-low-last'],
         'email': 'tolatestone@mercycorps.org',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'low',
         'home_country': 'United States - MCNW',
         'org': MC_ORG,
@@ -641,7 +642,7 @@ user_profiles = {
     'mc-medium': {
         'first_last': ['mc-med-first', 'mc-med-last'],
         'email': 'tolatesttwo@mercycorps.org',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'medium',
         'home_country': 'United States - MCNW',
         'org': MC_ORG,
@@ -649,7 +650,7 @@ user_profiles = {
     'mc-high': {
         'first_last': ['mc-high-first', 'mc-high-last'],
         'email': 'tolatestthree@mercycorps.org',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'high',
         'home_country': 'United States - MCNW',
         'org': MC_ORG,
@@ -657,16 +658,16 @@ user_profiles = {
     'mc-basicadmin': {
         'first_last': ['mc-basicadmin-first', 'mc-basicadmin-last'],
         'email': 'mcbasicadmin@example.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'high',
         'home_country': 'United States - MCNW',
         'org': MC_ORG,
-        'admin': 'all'
+        # 'admin': 'all'
     },
     'gmail-low': {
         'first_last': ['gmail-low-first', 'gmail-low-last'],
         'email': 'mctest.low@gmail.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'low',
         'home_country': None,
         'org': TEST_ORG,
@@ -674,7 +675,7 @@ user_profiles = {
     'gmail-medium': {
         'first_last': ['gmail-med-first', 'gmail-med-last'],
         'email': 'mctest.medium@gmail.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'medium',
         'home_country': None,
         'org': TEST_ORG,
@@ -682,7 +683,7 @@ user_profiles = {
     'gmail-high': {
         'first_last': ['gmail-high-first', 'gmail-high-last'],
         'email': 'mctest.high@gmail.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'high',
         'home_country': None,
         'org': TEST_ORG,
@@ -690,7 +691,7 @@ user_profiles = {
     'external-low': {
         'first_last': ['external-low-first', 'external-low-last'],
         'email': 'external-low@example.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'low',
         'home_country': None,
         'org': TEST_ORG,
@@ -698,7 +699,7 @@ user_profiles = {
     'external-medium': {
         'first_last': ['external-med-first', 'external-med-last'],
         'email': 'external-medium@example.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'medium',
         'home_country': None,
         'org': TEST_ORG,
@@ -706,7 +707,7 @@ user_profiles = {
     'external-high': {
         'first_last': ['external-high-first', 'external-high-last'],
         'email': 'external-high@example.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'high',
         'home_country': None,
         'org': TEST_ORG,
@@ -716,8 +717,8 @@ user_profiles = {
         'email': 'demo1@example.com',
         'accessible_countries': ['Ethiopia'],
         'permission_level': 'low',
-        'home_country': 'Ethiopia',
-        'org': MC_ORG,
+        'home_country': None,
+        'org': TEST_ORG,
     },
     'demo2': {
         'first_last': ['demo', 'two'],
@@ -726,7 +727,7 @@ user_profiles = {
         'permission_level': 'medium',
         'home_country': None,
         'org': TEST_ORG,
-        'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'medium')]
+        'program_access': [('Ethiopia', 'DREAMS', 'medium')]
     },
     'demo3': {
         'first_last': ['demo', 'three'],
@@ -735,7 +736,7 @@ user_profiles = {
         'permission_level': 'high',
         'home_country': None,
         'org': TEST_ORG,
-        'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'high')]
+        'program_access': [('Ethiopia', 'DREAMS', 'high')]
     },
 
 }

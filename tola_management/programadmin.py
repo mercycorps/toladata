@@ -56,10 +56,6 @@ from tola_management.models import (
 
 from tola_management.permissions import HasProgramAdminAccess
 
-from tola.util import append_GAIT_dates
-
-
-
 
 def get_audit_log_workbook(ws, program):
 

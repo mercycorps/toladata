@@ -40,6 +40,7 @@ class Command(BaseCommand):
             'created': [],
             'updated': []
         }
+        created_countries = set()
 
         idaa_programs = AccessMSR().program_project_list()
         msr_country_codes_list = AccessMSR().countrycode_list()
@@ -57,7 +58,8 @@ class Command(BaseCommand):
 
         for index, program in enumerate(idaa_programs):
             upload_program = ProgramUpload(
-                program['fields'], msr_country_codes_list=msr_country_codes_list, msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=duplicated_gaitids
+                program['fields'], msr_country_codes_list=msr_country_codes_list, 
+                msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=duplicated_gaitids
             )
             action = ''
 
@@ -80,22 +82,28 @@ class Command(BaseCommand):
             else:
                 counts['invalid'] += 1
                 action = 'invalid'
+            if upload_program.created_countries:
+                created_countries.update(upload_program.created_countries)
             if self.report_date() or options['create_discrepancies']:
                 upload_program.create_discrepancies()
 
-            logger.info(f"({index + 1}/{len(idaa_programs)}) {action} program {program['fields']['ProgramName']}. Program ID: {program['fields']['id']}")
+            # Invalid programs in IDAA might not have a ProgramName
+            program_name = program['fields']['ProgramName'] if 'ProgramName' in program['fields'] else 'N/A'
+
+            logger.info(f"({index + 1}/{len(idaa_programs)}) {action} program {program_name}. Program ID: {program['fields']['id']}")
 
         if self.report_date() or options['create_report']:
             report = GenerateDiscrepancyReport()
             report.generate()
             end_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-            self.email_notifications(today, start_time, end_time, counts, uploaded_programs)
+            self.email_notifications(today, start_time, end_time, counts, uploaded_programs, created_countries)
 
         if not options['supress_output']:
             print(f"Total IDAA Programs: {counts['total']}")
             print(f"Created Programs: {counts['created']}")
             print(f"Updated Programs: {counts['updated']}")
             print(f"Invalid Programs: {counts['invalid']}")
+            print(f"Created Countries: {len(created_countries)}")
 
     @staticmethod
     def report_date():
@@ -106,20 +114,24 @@ class Command(BaseCommand):
         return report_day
 
     @staticmethod
-    def email_notifications(today, start_time, end_time, counts, uploaded_programs):
+    def email_notifications(today, start_time, end_time, counts, uploaded_programs, created_countries):
         created_programs = '\n'.join([created.name for created in uploaded_programs['created']])
         updated_programs = '\n'.join([updated.name for updated in uploaded_programs['updated']])
+        created_countries_str = '\n'.join([country.country for country in created_countries])
         message = (f"Start time: {start_time}\n"
                    f"End time: {end_time}\n"
                    f"Total IDAA programs: {counts['total']}\n"
                    f"Programs created: {counts['created']}\n"
                    f"Programs updated: {counts['updated']}\n"
                    f"Invalid programs: {counts['invalid']}\n"
+                   f"Created Countries: {len(created_countries)}"
                    )
         if counts['created']:
             message += f"\nPrograms created in TolaData:\n-----\n{created_programs}\n"
         if counts['updated']:
             message += f"\nPrograms updated in TolaData:\n-----\n{updated_programs}\n"
+        if created_countries:
+            message += f"\nCountries created in TolaData:\n----\n{created_countries_str}\n"
         send_mail(
             f'IDAA program upload report {today}',
             message,

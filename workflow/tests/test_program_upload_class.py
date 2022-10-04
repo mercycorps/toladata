@@ -1,7 +1,7 @@
 from django.core import mail
 from factories import workflow_models
 from workflow import program, models, utils
-from tola_management.models import ProgramAdminAuditLog
+from tola_management.models import ProgramAdminAuditLog, CountryAdminAuditLog
 from unittest import skip
 from django import test
 import json
@@ -58,6 +58,9 @@ class TestProgramUpload(test.TestCase):
 
         workflow_models.CountryFactory(country='HQ', code='HQ')
         workflow_models.CountryFactory(country='Palestine (West Bank / Gaza)', code='PS')
+
+        region = models.Region(name='Middle East', gait_region_id=7)
+        region.save()
 
     def _create_IDAA_user(self):
         user = workflow_models.UserFactory(username='IDAA', first_name='IDAA', last_name='')
@@ -189,7 +192,7 @@ class TestProgramUpload(test.TestCase):
         tola_programs = upload_program.get_tola_programs()
 
         for tola_program in tola_programs:
-            self.assertEqual(tola_program.name, idaa_program['ProgramName'])
+            self.assertNotEqual(tola_program.name, idaa_program['ProgramName'])
 
     def test_invalid_gaitid_idaa_program(self):
         """
@@ -323,6 +326,28 @@ class TestProgramUpload(test.TestCase):
         self.assertEquals(tola_program.gaitid.first().donor, expected_donor)
         self.assertEquals(tola_program.gaitid.first().donor_dept, expected_donor_dept)
         self.assertEquals(audit_log_count, 1)
+
+    def test_new_country_created(self):
+        """
+        Test that a new country is created if it does not exist in TolaData
+        """
+        idaa_index = 8
+
+        upload_program = program.ProgramUpload(
+            idaa_program=self.idaa_json['value'][idaa_index]['fields'], msr_country_codes_list=msr_country_codes_list,
+            msr_gaitid_list=msr_gaitid_list, duplicated_gaitids=self.duplicated_gaitids
+        )
+
+        self.assertTrue(upload_program.is_valid())
+        upload_program.upload()
+        self.assertTrue(upload_program.new_upload)
+        self.assertEqual(len(upload_program.created_countries), 1)
+
+        created_program = upload_program.get_tola_programs()
+        audit_log_count = CountryAdminAuditLog.objects.filter(country=created_program.country.first()).count()
+
+        self.assertTrue(created_program.country.first().country, 'Yemen')
+        self.assertEqual(audit_log_count, 1)
 
     def test_program_update_delete_mismatched_gaitid(self):
         """

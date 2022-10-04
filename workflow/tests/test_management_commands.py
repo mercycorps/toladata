@@ -8,6 +8,7 @@ from django.core.management import call_command
 from unittest import skip
 from factories import workflow_models as w_factories
 from workflow.management.commands.upload_programs import process_file
+from django.contrib.auth.models import User
 
 
 @skip('Tests will fail on GitHub without the secret_keys')
@@ -77,3 +78,49 @@ class TestProgramUpload(test.TestCase):
 
     def test_validates_csv_file_structure(self):
         pass
+
+
+class TestXanaduPermissions(test.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.mc_organization = w_factories.OrganizationFactory(pk=1, name='Mercy Corps')
+        cls.non_mc_organization = w_factories.OrganizationFactory()
+        cls.homecountry = w_factories.CountryFactory(country="USA", code="US")
+        cls.xanadu = w_factories.CountryFactory(country="Xanadu", code="XA")
+        cls.mc_tolauser = w_factories.TolaUserFactory(organization=cls.mc_organization)
+        w_factories.CountryAccessFactory(tolauser=cls.mc_tolauser, country=cls.homecountry, role='basic_admin')
+        cls.non_mc_tolauser = w_factories.TolaUserFactory(organization=cls.non_mc_organization)
+
+    def test_access_to_xanadu(self):
+        # Test that mc_tolauser initially has one managed country, non_mc_tolauser has none
+        self.assertEqual(len(self.mc_tolauser.managed_countries), 1)
+        self.assertEqual(len(self.non_mc_tolauser.managed_countries), 0)
+        output = StringIO()
+        call_command('Xanadu_permissions', verbosity=0, stdout=output)
+        # Test that after management command mc_tolauser has Xanadu added as managed country, non_mc_tolauser has not
+        self.assertEqual(len(self.mc_tolauser.managed_countries), 2)
+        xa = self.mc_tolauser.countries.filter(country="Xanadu").exists()
+        self.assertEqual(xa, True)
+        self.assertEqual(len(self.non_mc_tolauser.managed_countries), 0)
+
+
+class TestAliasUserEmails(test.TestCase):
+    alias = 'tola+'
+    users_to_create = 5
+
+    def setUp(self):
+        organization = w_factories.OrganizationFactory(pk=1, name='Mercy Corps')
+
+        for _ in range(self.users_to_create):
+            w_factories.TolaUserFactory(organization=organization)
+
+    def test_command(self):
+        call_command('alias_user_emails', execute=True)
+
+        users = User.objects.all()
+
+        for user in users:
+            self.assertEqual(user.email[0:len(self.alias)], self.alias)
+            self.assertTrue(user.email.endswith('@mercycorps.org'))

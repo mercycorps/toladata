@@ -72,6 +72,7 @@ class CountryInLineAdmin(admin.StackedInline):
 
 class ProgramAccessInline(admin.TabularInline):
     model = ProgramAccess
+    autocomplete_fields = ('tolauser',)
 
     #the goal here is to limit the valid country choices to those associated with the related program
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
@@ -84,6 +85,11 @@ class ProgramAccessInline(admin.TabularInline):
         return field
 
 
+class GaitIDInlineAdmin(admin.StackedInline):
+    model = GaitID
+    extra = 0
+
+
 #########################
 # Customized model admins
 #########################
@@ -91,6 +97,7 @@ class ProgramAccessInline(admin.TabularInline):
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'create_date', 'edit_date')
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(Country)
@@ -99,50 +106,98 @@ class CountryAdmin(ImportExportModelAdmin):
     list_display = ('country','code','organization','create_date', 'edit_date')
     list_filter = ('country','organization__name')
     search_fields = ('country',)
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(TolaUser)
 class TolaUserAdmin(admin.ModelAdmin):
-    list_display = ('name', 'country')
+    list_display = ('name', 'country', 'create_date', 'edit_date',)
     list_filter = ('country', 'user__is_staff',)
     search_fields = ('name', 'country__country', 'title')
     inlines = (CountryAccessInline, )
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(SiteProfile)
 class SiteProfileAdmin(ImportExportModelAdmin):
     resource_class = SiteProfileResource
-    list_display = ('name', 'country')
+    list_display = ('name', 'country', 'create_date', 'edit_date',)
     list_filter = ('country__country',)
     search_fields = ('country__country',)
-    # Following lines copied from .models for historical purposes
-    # list_display = ('name', 'code', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = ('name', 'countries', 'gaitids', 'budget_check', 'funding_status', 'gaitids')
+    list_display = (
+        'name', 
+        'countries', 
+        'gaitids', 
+        'budget_check', 
+        'funding_status', 
+        'create_date', 
+        'edit_date',
+    )
     search_fields = ('name', 'gaitid__gaitid')
     list_filter = ('funding_status', 'country', 'budget_check', 'funding_status', 'sector')
-    readonly_fields = ('start_date', 'end_date', 'reporting_period_start', 'reporting_period_end', 'gaitids')
-    inlines = (ProgramAccessInline,)
+    inlines = (GaitIDInlineAdmin, ProgramAccessInline,)
+    fieldsets = (
+        ('Program profile', {
+            'fields': (
+                'name',
+                'external_program_id',
+                'start_date',
+                'end_date',
+                'funding_status',
+                'country',
+                'idaa_sector',
+                'idaa_outcome_theme',
+            )
+        }),
+        ('Program settings', {
+            'fields': (
+                'reporting_period_start',
+                'reporting_period_end',
+                'auto_number_indicators',
+                '_using_results_framework',
+            )
+        }),
+        ('Legacy', {
+            'fields': (
+                'legacy_gaitid',
+                'cost_center',
+                'description',
+                'sector',
+                'budget_check',
+                'public_dashboard',
+            )
+        }),
+        ('Change history', {
+            'fields': (
+                'create_date',
+                'edit_date',
+            )
+        }),
+    )
     autocomplete_fields = ('sector', 'idaa_sector', 'idaa_outcome_theme', 'country')
-    exclude = ('create_date', 'edit_date')
+    readonly_fields = (
+        # Deprecated fields:
+        'legacy_gaitid',
+        'cost_center', # legacy Fund Code field
+        'description',
+        'sector', # legacy (non-IDAA) sector
+        'budget_check', # aka Enable approval authority
+        'public_dashboard', 
+        # non-editable date fields:
+        'create_date', 
+        'edit_date',
+    )
 
     #we need a reference for the inline to limit country choices properly
     def get_form(self, request, obj=None, **kwargs):
         # just save obj reference for future processing in Inline
         request._obj_ = obj
         return super(ProgramAdmin, self).get_form(request, obj, **kwargs)
-
-    # Non-destructively save the GAIT start and end dates based on the value entered in the ID field.
-    # Non-destructively populate the reporting start and end dates based on the GAIT dates.
-    def save_model(self, request, obj, form, change):
-        message = util.append_GAIT_dates(obj)
-        if message:
-            messages.add_message(request, messages.ERROR, message)
-
-        super(ProgramAdmin, self).save_model(request, obj, form, change)
 
 
 @admin.register(Region)
@@ -155,17 +210,20 @@ class RegionAdmin(admin.ModelAdmin):
 class SectorAdmin(admin.ModelAdmin):
     list_display = ('sector', 'create_date', 'edit_date')
     search_fields =('sector',)
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(ProfileType)
 class ProfileTypeAdmin(admin.ModelAdmin):
     list_display = ('profile', 'create_date', 'edit_date')
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(IDAASector)
 class IDAASectorAdmin(admin.ModelAdmin):
     list_display = ('sector', 'create_date', 'edit_date')
     search_fields =('sector',)
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(ProgramDiscrepancy)
@@ -173,22 +231,23 @@ class ProgramDiscrepancyAdmin(admin.ModelAdmin):
     list_display = ('idaa_program_name', 'create_date', 'edit_date')
     autocomplete_fields = ('program',)
     search_fields = ('program__name', 'idaa_json', 'discrepancies')
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(GaitID)
 class GaitIDAdmin(admin.ModelAdmin):
-    list_display = ('gaitid', 'program', 'create_date', 'edit_date')
+    list_display = ('gaitid', 'program', 'create_date', 'edit_date',)
     search_fields = ('gaitid', 'program__name',)
     autocomplete_fields = ('program',)
     list_filter = (AutocompleteFilterFactory('Program', 'program'),)
+    readonly_fields = ('create_date', 'edit_date',)
 
 
 @admin.register(FundCode)
 class FundCodeAdmin(admin.ModelAdmin):
     list_display = ('fund_code', 'gaitid', 'program', 'create_date', 'edit_date')
-    readonly_fields = ('program',)
     autocomplete_fields = ('gaitid',)
     search_fields = ('fund_code', 'gaitid__gaitid')
     list_filter = (AutocompleteFilterFactory('Program', 'gaitid__program'),)
-
+    readonly_fields = ('program','create_date', 'edit_date',)
 
