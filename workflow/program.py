@@ -670,20 +670,25 @@ class ProgramUpload(ProgramValidation):
             gaitid_obj.save()
 
             if 'FundCode' in gaitid_details:
-                idaa_fund_codes = gaitid_details['FundCode'].split(',')
+                idaa_fund_codes = []
+
+                for idaa_fund_code in gaitid_details['FundCode'].split(','):
+                    try:
+                        idaa_fund_codes.append(int(idaa_fund_code))
+                    except ValueError:
+                        logger.exception(f'Received invalid fundcode {idaa_fund_code}. IDAA program id {self.idaa_program["id"]}')
+                        continue
+
                 tola_fund_codes = models.FundCode.objects.filter(gaitid=gaitid_obj).values_list('fund_code', flat=True).distinct()
 
-                fundcodes_to_add = [x for x in idaa_fund_codes if str(x) not in tola_fund_codes]
-                fundcodes_to_delete = [x for x in tola_fund_codes if str(x) not in idaa_fund_codes]
+                fundcodes_to_add = [x for x in idaa_fund_codes if x not in tola_fund_codes]
+                fundcodes_to_delete = [x for x in tola_fund_codes if x not in idaa_fund_codes]
 
                 for fund_code in fundcodes_to_add:
-                    try:
-                        fundcode_obj, created = models.FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+                    fundcode_obj, created = models.FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
 
-                        if created:
-                            program_updated = True
-                    except ValueError:
-                        logger.exception(f'Received invalid fundcode {fund_code}. IDAA program id {self.idaa_program["id"]}')
+                    if created:
+                        program_updated = True
 
                 for fund_code in fundcodes_to_delete:
                     old_fund_code = models.FundCode.objects.get(fund_code=fund_code, gaitid=gaitid_obj)
