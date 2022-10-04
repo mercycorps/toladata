@@ -670,15 +670,30 @@ class ProgramUpload(ProgramValidation):
             gaitid_obj.save()
 
             if 'FundCode' in gaitid_details:
-                fund_codes = gaitid_details['FundCode'].split(',')
-                for fund_code in fund_codes:
-                    try:
-                        fundcode_obj, created = models.FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+                idaa_fund_codes = []
 
-                        if created:
-                            program_updated = True
+                for idaa_fund_code in gaitid_details['FundCode'].split(','):
+                    try:
+                        idaa_fund_codes.append(int(idaa_fund_code))
                     except ValueError:
-                        logger.exception(f'Recieved invalid fundcode {fund_code}. IDAA program id {self.idaa_program["id"]}')
+                        logger.exception(f'Received invalid fundcode {idaa_fund_code}. IDAA program id {self.idaa_program["id"]}')
+                        continue
+
+                tola_fund_codes = models.FundCode.objects.filter(gaitid=gaitid_obj).values_list('fund_code', flat=True).distinct()
+
+                fundcodes_to_add = [x for x in idaa_fund_codes if x not in tola_fund_codes]
+                fundcodes_to_delete = [x for x in tola_fund_codes if x not in idaa_fund_codes]
+
+                for fund_code in fundcodes_to_add:
+                    fundcode_obj, created = models.FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+
+                    if created:
+                        program_updated = True
+
+                for fund_code in fundcodes_to_delete:
+                    old_fund_code = models.FundCode.objects.get(fund_code=fund_code, gaitid=gaitid_obj)
+                    old_fund_code.delete()
+                    program_updated = True
 
             else:
                 # If FundCode is not in gaitid_details delete any fundcodes attached to the gaitid in TolaData
