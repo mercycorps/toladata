@@ -601,6 +601,11 @@ class ProgramUpload(ProgramValidation):
         updated_dates = False
         program_updated = False
 
+        # Remove old sectors from the tola_program and log the change in the ProgramAdminAuditLog (Status & History Log)
+        if tola_program.sector.all():
+            tola_program.sector.clear()
+            ProgramAdminAuditLog.updated(tola_program, idaa_user, program_before_update_old_sectors, tola_program.admin_logged_fields)
+
         for program_field in program_fields:
             idaa_value = self.idaa_program[program_field['idaa']]
 
@@ -623,11 +628,6 @@ class ProgramUpload(ProgramValidation):
 
         if updated_dates:
             self.valid_tracking_dates(tola_program)
-
-        # Remove old sectors from the tola_program and log the change in the ProgramAdminAuditLog (Status & History Log)
-        if tola_program.sector.all():
-            tola_program.sector.clear()
-            ProgramAdminAuditLog.updated(tola_program, idaa_user, program_before_update_old_sectors, tola_program.admin_logged_fields)
 
         if 'Sector' in self.idaa_program:
             idaa_sectors = [sector['LookupValue'] for sector in self.idaa_program['Sector']]
