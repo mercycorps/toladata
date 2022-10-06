@@ -651,7 +651,7 @@ class Program(models.Model):
         for gaitid in self.gaitid.all():
             if gaitid.donor:
                 if gaitid.donor_dept:
-                    donors.append(f'{gaitid.donor} {gaitid.donor_dept}')
+                    donors.append(f'{gaitid.donor} - {gaitid.donor_dept}')
                 else:
                     donors.append(gaitid.donor)
         return donors
