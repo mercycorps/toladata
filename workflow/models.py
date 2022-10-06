@@ -852,8 +852,8 @@ class ProgramDiscrepancy(models.Model):
 class GaitID(models.Model):
     gaitid = models.IntegerField()
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='gaitid')
-    donor = models.TextField(null=True)
-    donor_dept = models.TextField(null=True)
+    donor = models.TextField(null=True, blank=True)
+    donor_dept = models.TextField(null=True, blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
