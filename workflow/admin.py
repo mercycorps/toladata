@@ -240,7 +240,7 @@ class GaitIDAdmin(admin.ModelAdmin):
     search_fields = ('gaitid', 'program__name',)
     autocomplete_fields = ('program',)
     list_filter = (AutocompleteFilterFactory('Program', 'program'),)
-    readonly_fields = ('create_date', 'edit_date',)
+    readonly_fields = ('fund_codes', 'create_date', 'edit_date',)
 
 
 @admin.register(FundCode)

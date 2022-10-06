@@ -863,7 +863,10 @@ class GaitID(models.Model):
         verbose_name_plural = _('GAIT IDs')
 
     def fund_codes(self):
-        return list(self.fund_code.values_list('fund_code', flat=True))
+        """
+        Returns a list of fund_code fields for FundCodes related to this GAIT ID. Does not return a list of FundCode objects, or a Query object.
+        """
+        return list(FundCode.objects.filter(gaitid=self).values_list('fund_code', flat=True))
 
     def __str__(self):
         return str(self.gaitid)
