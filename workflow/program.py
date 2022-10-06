@@ -361,6 +361,14 @@ class ProgramValidation(ProgramDiscrepancies):
             # Clear all discrepancies just in case.
             self.clear_discrepancies()
             self.has_duplicated_gaitids()
+
+            # If a program was Funded with discrepancies then updated to a non funded status the discrepancies will continue to show up in the report
+            # To prevent that check if non-funded programs have a discrepancy and delete
+            discrepancies = self.get_program_discrepancies()
+
+            if discrepancies:
+                discrepancies.delete()
+
             return False
 
         # These discrepancies can come up while trying to retrieve the Tola program
@@ -587,9 +595,16 @@ class ProgramUpload(ProgramValidation):
         ]
         idaa_gaitids = self.compressed_idaa_gaitids()
         program_before_update = tola_program.idaa_logged_fields
+        program_before_update_old_sectors = tola_program.admin_logged_fields
+        idaa_user = self.get_idaa_user()
         # Boolean to track if the program in TolaData had updates to either the start_date or end_date
         updated_dates = False
         program_updated = False
+
+        # Remove old sectors from the tola_program and log the change in the ProgramAdminAuditLog (Status & History Log)
+        if tola_program.sector.all():
+            tola_program.sector.clear()
+            ProgramAdminAuditLog.updated(tola_program, idaa_user, program_before_update_old_sectors, tola_program.admin_logged_fields)
 
         for program_field in program_fields:
             idaa_value = self.idaa_program[program_field['idaa']]
@@ -670,15 +685,30 @@ class ProgramUpload(ProgramValidation):
             gaitid_obj.save()
 
             if 'FundCode' in gaitid_details:
-                fund_codes = gaitid_details['FundCode'].split(',')
-                for fund_code in fund_codes:
-                    try:
-                        fundcode_obj, created = models.FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+                idaa_fund_codes = []
 
-                        if created:
-                            program_updated = True
+                for idaa_fund_code in gaitid_details['FundCode'].split(','):
+                    try:
+                        idaa_fund_codes.append(int(idaa_fund_code))
                     except ValueError:
-                        logger.exception(f'Recieved invalid fundcode {fund_code}. IDAA program id {self.idaa_program["id"]}')
+                        logger.exception(f'Received invalid fundcode {idaa_fund_code}. IDAA program id {self.idaa_program["id"]}')
+                        continue
+
+                tola_fund_codes = models.FundCode.objects.filter(gaitid=gaitid_obj).values_list('fund_code', flat=True).distinct()
+
+                fundcodes_to_add = [x for x in idaa_fund_codes if x not in tola_fund_codes]
+                fundcodes_to_delete = [x for x in tola_fund_codes if x not in idaa_fund_codes]
+
+                for fund_code in fundcodes_to_add:
+                    fundcode_obj, created = models.FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+
+                    if created:
+                        program_updated = True
+
+                for fund_code in fundcodes_to_delete:
+                    old_fund_code = models.FundCode.objects.get(fund_code=fund_code, gaitid=gaitid_obj)
+                    old_fund_code.delete()
+                    program_updated = True
 
             else:
                 # If FundCode is not in gaitid_details delete any fundcodes attached to the gaitid in TolaData
@@ -739,7 +769,6 @@ class ProgramUpload(ProgramValidation):
                 logger.exception(f"{subject_line}\n{plain_message}\nNo Basic Administrators are assigned to {tola_program.countries}. Please assign a Basic Administrator(s) to this country.")
 
         if program_updated:
-            idaa_user = self.get_idaa_user()
             ProgramAdminAuditLog.updated(tola_program, idaa_user, program_before_update, tola_program.idaa_logged_fields)
 
         if not self.program_updated:

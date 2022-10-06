@@ -643,15 +643,22 @@ class Program(models.Model):
 
     @property
     def donors(self):
-        return list(self.gaitid.values_list('donor', flat=True))
-
-    @property
-    def donor_depts(self):
-        return list(self.gaitid.values_list('donor_dept', flat=True))
+        """
+        Returns a list of donors for the programs gaitid
+        If the gaitid has a donor_dept append the donor_dept to the donor
+        """
+        donors = []
+        for gaitid in self.gaitid.all():
+            if gaitid.donor:
+                if gaitid.donor_dept:
+                    donors.append(f'{gaitid.donor} {gaitid.donor_dept}')
+                else:
+                    donors.append(gaitid.donor)
+        return donors
 
     @property
     def fund_codes(self):
-        return list(self.gaitid.values_list('fundcode__fund_code', flat=True))
+        return [fundcode.fund_code for gaitid in self.gaitid.all() for fundcode in gaitid.fundcode_set.all() if fundcode.fund_code]
 
     @property
     def collected_record_count(self):
@@ -743,7 +750,6 @@ class Program(models.Model):
         return {
             "gaitid": self.gaitids,
             "donors": self.donors,
-            "donor_depts": self.donor_depts,
             "name": self.name,
             "funding_status": self.funding_status,
             "fund_codes": self.fund_codes,

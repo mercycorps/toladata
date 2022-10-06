@@ -827,7 +827,13 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
             'cost_center': _("Cost center"),
             'description': _("Description"),
             'sectors': _("Sectors"),
-            'countries': _("Countries")
+            'countries': _("Countries"),
+            'external_program_id': _('Program ID'),
+            'start_date': _('Program start date'),
+            'end_date': _('Program end date'),
+            'outcome_themes': _('Outcome themes'),
+            'donors': _('Donors'),
+            'fund_codes': _('Fund codes')
         }
 
     @property
