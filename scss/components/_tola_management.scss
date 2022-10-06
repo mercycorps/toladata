@@ -241,7 +241,7 @@
 .profile-table__column {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0;
+    // margin-bottom: 0;
     &--left {
         width: 18%;
         min-width: 15%;
@@ -256,7 +256,7 @@
         width: 65%;
     }
     .form-group {
-        margin-bottom: 0;
+        // margin-bottom: 0;
     }
 }
 #id_admin_program_profile-tab {
