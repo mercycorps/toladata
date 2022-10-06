@@ -713,7 +713,7 @@ class OutcomeTheme(models.Model):
 
 
 class IDAAOutcomeTheme(models.Model):
-    name = models.CharField(max_length=256, unique=True, verbose_name=_('Outcome theme name'))
+    name = models.CharField(max_length=255, unique=True, verbose_name=_('Outcome theme name'))
     is_active = models.BooleanField(verbose_name=_('Active?'), default=True)
     create_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Creation date'))
 
