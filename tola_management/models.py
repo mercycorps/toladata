@@ -961,6 +961,8 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
             "is_archived": _("Archived"),
             # Translators: Heading for list of disaggregation categories in a particular disaggregation type.
             "disaggregation_type": _("Disaggregation"),
+            "country_name": _("Country name"),
+            "country_code": _("Country code")
         }
 
     @property
@@ -978,6 +980,7 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
             "country_disaggregation_unarchived": _("Country disaggregation unarchived"),
             # Translators: Heading for data that tracks when the categories of a data disaggregation that has been assigned to country have been updated.
             "country_disaggregation_categories_updated": _("Country disaggregation categories updated"),
+            "country_created": _("Country created")
         }
 
     @property
@@ -1009,6 +1012,6 @@ class CountryAdminAuditLog(models.Model, DiffableLog):
             admin_user=created_by,
             new_entry=new_entry,
             country=country,
-            change_type='Country created'
+            change_type='country_created'
         )
         entry.save()

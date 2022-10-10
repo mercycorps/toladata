@@ -162,8 +162,8 @@ class Country(models.Model):
     @property
     def admin_logged_fields(self):
         return {
-            "Country name": self.country,
-            "Country code": self.code
+            "country_name": self.country,
+            "country_code": self.code
         }
 
     @property
