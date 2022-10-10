@@ -87,7 +87,7 @@ class ProgramAccessInline(admin.TabularInline):
 
 class GaitIDInlineAdmin(admin.StackedInline):
     model = GaitID
-    fields = ['gaitid', 'donor', 'donor_dept', 'fund_codes',]
+    fields = ('gaitid', 'donor', 'donor_dept', 'fund_codes',)
     readonly_fields = ('fund_codes',)
     extra = 0
 
