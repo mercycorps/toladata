@@ -852,8 +852,8 @@ class ProgramDiscrepancy(models.Model):
 class GaitID(models.Model):
     gaitid = models.IntegerField()
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='gaitid')
-    donor = models.TextField(null=True)
-    donor_dept = models.TextField(null=True)
+    donor = models.TextField(null=True, blank=True)
+    donor_dept = models.TextField(null=True, blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
@@ -863,7 +863,10 @@ class GaitID(models.Model):
         verbose_name_plural = _('GAIT IDs')
 
     def fund_codes(self):
-        return list(self.fund_code.values_list('fund_code', flat=True))
+        """
+        Returns a list of fund_code fields for FundCodes related to this GAIT ID. Does not return a list of FundCode objects, or a Query object.
+        """
+        return list(FundCode.objects.filter(gaitid=self).values_list('fund_code', flat=True))
 
     def __str__(self):
         return str(self.gaitid)
