@@ -3,7 +3,13 @@ import { HelpText } from '../components/HelpText.js'
 
 const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErrors, setFormErrors, handleSADDActualsValidation, readOnly, setWasUpdated }) => {
 
+    // Method to format the value displayed. Set null values to a empty field and allows for 0 to be displayed
+    let setDisplayValue = (value) => {
+        return value === null ? "" : Math.round(value);
+    }
+
     let handleDataEntry = (value, inputDisagg, inputLabelIndex) => {
+        value = value === '' ? null : value; // Sets empty cells to value of null. Allows zeros to be entered and displayed.
         setWasUpdated(true);
         let update = {...disaggregationData};
         update[inputDisagg].labels[inputLabelIndex] = {...disaggregationData[inputDisagg].labels[inputLabelIndex], value: value};
@@ -52,7 +58,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id="id_Actual-without-double-counting--Direct"
                             name="Actual-without-double-counting--Direct"
                             disabled={readOnly}
-                            value={Math.round(disaggregationData["Actual without double counting"].labels[0].value) || ""}
+                            value={setDisplayValue(disaggregationData["Actual without double counting"].labels[0].value)}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual without double counting", 0)}
                             onBlur={() => handleValdiation()}
                         />
@@ -62,7 +68,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id="id_Actual-with-double-counting--Direct"
                             name="Actual-with-double-counting--Direct"
                             disabled={readOnly}
-                            value={Math.round(disaggregationData["Actual with double counting"].labels[0].value) || ""}
+                            value={setDisplayValue(disaggregationData["Actual with double counting"].labels[0].value)}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual with double counting", 0)}
                             onBlur={() => handleValdiation()}
                         />
@@ -78,7 +84,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id="id_Actual-without-double-counting--Indirect"
                             name="Actual-without-double-counting--Indirect"
                             disabled={readOnly}
-                            value={Math.round(disaggregationData["Actual without double counting"].labels[1].value) || ""}
+                            value={setDisplayValue(disaggregationData["Actual without double counting"].labels[1].value)}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual without double counting", 1)}
                             onBlur={() => handleValdiation()}
                         />
@@ -88,7 +94,7 @@ const ActualValueFields = ({ disaggregationData, setDisaggregationData, formErro
                             id="id_Actual-with-double-counting--Indirect"
                             name="Actual-with-double-counting--Indirect"
                             disabled={readOnly}
-                            value={Math.round(disaggregationData["Actual with double counting"].labels[1].value) || ""}
+                            value={setDisplayValue(disaggregationData["Actual with double counting"].labels[1].value)}
                             onChange={(e) => handleDataEntry(e.target.value, "Actual with double counting", 1)}
                             onBlur={() => handleValdiation()}
                         />
