@@ -4,6 +4,7 @@ from indicators.models import IDAAOutcomeTheme
 from rest_framework.test import APIClient
 from factories.workflow_models import UserFactory
 from django.shortcuts import reverse
+from unittest import skip
 
 
 class TestProgramAdminSerializer(test.TestCase):
@@ -114,6 +115,7 @@ class TestProgramAdminSerializer(test.TestCase):
 
         self.assert_errors(response.json())
 
+    @skip("Not currently limiting start and end date")
     def test_invalid_values(self):
         data = self.default_program
         data['start_date'] = '2000-01-01'
