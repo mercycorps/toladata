@@ -257,8 +257,8 @@ class NestedFundCodeSerializer(ModelSerializer):
 
 class NestedGaitIDSerializer(ModelSerializer):
     gaitid = IntegerField(max_value=99999)
-    donor = CharField(max_length=255, required=False, allow_blank=True)
-    donor_dept = CharField(required=False, allow_blank=True)
+    donor = CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
+    donor_dept = CharField(required=False, allow_blank=True, allow_null=True)
     fund_code = NestedFundCodeSerializer(many=True, required=False)
 
     class Meta:
@@ -290,7 +290,7 @@ class NestedIDAAOutcomeThemeSerializer(Serializer):
 
 class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(read_only=True)
-    external_program_id = IntegerField(required=False, max_value=9999)
+    external_program_id = IntegerField(required=False, allow_null=True, max_value=9999)
     gaitid = NestedGaitIDSerializer(required=False, many=True)
     idaa_sector = NestedIDAASectorSerializer(required=False, many=True)
     country = NestedCountrySerializer(required=True, many=True)
@@ -320,16 +320,16 @@ class ProgramAdminSerializer(ModelSerializer):
             self.validate_dates(data['start_date'], data['end_date'])
         return super().validate(data)
 
-    def validate_start_date(self, value):
-        past_limit = date.today() - relativedelta(years=10)
-        if value and value < past_limit:
-            raise ValidationError(_("The program start date may not be more than 10 years in the past."))
-        return value
-
-    def validate_end_date(self, value):
-        future_limit = date.today() + relativedelta(years=10)
-        if value and value > future_limit:
-            raise ValidationError(_("The program end date may not be more than 10 years in the future."))
+    # def validate_start_date(self, value):
+    #     past_limit = date.today() - relativedelta(years=10)
+    #     if value and value < past_limit:
+    #         raise ValidationError(_("The program start date may not be more than 10 years in the past."))
+    #     return value
+    #
+    # def validate_end_date(self, value):
+    #     future_limit = date.today() + relativedelta(years=10)
+    #     if value and value > future_limit:
+    #         raise ValidationError(_("The program end date may not be more than 10 years in the future."))
 
     def validate_gaitid(self, values):
         checked_gaitids = []
