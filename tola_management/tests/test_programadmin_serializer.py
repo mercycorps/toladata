@@ -4,6 +4,7 @@ from indicators.models import IDAAOutcomeTheme
 from rest_framework.test import APIClient
 from factories.workflow_models import UserFactory
 from django.shortcuts import reverse
+from unittest import skip
 
 
 class TestProgramAdminSerializer(test.TestCase):
@@ -12,13 +13,13 @@ class TestProgramAdminSerializer(test.TestCase):
     error_messages = {
         'external_program_id': ['This field may not be null.'],
         'name': ['This field may not be blank.'],
-        'funding_status': ['This field may not be blank.'], 
-        'country': ['This field may not be blank.'], 
-        'start_date': ['Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', 'The program start date may not be more than 10 years in the past.'], 
+        'funding_status': ['This field may not be blank.'],
+        'country': ['This field may not be blank.'],
+        'start_date': ['Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', 'The program start date may not be more than 10 years in the past.'],
         'end_date': ['Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', 'The program end date may not be more than 10 years in the future.'],
         'gaitid': ['Duplicate GAIT ID numbers are not allowed.', 'A valid integer is required.', 'Ensure this value is less than or equal to 99999.']
     }
-    
+
     def setUp(self):
         self.default_sector = IDAASector(sector='Agriculture')
         self.default_sector.save()
@@ -77,6 +78,18 @@ class TestProgramAdminSerializer(test.TestCase):
             "idaa_outcome_theme": [self.default_outcome_theme.id],
         }
 
+    @property
+    def demo_program(self):
+        return {
+            "name": "Program Test",
+            "funding_status": "Funded",
+            "country": [self.default_country.id],
+            "gaitid": [
+                {
+                    "gaitid": 7654,
+                }]
+        }
+
     def assert_errors(self, response):
         for key, _ in self.empty_program.items():
             if key in self.error_messages and key in response:
@@ -88,6 +101,12 @@ class TestProgramAdminSerializer(test.TestCase):
 
         self.assertEqual(response.status_code, 201)
 
+    def test_create_program_with_empty_fields(self):
+        data = self.demo_program
+        response = self.client.post(reverse(self.list_url), data=data, format='json')
+
+        self.assertEqual(response.status_code, 201)
+
     def test_invalid_create(self):
         data = self.empty_program
         response = self.client.post(reverse(self.list_url), data=data, format='json')
@@ -96,6 +115,7 @@ class TestProgramAdminSerializer(test.TestCase):
 
         self.assert_errors(response.json())
 
+    @skip("Not currently limiting start and end date")
     def test_invalid_values(self):
         data = self.default_program
         data['start_date'] = '2000-01-01'
@@ -110,7 +130,7 @@ class TestProgramAdminSerializer(test.TestCase):
         data = self.default_program
         data['gaitid'].append(data['gaitid'][0])
         response = self.client.post(reverse(self.list_url), data=data, format='json')
-        
+
         self.assertEqual(response.status_code, 400)
 
         self.assert_errors(response.json())
@@ -120,7 +140,7 @@ class TestProgramAdminSerializer(test.TestCase):
         data['gaitid'][0]['gaitid'] = 'aaaa'
         data['gaitid'][0]['fund_code'].append('aaaa')
         response = self.client.post(reverse(self.list_url), data=data, format='json')
-        
+
         self.assertEqual(response.status_code, 400)
 
         self.assert_errors(response.json()['gaitid'])
@@ -130,7 +150,7 @@ class TestProgramAdminSerializer(test.TestCase):
         data['gaitid'][0]['gaitid'] = 999999
         data['gaitid'][0]['fund_code'].append(999999)
         response = self.client.post(reverse(self.list_url), data=data, format='json')
-        
+
         self.assertEqual(response.status_code, 400)
 
         self.assert_errors(response.json()['gaitid'])
@@ -144,9 +164,33 @@ class TestProgramAdminSerializer(test.TestCase):
 
         data['name'] = 'Program Update'
         data['gaitid'].pop(1)
+        data['gaitid'].append({
+                                "gaitid": 2233,
+                                "donor": "donor",
+                                "donor_dept": "donordept",
+                                "fund_code": [30123, 30321]
+                            })
 
         response = self.client.put(reverse(self.detail_url, kwargs={'pk': response.json()['id']}), data=data, format='json')
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['gaitid']), 1)
+        self.assertEqual(len(response.json()['gaitid']), 2)
         self.assertEqual(response.json()['name'], 'Program Update')
+
+    def test_update_program_with_empty_fields(self):
+        data = self.demo_program
+
+        response = self.client.post(reverse(self.list_url), data=data, format='json')
+
+        self.assertEqual(response.status_code, 201)
+
+        data['start_date'] = '2022-2-1'
+        data['end_date'] = '2023-12-28'
+        data['gaitid'].pop()
+
+        response = self.client.put(reverse(self.detail_url, kwargs={'pk': response.json()['id']}), data=data,
+                                   format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['gaitid']), 0)
+        self.assertEqual(response.json()['name'], 'Program Test')
