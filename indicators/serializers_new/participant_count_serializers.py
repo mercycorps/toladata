@@ -297,17 +297,21 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
             # Translators: An error message detailing that the sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'
             raise exceptions.ValidationError(_("The sum of 'SADD without double counting' should be equal to the sum of 'Direct without double counting'."))
 
-        if actual_with_direct == 0 or actual_with_indirect == 0:
-            # Translators: An error message detailing that the fields Direct and Indirect total participants with double counting is required
-            raise exceptions.ValidationError(_("Direct/indirect total participants with double counting is required. Please complete these fields."))
+        if actual_with_direct is None or actual_with_indirect is None:
+            # Translators: An error message detailing that the field Direct total participants with double counting is required
+            raise exceptions.ValidationError(_("Direct total participants with double counting is required. Please complete these fields."))
 
         if (actual_without_direct + actual_without_indirect) > (actual_with_direct + actual_with_indirect):
             # Translators: An error message detailing that the Direct and Indirect without double counting should be equal to or lower than the value of Direct and Indirect with double counting
             raise exceptions.ValidationError(_("Direct/indirect without double counting should be equal to or lower than direct/indirect with double counting."))
 
-        if (sectors_direct + sectors_indirect) > (actual_with_direct + actual_with_indirect):
+        if sectors_direct > actual_with_direct:
             # Translators: An error message detailing that the Sector values should be less to or equal to the sum of Direct and Indirect with double counting value
-            raise exceptions.ValidationError(_("Sector values should be less than or equal to the 'Direct/Indirect with double counting' value."))
+            raise exceptions.ValidationError(_("Direct sector values should be less than or equal to the 'Direct with double counting' value."))
+
+        if sectors_indirect > actual_with_indirect:
+            # Translators: An error message detailing that the Sector values should be less to or equal to the sum of Direct and Indirect with double counting value
+            raise exceptions.ValidationError(_("Indirect sector values should be less than or equal to the 'Indirect with double counting' value."))
 
         return True
 
@@ -380,13 +384,15 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
                     else:
                         key = disagg['count_type'].lower()
 
-                    try:
-                        used_disaggregations[disagg_type][key]['value'] += int(label_value['value'])
-                    except ValueError:
+                    # Record max sector value for validation
+                    if disagg_type in ['Sectors Direct with double counting', 'Sectors Indirect with double counting']:
+                        used_disaggregations[disagg_type][key]['value'] = max(used_disaggregations[disagg_type][key]['value'], float(label_value['value']))
+                    else:
                         used_disaggregations[disagg_type][key]['value'] += float(label_value['value'])
 
                     new_value_objs.append(DisaggregatedValue(
-                        category_id=label_value['disaggregationlabel_id'], result=instance, value=label_value['value']))
+                        category_id=label_value['disaggregationlabel_id'], result=instance,
+                        value=label_value['value']))
 
         if self.disaggregations_are_valid(used_disaggregations):
             if preserve_old_ids:
@@ -413,8 +419,11 @@ class PCResultSerializerWrite(serializers.ModelSerializer):
         for key, value in validated_data.items():
             setattr(instance, key, value)
         instance.save()
-        instance.outcome_themes.remove()
-        instance.outcome_themes.add(*outcome_themes)
+        old_outcome_themes = [x.pk for x in instance.outcome_themes.all()]
+        added_outcome_themes = [x for x in outcome_themes if x not in old_outcome_themes]
+        removed_outcome_themes = [x for x in old_outcome_themes if x not in outcome_themes]
+        instance.outcome_themes.remove(*removed_outcome_themes)
+        instance.outcome_themes.add(*added_outcome_themes)
 
         new_value_objs, old_label_ids = self.process_disaggregations(disaggregations, instance, preserve_old_ids=True)
 

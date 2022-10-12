@@ -206,7 +206,8 @@ class TestParticipantCountSetup(test.TestCase):
         # Get base result data
         base_result_data = self.get_base_result_data(indicator)
         # Add outcome theme 'Economic Opportunity'
-        result.outcome_themes.add(base_result_data['outcome_themes'].first()['id'])
+        base_outcome_theme = base_result_data['outcome_themes'].first()['id']
+        result.outcome_themes.add(base_outcome_theme)
 
         response_get = self.client.get(reverse('pcountupdate', args=[result.pk]))
         data = json.loads(response_get.content)
@@ -223,15 +224,13 @@ class TestParticipantCountSetup(test.TestCase):
         updated_base_result_data, updated_disagg_values = self.update_base_results(base_result_data)
         disaggs = updated_base_result_data['disaggregations']
         # Adding a second outcome theme to the existing one
-        outcome_theme = [base_result_data['outcome_themes'].last()['id']]
+        outcome_theme = [base_outcome_theme, base_result_data['outcome_themes'].last()['id']]
         url = reverse('pcountupdate', args=[result.pk])
         payload = {'disaggregations': disaggs, 'outcome_theme': outcome_theme,
                    'rationale': 'test'}
         response_post = self.client.put(url, data=payload, content_type='application/json')
         # Getting updated result object
         updated_result = Result.objects.get(pk=result.pk)
-        # Expected outcome themes
-        outcome_theme_list = [base_result_data['outcome_themes'].first()['id']] + outcome_theme
         # Fetching outcome themes from updated result object and adding them to list
         ot_list = self.get_outcome_theme_list(updated_result)
         disagg_values = []
@@ -240,5 +239,5 @@ class TestParticipantCountSetup(test.TestCase):
 
         self.assertEqual(response_post.status_code, 200)
         self.assertEqual(updated_result.periodic_target.period, self.period_string)
-        self.assertEqual(ot_list, outcome_theme_list)
+        self.assertEqual(ot_list, outcome_theme)
         self.assertEqual(disagg_values, updated_disagg_values)
