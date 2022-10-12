@@ -4,6 +4,7 @@ import logging
 
 
 logger = logging.getLogger(__name__)
+admin_email_log = logging.getLogger('workflow')
 
 
 class AccessMSR:
@@ -106,6 +107,13 @@ def check_IDAA_duplicates(idaa_programs):
 
     if len(duplicated_gaitids):
         filter_values = "%3B%23".join(gaitid_filter_values)
-        logger.exception(f"Found {len(duplicated_gaitids)} duplicated gaitids\nSharePoint URL for duplicated GaitIDs: {base_url + filter_values}")
+        '''
+        Log the duplicates to two loggers. 
+        logger.info to prevent the following NoneType: None log (python was trying to include a traceback when using logger.exception)
+        admin_email_log to send the log to the tola-devs-errors slack channel
+        '''
+        log_str = f"Found {len(duplicated_gaitids)} duplicated gaitids\nSharePoint URL for duplicated GaitIDs: {base_url + filter_values}"
+        logger.info(log_str)
+        admin_email_log.exception(log_str)
 
     return duplicates_for_report
