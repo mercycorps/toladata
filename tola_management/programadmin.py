@@ -290,7 +290,7 @@ class NestedIDAAOutcomeThemeSerializer(Serializer):
 
 class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(read_only=True)
-    external_program_id = IntegerField(required=False, allow_null=True, max_value=9999)
+    external_program_id = IntegerField(required=False, allow_null=True, max_value=99999)
     gaitid = NestedGaitIDSerializer(required=False, many=True)
     idaa_sector = NestedIDAASectorSerializer(required=False, many=True)
     country = NestedCountrySerializer(required=True, many=True)
