@@ -29,6 +29,7 @@ const ReactDatepicker = ({
     minDate,
     maxDate,
     onChange,
+    disabled,
     customDatesSelector
     }) => {
 
@@ -64,6 +65,7 @@ const ReactDatepicker = ({
             selected={formatDate(date) || ""}
             minDate={selectedMinDate}
             maxDate={selectedMaxDate}
+            disabled={disabled || false}
             onChange={onChange}
             renderCustomHeader={({
                 changeYear,
@@ -73,44 +75,33 @@ const ReactDatepicker = ({
                 prevMonthButtonDisabled,
                 nextMonthButtonDisabled,
                 }) => (
-                    <div
-                    style={{
-                        margin: 10,
-                        display: "flex",
-                        justifyContent: "space-between",
-                    }}
+                    <div style={{ margin: 10, display: "flex", justifyContent: "space-between" }}
                     >
-                    <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled} style={{border: "none"}}>
-                        {"<"}
-                    </button>
+                        <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled} style={{border: "none"}}>
+                            {"<"}
+                        </button>
 
-                    <select
-                        value={selectedDate.getFullYear()}
-                        onChange={({ target: { value } }) => changeYear(value)}
-                    >
-                        {years.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
+                        <select
+                            value={selectedDate.getFullYear()}
+                            onChange={({ target: { value } }) => changeYear(value)}
+                        >
+                            {years.map((option) => (
+                                <option key={option} value={option}>{ option }</option>
+                            ))}
+                        </select>
             
-                    <select
-                        value={months[selectedDate.getMonth()]}
-                        onChange={({ target: { value } }) =>
-                        changeMonth(months.indexOf(value))
-                        }
-                    >
-                        {months.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
-            
-                    <button onClick={increaseMonth} disabled={nextMonthButtonDisabled} style={{border: "none"}}>
-                        {">"}
-                    </button>
+                        <select
+                            value={months[selectedDate.getMonth()]}
+                            onChange={({ target: { value } }) => changeMonth(months.indexOf(value))}
+                        >
+                            {months.map((option) => (
+                                <option key={option} value={option}>{ option }</option>
+                            ))}
+                        </select>
+                
+                        <button onClick={increaseMonth} disabled={nextMonthButtonDisabled} style={{border: "none"}}>
+                            {">"}
+                        </button>
                     </div>
                 )}
         >
