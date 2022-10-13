@@ -257,9 +257,9 @@ class NestedFundCodeSerializer(ModelSerializer):
 
 class NestedGaitIDSerializer(ModelSerializer):
     gaitid = IntegerField(max_value=99999)
-    donor = CharField(max_length=255)
-    donor_dept = CharField()
-    fund_code = NestedFundCodeSerializer(many=True)
+    donor = CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
+    donor_dept = CharField(required=False, allow_blank=True, allow_null=True)
+    fund_code = NestedFundCodeSerializer(many=True, required=False)
 
     class Meta:
         model = GaitID
@@ -290,24 +290,18 @@ class NestedIDAAOutcomeThemeSerializer(Serializer):
 
 class ProgramAdminSerializer(ModelSerializer):
     id = IntegerField(read_only=True)
-    external_program_id = IntegerField(required=True, max_value=9999)
-    name = CharField(required=True, max_length=255)
-    funding_status = CharField(required=True)
-    gaitid = NestedGaitIDSerializer(required=True, many=True)
-    fundCode = CharField(required=False, allow_blank=True, allow_null=True, source='cost_center')
-    idaa_sector = NestedIDAASectorSerializer(required=True, many=True)
+    external_program_id = IntegerField(required=False, allow_null=True, max_value=99999)
+    gaitid = NestedGaitIDSerializer(required=False, many=True)
+    idaa_sector = NestedIDAASectorSerializer(required=False, many=True)
     country = NestedCountrySerializer(required=True, many=True)
     auto_number_indicators = BooleanField(required=False)
-    #organizations = IntegerField(source='organization_count', read_only=True)
-    #program_users = IntegerField(source='program_users_count', read_only=True)
-    #onlyOrganizationId = IntegerField(source='only_organization_id', read_only=True)
     organizations = SerializerMethodField()
     program_users = SerializerMethodField()
     onlyOrganizationId = SerializerMethodField()
     _using_results_framework = IntegerField(required=False, allow_null=True)
-    start_date = DateField(required=True)
-    end_date = DateField(required=True)
-    idaa_outcome_theme = NestedIDAAOutcomeThemeSerializer(required=True, many=True)
+    start_date = DateField(required=False, allow_null=True)
+    end_date = DateField(required=False, allow_null=True)
+    idaa_outcome_theme = NestedIDAAOutcomeThemeSerializer(many=True, required=False)
 
     def validate_country(self, values):
         if not values:
@@ -322,19 +316,20 @@ class ProgramAdminSerializer(ModelSerializer):
                 raise ValidationError(_("The program end date may not be before the program start date."))
 
     def validate(self, data):
-        self.validate_dates(data['start_date'], data['end_date'])
+        if data.get('start_date') and data.get('end_date'):
+            self.validate_dates(data['start_date'], data['end_date'])
         return super().validate(data)
 
-    def validate_start_date(self, value):
-        past_limit = date.today() - relativedelta(years=10)
-        if value < past_limit:
-            raise ValidationError(_("The program start date may not be more than 10 years in the past."))
-        return value
-
-    def validate_end_date(self, value):
-        future_limit = date.today() + relativedelta(years=10)
-        if value > future_limit:
-            raise ValidationError(_("The program end date may not be more than 10 years in the future."))
+    # def validate_start_date(self, value):
+    #     past_limit = date.today() - relativedelta(years=10)
+    #     if value and value < past_limit:
+    #         raise ValidationError(_("The program start date may not be more than 10 years in the past."))
+    #     return value
+    #
+    # def validate_end_date(self, value):
+    #     future_limit = date.today() + relativedelta(years=10)
+    #     if value and value > future_limit:
+    #         raise ValidationError(_("The program end date may not be more than 10 years in the future."))
 
     def validate_gaitid(self, values):
         checked_gaitids = []
@@ -355,7 +350,6 @@ class ProgramAdminSerializer(ModelSerializer):
             'name',
             'funding_status',
             'gaitid',
-            'fundCode',
             'idaa_sector',
             'country',
             'organizations',
@@ -411,9 +405,9 @@ class ProgramAdminSerializer(ModelSerializer):
                 validated_data['_using_results_framework'] is None:
             validated_data.pop('_using_results_framework')
         country = validated_data.pop('country')
-        sector = validated_data.pop('idaa_sector')
-        gaitid_data = validated_data.pop('gaitid')
-        idaa_outcome_theme = validated_data.pop('idaa_outcome_theme')
+        sector = validated_data.pop('idaa_sector', [])
+        gaitid_data = validated_data.pop('gaitid', [])
+        idaa_outcome_theme = validated_data.pop('idaa_outcome_theme', [])
         program = super(ProgramAdminSerializer, self).create(validated_data)
         program.country.add(*country)
         program.idaa_sector.add(*sector)
@@ -421,13 +415,18 @@ class ProgramAdminSerializer(ModelSerializer):
         program.save()
 
         for gid in gaitid_data:
-            gaitid = GaitID(gaitid=gid['gaitid'], donor=gid['donor'], program=program)
+            gaitid = GaitID.objects.create(gaitid=gid['gaitid'], program_id=program.id)
+            if gid.get('donor'):
+                gaitid.donor = gid['donor']
+            if gid.get('donor_dept'):
+                gaitid.donor_dept = gid['donor_dept']
             gaitid.save()
 
-            for fund_code in gid['fund_code']:
-                if fund_code:
-                    new_fund_code = FundCode(fund_code=fund_code, gaitid=gaitid)
-                    new_fund_code.save()
+            if gid.get('fund_code'):
+                for fund_code in gid['fund_code']:
+                    if fund_code:
+                        new_fund_code = FundCode(fund_code=fund_code, gaitid=gaitid)
+                        new_fund_code.save()
 
         ProgramAdminAuditLog.created(
             program=program,
@@ -456,23 +455,28 @@ class ProgramAdminSerializer(ModelSerializer):
         removed_countries = [x for x in original_countries if x not in incoming_countries]
 
         original_sectors = instance.idaa_sector.all()
-        incoming_sectors = validated_data.pop('idaa_sector')
+        incoming_sectors = validated_data.pop('idaa_sector', [])
         added_sectors = [x for x in incoming_sectors if x not in original_sectors]
         removed_sectors = [x for x in original_sectors if x not in incoming_sectors]
 
         original_outcome_theme = instance.idaa_outcome_theme.all()
-        incoming_outcome_theme = validated_data.pop('idaa_outcome_theme')
+        incoming_outcome_theme = validated_data.pop('idaa_outcome_theme', [])
         added_outcome_theme = [x for x in incoming_outcome_theme if x not in original_outcome_theme]
         removed_outcome_theme = [x for x in original_outcome_theme if x not in incoming_outcome_theme]
 
-        gaitid_data = validated_data.pop('gaitid')
+        gaitid_data = validated_data.pop('gaitid', [])
+
         for gid in gaitid_data:
             gaitid_obj, created = GaitID.objects.get_or_create(gaitid=gid['gaitid'], program_id=instance.id)
-            gaitid_obj.donor = gid['donor']
+            if gid.get('donor'):
+                gaitid_obj.donor = gid['donor']
+            if gid.get('donor_dept'):
+                gaitid_obj.donor_dept = gid['donor_dept']
             gaitid_obj.save()
 
-            for fund_code in gid['fund_code']:
-                _ = FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+            if gid.get('fund_code'):
+                for fund_code in gid['fund_code']:
+                    _ = FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
 
             if not created:
                 for previous_fund_code in gaitid_obj.fundcode_set.all():

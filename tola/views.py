@@ -33,6 +33,14 @@ def index(request, selected_country=None):
     user_countries = user.available_countries # all countries whose programs are available to the user
     user_country_codes = json.dumps(
         {country.code: country.country_page for country in user_countries})
+
+    # Check if selected_country is a string. If it is a string set selected_country to None to trigger the else statement
+    if selected_country:
+        try:
+            int(selected_country)
+        except ValueError:
+            selected_country = None
+
     if selected_country:  # from URL
         if not user.available_countries.filter(id=selected_country).exists():
             raise PermissionDenied

@@ -87,7 +87,14 @@ class ProgramAccessInline(admin.TabularInline):
 
 class GaitIDInlineAdmin(admin.StackedInline):
     model = GaitID
+    fields = ('gaitid', 'donor', 'donor_dept', 'fund_codes',)
+    readonly_fields = ('fund_codes',)
     extra = 0
+
+
+class FundCodeInlineAdmin(admin.TabularInline):
+    model = FundCode
+    extra = 1
 
 
 #########################
@@ -238,6 +245,7 @@ class ProgramDiscrepancyAdmin(admin.ModelAdmin):
 class GaitIDAdmin(admin.ModelAdmin):
     list_display = ('gaitid', 'program', 'create_date', 'edit_date',)
     search_fields = ('gaitid', 'program__name',)
+    inlines = (FundCodeInlineAdmin,)
     autocomplete_fields = ('program',)
     list_filter = (AutocompleteFilterFactory('Program', 'program'),)
     readonly_fields = ('create_date', 'edit_date',)
