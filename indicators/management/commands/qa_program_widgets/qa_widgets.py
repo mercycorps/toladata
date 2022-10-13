@@ -57,7 +57,7 @@ class ProgramFactory:
         gait_id.donor = "QATestDonor"
         gait_id.donor_dept = "QATestDonorDept"
         gait_id.save()
-        fund_code = 12345
+        fund_code = 77777
         FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gait_id)
 
     def create_program(
