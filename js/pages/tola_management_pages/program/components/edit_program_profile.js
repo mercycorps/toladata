@@ -201,9 +201,6 @@ export default class EditProgramProfile extends React.Component {
             })
         });
 
-        console.log('uniqueGaitIds', uniqueGaitIds)
-        console.log('detected Errors', detectedErrors);
-        console.log('detectedGaitRowErrors', detectedGaitRowErrors);
         this.setState({
             formErrors: detectedErrors,
             gaitRowErrors: detectedGaitRowErrors,
