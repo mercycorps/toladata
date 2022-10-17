@@ -30,7 +30,6 @@ const ReactDatepicker = ({
     maxDate,
     onChange,
     disabled,
-    customDatesSelector
     }) => {
 
         // Function to set up the range for the year picker
@@ -57,7 +56,6 @@ const ReactDatepicker = ({
         let years = yearRangeOptions(selectedMinDate, selectedMaxDate)
 
     return (
-        // TODO: Handle null dates
         <Datepicker
             dateFormat={dateFormat || "yyyy-MM-dd"}
             locale={locale || window.userLang}
@@ -68,6 +66,7 @@ const ReactDatepicker = ({
             disabled={disabled || false}
             onChange={onChange}
             renderCustomHeader={({
+                date,
                 changeYear,
                 changeMonth,
                 decreaseMonth,
@@ -82,7 +81,7 @@ const ReactDatepicker = ({
                         </button>
 
                         <select
-                            value={selectedDate.getFullYear()}
+                            value={date.getFullYear()}
                             onChange={({ target: { value } }) => changeYear(value)}
                         >
                             {years.map((option) => (
@@ -91,7 +90,7 @@ const ReactDatepicker = ({
                         </select>
             
                         <select
-                            value={months[selectedDate.getMonth()]}
+                            value={months[date.getMonth()]}
                             onChange={({ target: { value } }) => changeMonth(months.indexOf(value))}
                         >
                             {months.map((option) => (

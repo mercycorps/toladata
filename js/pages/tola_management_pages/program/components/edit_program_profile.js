@@ -37,8 +37,7 @@ export default class EditProgramProfile extends React.Component {
     }
 
     componentDidMount() {
-        // Set the form to editable for demo, devs, and local servers
-        // let editableEnv = ["demo", "dev"].reduce((editable, env) => {
+        // Set the form to editable for demo, dev, dev2, and localhost servers
         let editableEnv = ["demo", "dev", "local"].reduce((editable, env) => {
             if (!editable) editable = window.location.href.includes(env);
             return editable;
@@ -50,7 +49,7 @@ export default class EditProgramProfile extends React.Component {
     }
 
 
-    // ***** Action buttons function *****
+    // ***** Action functions *****
 
     hasUnsavedDataAction() {
         this.props.onIsDirtyChange(JSON.stringify(this.state.managed_data) != JSON.stringify(this.state.original_data))
@@ -64,18 +63,18 @@ export default class EditProgramProfile extends React.Component {
         if (this.validate()) this.props.onCreate(this.state.managed_data);
     }
 
-    updateFormField(fieldKey, val) {
-        this.setState({
-            managed_data: Object.assign(this.state.managed_data, {[fieldKey]: val})
-        }, () => this.hasUnsavedDataAction())
-    }
-
     resetForm() {
         this.setState({
             managed_data: $.extend(true, {}, this.state.original_data),
             formErrors: {},
             gaitRowErrors: {},
             gaitRowErrorsFields: {}
+        }, () => this.hasUnsavedDataAction())
+    }
+
+    updateFormField(fieldKey, val) {
+        this.setState({
+            managed_data: Object.assign(this.state.managed_data, {[fieldKey]: val})
         }, () => this.hasUnsavedDataAction())
     }
 
@@ -91,11 +90,72 @@ export default class EditProgramProfile extends React.Component {
         }
     }
 
+    // ***** Gait row functions *****
+
+    // Function to update the fields in a gait row
+    updateGaitRow(label, val, index) {
+        let updatedRows = [...this.state.managed_data.gaitid];
+        updatedRows[index][label] = val;
+        this.updateFormField("gaitid", updatedRows);
+    }
+
+    // Function to add a new gait row
+    appendGaitRow() {
+        const newRow = {
+            gaitid: "",
+            donor: "",
+            donor_dept: "",
+            fund_code: [],
+        };
+        this.setState({
+            managed_data: $.extend(true, this.state.managed_data, {gaitid: [...this.state.managed_data.gaitid, newRow]})
+        })
+    }
+
+    // Function to delete a gait row
+    deleteGaitRow(index) {
+        let updatedRow = [...this.state.managed_data.gaitid];
+        updatedRow.splice(index, 1);
+        this.updateFormField("gaitid", updatedRow);
+    }
+
+    // Function to handle updating the fund code field
+    updateFundCode(label, value, index) {
+        let val = value.split(/[, ]+/);
+        val = val.map((code) => {
+            if (!code) {
+                return '';
+            } else if ( /\D+/.test(code)) {
+                return parseInt(code.slice(0, code.length - 1)) || "";
+            }
+            return parseInt(code);
+        });
+        this.updateGaitRow(label, val, index);
+    }
+
+    // Function to create a comma separated list to display converted from an array of items
+    createDisplayList(listArray) {
+        if (!listArray) return null;
+        listArray = [...listArray];
+        if (Array.isArray(listArray)) {
+            listArray = listArray.reduce((list, item, i) => {
+                let separator = i === 0 ? "" : ", ";
+                item = item.label || item[1] || item;
+                return list + separator + item;
+            }, "");
+        }
+        return listArray;
+    }
+
+    
+
     // ***** Validations *****
     validate() {
         let isValid = true;
         let detectedErrors = {};
         let formdata = this.state.managed_data;
+
+        // Adds error message text to the detected errors object
         let addErrorMessage = (type, field, msg, idx) => {
             if (type === 'normal') {
                 detectedErrors[field] ? detectedErrors[field].push(msg) : detectedErrors[field] = [msg];
@@ -191,7 +251,7 @@ export default class EditProgramProfile extends React.Component {
                 }
             })
 
-            // Create the invalid field arrays for the GAIT Rows
+            // Create the invalid field arrays for the GAIT Rows to highlight
             Object.keys(detectedGaitRowErrors).map((index) => {
                 let fieldNames = new Set();
                 detectedGaitRowErrors[index].map((msg) => {
@@ -205,65 +265,8 @@ export default class EditProgramProfile extends React.Component {
             formErrors: detectedErrors,
             gaitRowErrors: detectedGaitRowErrors,
             gaitRowErrorsFields: gaitRowErrorsFields
-        })
-        return isValid;
-    }
-
-    // ***** Gait row functions *****
-
-    // Function to create a comma separated list to display from an array of items
-    createDisplayList(listArray) {
-        if (!listArray) return null;
-        listArray = [...listArray];
-        if (Array.isArray(listArray)) {
-            listArray = listArray.reduce((list, item, i) => {
-                let separator = i === 0 ? "" : ", ";
-                item = item.label || item[1] || item;
-                return list + separator + item;
-            }, "");
-        }
-        return listArray;
-    }
-
-    // Function to handle updating the fund code field.
-    updateFundCode(label, value, index) {
-        let val = value.split(/[, ]+/);
-        val = val.map((code) => {
-            if (!code) {
-                return '';
-            } else if ( /\D+/.test(code)) {
-                return parseInt(code.slice(0, code.length - 1)) || "";
-            }
-            return parseInt(code);
         });
-        this.updateGaitRow(label, val, index);
-    }
-    
-    // Function to update the fields in a gait row
-    updateGaitRow(label, val, index) {
-        let updatedRows = [...this.state.managed_data.gaitid];
-        updatedRows[index][label] = val;
-        this.updateFormField("gaitid", updatedRows);
-    }
-
-    // Function to add a new gait row
-    appendGaitRow() {
-        const newRow = {
-            gaitid: "",
-            donor: "",
-            donor_dept: "",
-            fund_code: [],
-        };
-        this.setState({
-            managed_data: $.extend(true, this.state.managed_data, {gaitid: [...this.state.managed_data.gaitid, newRow]})
-        })
-    }
-
-    // Function to delete a gait row
-    deleteGaitRow(index) {
-        let updatedRow = [...this.state.managed_data.gaitid];
-        updatedRow.splice(index, 1);
-        this.updateFormField("gaitid", updatedRow);
+        return isValid;
     }
 
     // ***** Render Componenent *****
@@ -454,6 +457,7 @@ export default class EditProgramProfile extends React.Component {
                         <tbody>
                             {formdata.gaitid.map((gaitRow, index) => {
                                 let donorText = gaitRow.donor || "";
+                                
                                 // If form is not editable, concatenate and display the donor and donor dept text in the donor field
                                 if (!this.state.formEditable) { 
                                     donorText = gaitRow.donor_dept ? donorText + " - " + gaitRow.donor_dept : donorText;
