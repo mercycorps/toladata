@@ -128,7 +128,7 @@ export default class EditProgramProfile extends React.Component {
             }
             if (formdata.end_date.length > 0 && startDate > endDate) {
                 isValid = false;
-                addErrorMessage("normal", "end_date", gettext("The program end date may not be more than 10 years in the future."));
+                addErrorMessage("normal", "end_date", gettext("The program start date may not be after the program end date."));
             }
         }
         if (formdata.end_date.length > 0) {
@@ -226,24 +226,24 @@ export default class EditProgramProfile extends React.Component {
     }
 
     // Function to handle updating the fund code field.
-    updateFundCode(e, index) {
-        let val = e.target.value.split(/[, ]+/);
-        val = val.map((value) => {
-            if (!value) {
+    updateFundCode(label, value, index) {
+        let val = value.split(/[, ]+/);
+        val = val.map((code) => {
+            if (!code) {
                 return '';
-            } else if ( /\D+/.test(value)) {
-                return parseInt(value.slice(0, value.length - 1)) || "";
+            } else if ( /\D+/.test(code)) {
+                return parseInt(code.slice(0, code.length - 1)) || "";
             }
-            return parseInt(value);
+            return parseInt(code);
         });
-        this.updateGaitRow(e.target.name, val, index);
+        this.updateGaitRow(label, val, index);
     }
     
     // Function to update the fields in a gait row
     updateGaitRow(label, val, index) {
-        let updateRow = [...this.state.managed_data.gaitid];
-        updateRow[index][label] = val;
-        this.updateFormField("gaitid", updateRow);
+        let updatedRows = [...this.state.managed_data.gaitid];
+        updatedRows[index][label] = val;
+        this.updateFormField("gaitid", updatedRows);
     }
 
     // Function to add a new gait row
@@ -359,10 +359,10 @@ export default class EditProgramProfile extends React.Component {
                         <Select
                             id="program-funding_status-input"
                             className={classNames('react-select', { 'is-invalid': this.state.formErrors['funding_status'] })}
-                            placeholder={ gettext("None selected") }
+                            placeholder={ gettext("Select...") }
                             isDisabled={!this.state.formEditable}
                             options={this.props.fundingStatusOptions}
-                            value={this.props.fundingStatusOptions.find(y=>y.label===formdata.funding_status)}
+                            value={this.props.fundingStatusOptions.find(y=>y.label===formdata.funding_status) || ""}
                             onChange={(e) => this.updateFormField('funding_status', e.label) }
                         />
                         <ErrorFeedback errorMessages={this.state.formErrors['funding_status']} />
@@ -482,7 +482,7 @@ export default class EditProgramProfile extends React.Component {
                                                     placeholder={ this.state.formEditable ? "" : gettext("None")}
                                                     disabled={!this.state.formEditable}
                                                     value={ this.createDisplayList(gaitRow.fund_code) || "" }
-                                                    onChange={(e) => this.updateFundCode(e, index)}
+                                                    onChange={(e) => this.updateFundCode('fund_code', e.target.value, index)}
                                                     onKeyUp={(e) => {
                                                         if (e.key === "Backspace" && !gaitRow.fund_code[gaitRow.fund_code.length - 1]) {
                                                             let updatedFundCode = [...gaitRow.fund_code];

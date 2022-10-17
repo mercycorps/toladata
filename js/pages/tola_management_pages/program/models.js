@@ -256,7 +256,7 @@ export class ProgramStore {
                 external_program_id: "",
                 start_date: "",
                 end_date: "",
-                funding_status: "Funded",
+                funding_status: "",
                 country: [],
                 idaa_sector: [],
                 idaa_outcome_theme: [],
