@@ -258,6 +258,7 @@ export const IndexView = observer(
                                                             idaaOutcomeThemesOptions={idaaOutcomeThemesOptions}
                                                             countryOptions={allCountryOptions}
                                                             fundingStatusOptions={fundingStatusOptions}
+                                                            isLoading={store.saving}
                                                             errors={store.editing_errors} />
                                                 </LoadingSpinner>
                                             )}

@@ -260,7 +260,12 @@ export class ProgramStore {
                 country: [],
                 idaa_sector: [],
                 idaa_outcome_theme: [],
-                gaitid: [],
+                gaitid: [{
+                    gaitid: "",
+                    donor: "",
+                    donor_dept: "",
+                    fund_code: [],
+                }],
                 description: "",
             }
             this.programs.unshift(new_program_data)

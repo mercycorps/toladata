@@ -27,10 +27,9 @@ export default class EditProgramProfile extends React.Component {
         const {program_data} = props
 
         this.state = {
-            waiting: false, // prevent button smashing when waiting on api response
             formEditable: false,
-            original_data: Object.assign({}, program_data),
-            managed_data: Object.assign({}, program_data),
+            original_data: $.extend(true, {}, program_data),
+            managed_data: $.extend(true, {}, program_data),
             formErrors: {},
             gaitRowErrors: {},
             gaitRowErrorsFields: {},
@@ -58,36 +57,11 @@ export default class EditProgramProfile extends React.Component {
     }
 
     save() {
-        this.setState({ waiting: true });
-        if (this.validate()) {
-            const program_id = this.props.program_data.id
-            const program_data = this.state.managed_data
-            // this.props.onUpdate(this.props.program_id, this.state.program_data);
-        }
-        setTimeout(() => {
-
-            this.setState({waiting: false})
-        }, 5000)
+        if (this.validate()) this.props.onUpdate(this.props.program_data.id, this.state.managed_data);
     }
 
-    saveNew(e) {
-        e.preventDefault()
-        this.setState({ waiting: true });
-        if (this.validate()) {
-            console.log("Form is Valid")
-            const program_data = this.state.managed_data
-            // this.props.onCreate(program_data)
-        } else {
-            setTimeout(() => {
-                console.log("this.state.formErrors: ", this.state.formErrors)
-                console.log("this.state.gaitRowErrors: ", this.state.gaitRowErrors)
-            }, 500)
-        }
-        setTimeout(() => {
-
-            this.setState({waiting: false})
-        }, 5000)
-
+    saveNew() {
+        if (this.validate()) this.props.onCreate(this.state.managed_data);
     }
 
     updateFormField(fieldKey, val) {
@@ -97,9 +71,11 @@ export default class EditProgramProfile extends React.Component {
     }
 
     resetForm() {
-        console.log(this.state)
         this.setState({
-            managed_data: Object.assign({}, this.state.original_data)
+            managed_data: $.extend(true, {}, this.state.original_data),
+            formErrors: {},
+            gaitRowErrors: {},
+            gaitRowErrorsFields: {}
         }, () => this.hasUnsavedDataAction())
     }
 
@@ -160,7 +136,7 @@ export default class EditProgramProfile extends React.Component {
                 isValid = false;
                 addErrorMessage("normal", "end_date", gettext("The program end date may not be more than 10 years in the future."));
             }
-            if (formdata.start_date.length > 0 && endDate > startDate) {
+            if (formdata.start_date.length > 0 && endDate < startDate) {
                 isValid = false;
                 addErrorMessage("normal", "end_date", gettext("The program end date may not be before the program start date."))
             }
@@ -171,7 +147,7 @@ export default class EditProgramProfile extends React.Component {
         let gaitRowErrorsFields = {};
         let uniqueGaitIds = {};
         let hasDuplicates = false;
-
+        
         formdata.gaitid.map((currentRow, idx) => {
             
             // The first row's GAIT ID is required
@@ -205,12 +181,11 @@ export default class EditProgramProfile extends React.Component {
             currentRow.fund_code.map(currentFundCode => {
                 currentFundCode = currentFundCode.toString();
                 let firstDigit = parseInt(currentFundCode.slice(0, 1));
-                let allowed = [3, 7, 9];
                 if (currentFundCode.length !== 5) {
                     isValid = false;
                     addErrorMessage("gaitRow", "fund_code", gettext("Fund codes may only be 5 digits long."), idx);
                 }
-                if (allowed.indexOf(firstDigit) === -1) {
+                if ([3, 7, 9].indexOf(firstDigit) === -1) {
                     isValid = false;
                     addErrorMessage("gaitRow", "fund_code", gettext("Fund codes may only begin with a 3, 7, or 9 (e.g., 30000)."), idx);
                 }
@@ -278,11 +253,13 @@ export default class EditProgramProfile extends React.Component {
     appendGaitRow() {
         const newRow = {
             gaitid: "",
-            fund_code: [],
             donor: "",
             donor_dept: "",
+            fund_code: [],
         };
-        this.updateFormField("gaitid", [...this.state.managed_data.gaitid, newRow]);
+        this.setState({
+            managed_data: $.extend(true, this.state.managed_data, {gaitid: [...this.state.managed_data.gaitid, newRow]})
+        })
     }
 
     // Function to delete a gait row
@@ -298,7 +275,6 @@ export default class EditProgramProfile extends React.Component {
         const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
         const selectedIDAASectors = formdata.idaa_sector.map(x=>this.props.idaaSectorOptions.find(y=>y.value==x));
         const selectedOutcomeThemes = formdata.idaa_outcome_theme.map(x=>this.props.idaaOutcomeThemesOptions.find(y=>y.value==x));
-        console.log('formdata:', formdata);
 
         return (
             <div className="tab-pane--react">
@@ -314,12 +290,12 @@ export default class EditProgramProfile extends React.Component {
                     <div className="form-group" data-toggle="tooltip" title={formdata.name}>
                         <label htmlFor="program-name-input" className="label--required">{gettext("Program name")}</label>
                         <input
-                            type="text"
                             id="program-name-input"
                             className={classNames('form-control', { 'is-invalid': this.state.formErrors['name'] })}
+                            type="text"
+                            placeholder={ !this.state.formEditable ? gettext("None") : "" }
                             maxLength={255}
                             required
-                            placeholder={ !this.state.formEditable ? gettext("None") : "" }
                             disabled={!this.state.formEditable}
                             value={formdata.name || ""}
                             onChange={(e) => this.updateFormField('name', e.target.value) }
@@ -329,12 +305,12 @@ export default class EditProgramProfile extends React.Component {
                     <div className="form-group">
                         <label htmlFor="program-id-input" className="label--required">{gettext("Program ID")}</label>
                         <input
-                            type="text"
                             id="program-id-input"
                             className={classNames('form-control', { 'is-invalid': this.state.formErrors['external_program_id'] })}
+                            type="text"
+                            placeholder={ !this.state.formEditable ? gettext("None") : "" }
                             maxLength={4}
                             required
-                            placeholder={ !this.state.formEditable ? gettext("None") : "" }
                             disabled={!this.state.formEditable}
                             value={formdata.external_program_id || ""}
                             onChange={(e) => this.updateFormField('external_program_id', e.target.value.replace(/[^0-9]/g, "")) }
@@ -345,16 +321,17 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-start-date" className="label--required">{gettext("Program start date")}</label>
                         <div className={ classNames( {'is-invalid': this.formErrors('start_date')} )}>
                             <ReactDatepicker
-                                customDatesSelector={false}
+                                id="program-start-date"
                                 className={classNames('form-control', { 'is-invalid': this.state.formErrors['end_date'] })}                
-                                date={formdata.start_date}
-                                maxDate={formdata.end_date}
+                                customDatesSelector={false}
                                 disabled={!this.state.formEditable}
+                                maxDate={formdata.end_date}
+                                date={formdata.start_date}
                                 onChange={(date) => {
                                     let validDate;
                                     try { validDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`; } 
                                     catch { validDate = ""; }
-                                    this.updateFormField('start_date', validDate)
+                                    this.updateFormField('start_date', validDate);
                                 }}
                             />
                         </div>
@@ -365,16 +342,16 @@ export default class EditProgramProfile extends React.Component {
                         <div className={ classNames( {'is-invalid': this.formErrors('start_date')} )}>
                             <ReactDatepicker
                                 id="program-end-date"
-                                customDatesSelector={false}
                                 className={classNames('form-control', { 'is-invalid': this.state.formErrors['end_date'] })}                
-                                date={formdata.end_date}
-                                minDate={formdata.start_date}
+                                customDatesSelector={false}
                                 disabled={!this.state.formEditable}
+                                minDate={formdata.start_date}
+                                date={formdata.end_date}
                                 onChange={(date) => {
                                     let validDate;
                                     try { validDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`; } 
                                     catch { validDate = ""; }
-                                    this.updateFormField('end_date', validDate)
+                                    this.updateFormField('end_date', validDate);
                                 }}
                             />
                         </div>
@@ -384,8 +361,8 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-funding_status-input" className="label--required">{gettext("Program funding status")}</label>
                         <Select
                             id="program-funding_status-input"
-                            placeholder={ gettext("None selected") }
                             className={classNames('react-select', { 'is-invalid': this.state.formErrors['funding_status'] })}
+                            placeholder={ gettext("None selected") }
                             isDisabled={!this.state.formEditable}
                             options={this.props.fundingStatusOptions}
                             value={this.props.fundingStatusOptions.find(y=>y.label===formdata.funding_status)}
@@ -397,20 +374,20 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-country-input" className="label--required">{gettext("Countries")}</label>
                         {!this.state.formEditable ?
                             <input
+                                id="program-country-input"
+                                className={classNames('form-control', { 'is-invalid': this.state.formErrors['country'] })}
                                 type="text"                      
                                 value={this.createDisplayList(selectedCountries) || gettext("None selected")}
-                                className={classNames('form-control', { 'is-invalid': this.state.formErrors['country'] })}
-                                id="program-country-input"
                                 disabled={!this.state.formEditable}
                             />
                         :
                             <CheckboxedMultiSelect
-                                value={selectedCountries}
-                                options={this.props.countryOptions}
-                                placeholder={gettext('None selected')}
-                                onChange={(e) => this.updateFormField('country', e.map(x=>x.value)) }
-                                className={classNames('react-select', {'is-invalid': this.state.formErrors['country']})}
                                 id="program-country-input"
+                                className={classNames('react-select', {'is-invalid': this.state.formErrors['country']})}
+                                placeholder={gettext('None selected')}
+                                options={this.props.countryOptions}
+                                value={selectedCountries}
+                                onChange={(e) => this.updateFormField('country', e.map(x=>x.value)) }
                             />
                         }
                         <ErrorFeedback errorMessages={this.state.formErrors['country']} />
@@ -420,19 +397,19 @@ export default class EditProgramProfile extends React.Component {
                         {!this.state.formEditable ? 
                             <input
                                 id="program-sector-input"
-                                type="text"                      
-                                value={this.createDisplayList(selectedIDAASectors) || gettext("None selected")}
                                 className={classNames('form-control')}
+                                type="text"                      
                                 disabled={!this.state.formEditable}
+                                value={this.createDisplayList(selectedIDAASectors) || gettext("None selected")}
                             />
                         :
                             <CheckboxedMultiSelect
                                 id="program-sectors-input"
-                                value={selectedIDAASectors}
+                                className={classNames('react-select')}
                                 placeholder={gettext('None selected')}
                                 options={this.props.idaaSectorOptions}
+                                value={selectedIDAASectors}
                                 onChange={(e) => this.updateFormField('idaa_sector', e.map(x=>x.value)) }
-                                className={classNames('react-select')}
                             />
                         }
                     </div>
@@ -440,20 +417,20 @@ export default class EditProgramProfile extends React.Component {
                         <label htmlFor="program-outcome_themes-input">{gettext("Outcome themes")}</label>
                         {!this.state.formEditable ? 
                             <input
-                                type="text"
-                                value={this.createDisplayList(formdata.idaa_outcome_theme) || gettext("None selected")}
-                                className={classNames('form-control')}
                                 id="program-outcome_themes-input"
+                                className={classNames('form-control')}
+                                type="text"
                                 disabled={!this.state.formEditable}
+                                value={this.createDisplayList(selectedOutcomeThemes) || gettext("None selected")}
                             />
                         :
                             <CheckboxedMultiSelect
-                                value={selectedOutcomeThemes}
+                                id="program-outcome_themes-input"
+                                className={classNames('react-select')}
                                 placeholder={gettext('None selected')}
                                 options={this.props.idaaOutcomeThemesOptions}
+                                value={selectedOutcomeThemes}
                                 onChange={(e) => this.updateFormField('idaa_outcome_theme', e.map(x=>x.value)) }
-                                className={classNames('react-select')}
-                                id="program-outcome_themes-input"
                             />
                         }
                     </div>
@@ -480,7 +457,8 @@ export default class EditProgramProfile extends React.Component {
                         <tbody>
                             {formdata.gaitid.map((gaitRow, index) => {
                                 let donorText = gaitRow.donor || "";
-                                if (!this.state.formEditable) { // If form is not editable, concatenate and display the donor and donor dept text
+                                // If form is not editable, concatenate and display the donor and donor dept text in the donor field
+                                if (!this.state.formEditable) { 
                                     donorText = gaitRow.donor_dept ? donorText + " - " + gaitRow.donor_dept : donorText;
                                 }
 
@@ -489,10 +467,10 @@ export default class EditProgramProfile extends React.Component {
                                         <tr>
                                             <td className="profile-table__td gaitid">
                                                 <input
-                                                    type="text"
                                                     id="program-gait-input"
-                                                    placeholder={ this.state.formEditable ? "" : gettext("None")}
                                                     className={classNames('form-control', "profile__text-input", { 'is-invalid': this.state.gaitRowErrorsFields[index] && this.state.gaitRowErrorsFields[index].includes('gaitid') })}
+                                                    type="text"
+                                                    placeholder={ this.state.formEditable ? "" : gettext("None")}
                                                     maxLength={5}
                                                     disabled={!this.state.formEditable}
                                                     value={gaitRow.gaitid !== null ? gaitRow.gaitid : ""}
@@ -501,13 +479,13 @@ export default class EditProgramProfile extends React.Component {
                                             </td>
                                             <td className="profile-table__td fund-code pl-1" data-toggle="tooltip" title={this.createDisplayList(gaitRow.fund_code) !== null ? gaitRow.fund_code : gettext("None")}>
                                                 <input
-                                                    type="text"
                                                     id="program-fund-code-input"
-                                                    name='fund_code'
-                                                    placeholder={ this.state.formEditable ? "" : gettext("None")}
                                                     className={classNames('form-control', "profile__text-input", { 'is-invalid': this.state.gaitRowErrorsFields[index] && this.state.gaitRowErrorsFields[index].includes('fund_code') })}
+                                                    type="text"
+                                                    placeholder={ this.state.formEditable ? "" : gettext("None")}
                                                     disabled={!this.state.formEditable}
                                                     value={ this.createDisplayList(gaitRow.fund_code) || "" }
+                                                    onChange={(e) => this.updateFundCode(e, index)}
                                                     onKeyUp={(e) => {
                                                         if (e.key === "Backspace" && !gaitRow.fund_code[gaitRow.fund_code.length - 1]) {
                                                             let updatedFundCode = [...gaitRow.fund_code];
@@ -515,17 +493,15 @@ export default class EditProgramProfile extends React.Component {
                                                             this.updateGaitRow('fund_code', updatedFundCode, index);
                                                         }
                                                     }}
-                                                    onChange={(e) => this.updateFundCode(e, index)}
                                                 />
                                             </td>
                                             <td className="profile-table__td pl-1" data-toggle="tooltip" title={donorText !== null ? donorText : gettext("None")}>
                                                 <input
-                                                    type="text"
                                                     id="program-donor-input"
-                                                    // placeholder={ gettext("None") }
+                                                    className={classNames('form-control', "profile__text-input")}
+                                                    type="text"
                                                     placeholder={ this.state.formEditable ? "" : gettext("None")}
                                                     maxLength={255}
-                                                    className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('donor')})}
                                                     disabled={!this.state.formEditable}
                                                     value={donorText !== null ? donorText : ""}
                                                     onChange={(e) => this.updateGaitRow('donor', e.target.value, index) }
@@ -534,11 +510,11 @@ export default class EditProgramProfile extends React.Component {
                                             {this.state.formEditable &&
                                                 <td className="profile-table__td pl-1" data-toggle="tooltip" title={gaitRow.donor_dept || gettext("None")}>
                                                     <input
-                                                        type="text"
                                                         id="program-donor-dept-input"
+                                                        className={classNames('form-control', "profile__text-input")}
+                                                        type="text"
                                                         placeholder={""}
                                                         maxLength={255}
-                                                        className={classNames('form-control', "profile__text-input", { 'is-invalid': this.formErrors('donor-dept')})}
                                                         disabled={!this.state.formEditable}
                                                         value={gaitRow.donor_dept || ""}
                                                         onChange={(e) => this.updateGaitRow('donor_dept', e.target.value, index) }
@@ -576,8 +552,8 @@ export default class EditProgramProfile extends React.Component {
                     }
                     {this.state.formEditable &&
                         <div className="form-group btn-row mt-4">
-                            <button className="btn btn-primary" type="button" disabled={this.state.waiting} onClick={(e) => formdata.id === 'new' ? this.saveNew(e) : this.save(e)}>{gettext("Save changes")}</button>
-                            <button className="btn btn-reset" type="button" disabled={this.state.waiting} onClick={() => this.resetForm()}>{gettext("Cancel changes")}</button>
+                            <button className="btn btn-primary" type="button" disabled={this.props.isLoading} onClick={() => formdata.id === 'new' ? this.saveNew() : this.save()}>{gettext("Save changes")}</button>
+                            <button className="btn btn-reset" type="button" disabled={this.props.isLoading} onClick={() => this.resetForm()}>{gettext("Cancel changes")}</button>
                         </div>
                     }
                 </form>
