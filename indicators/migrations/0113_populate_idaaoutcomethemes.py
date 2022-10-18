@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 idaa_outcome_themes = [
-    "(Empty)",
     "Food Security",
     "Water Security",
     "Economic Opportunities",
@@ -15,7 +14,7 @@ idaa_outcome_themes = [
 
 def populate_idaa_outcome_themes(apps, schema_editor):
     idaa_outcome_themes_model = apps.get_model('indicators', 'IDAAOutcomeTheme')
-    
+
     for idaa_outcome_theme in idaa_outcome_themes:
         idaa_outcome_themes_model.objects.get_or_create(name=idaa_outcome_theme)
 
