@@ -167,7 +167,7 @@ export default class EditProgramProfile extends React.Component {
         // Required fields validations
         let requiredFields = ['name', 'external_program_id', 'start_date', 'end_date', 'funding_status', 'country'];
         requiredFields.map(field => {
-            if (formdata[field].length === 0) {
+            if (!formdata[field] || formdata[field].length === 0) {
                 isValid = false;
                 addErrorMessage("normal", field, gettext('This field may not be left blank.'));
             }
@@ -319,10 +319,10 @@ export default class EditProgramProfile extends React.Component {
                     </div>
                     <div className="form-group">
                         <label htmlFor="program-start-date" className="label--required">{gettext("Program start date")}</label>
-                        <div className={ classNames( {'is-invalid': this.formErrors('start_date')} )}>
+                        <div className={ classNames( {'is-invalid': this.state.formErrors['start_date']} )}>
                             <ReactDatepicker
                                 id="program-start-date"
-                                className={classNames('form-control', { 'is-invalid': this.state.formErrors['end_date'] })}                
+                                className={classNames('form-control', { 'is-invalid': this.state.formErrors['start_date'] })}                
                                 customDatesSelector={false}
                                 disabled={!this.state.formEditable}
                                 maxDate={formdata.end_date}
@@ -339,7 +339,7 @@ export default class EditProgramProfile extends React.Component {
                     </div>
                     <div className="form-group">
                         <label htmlFor="program-end-date" className="label--required">{gettext("Program end date")}</label>
-                        <div className={ classNames( {'is-invalid': this.formErrors('start_date')} )}>
+                        <div className={ classNames( {'is-invalid': this.state.formErrors['end_date']} )}>
                             <ReactDatepicker
                                 id="program-end-date"
                                 className={classNames('form-control', { 'is-invalid': this.state.formErrors['end_date'] })}                
