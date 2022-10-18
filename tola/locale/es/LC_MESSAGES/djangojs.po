@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-18 14:30-0700\n"
-"PO-Revision-Date: 2022-08-11 14:53-0400\n"
+"PO-Revision-Date: 2022-10-18 13:35-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -1787,11 +1787,11 @@ msgstr ""
 
 #: js/pages/results_form_PC/resultsFormPC.js:96
 msgid ""
-"Direct total participants with double counting is required. Please "
-"complete these fields."
+"Direct total participants with double counting is required. Please complete "
+"these fields."
 msgstr ""
-"Se requiere un total de participantes directos con cómputo doble. "
-"Por favor, complete estos campos."
+"Se requiere un total de participantes directos con cómputo doble. Por favor, "
+"complete estos campos."
 
 #: js/pages/results_form_PC/resultsFormPC.js:279
 #: js/pages/results_framework/components/level_cards.js:406
@@ -2638,7 +2638,7 @@ msgstr "Nombre del programa"
 
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:117
 msgid "Program ID"
-msgstr "Identificador de Programa"
+msgstr "Identificador de programa"
 
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:129
 msgid "Program start date"
