@@ -129,6 +129,7 @@ class CheckboxedMultiSelect extends React.Component {
                 placeholderButtonLabel={ this.props.placeholder }
                 getDropdownButtonLabel={ this.makeLabel }
                 components={{MenuList, Group }}
+                className={ this.props.className }
                 />;
       }
 }

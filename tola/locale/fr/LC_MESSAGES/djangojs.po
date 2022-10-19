@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-18 14:29-0700\n"
-"PO-Revision-Date: 2022-08-11 14:45-0400\n"
+"POT-Creation-Date: 2022-10-17 09:49-0700\n"
+"PO-Revision-Date: 2022-10-17 14:21-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #. Translators: This is the file name of an Excel template that will be used for batch imports
 #: js/apiv2.js:152 js/apiv2.js:185
@@ -48,8 +48,8 @@ msgid_plural ""
 "Removing this target means that %s results will no longer have targets "
 "associated with them."
 msgstr[0] ""
-"La suppression de cette cible signifie que %s résultat ne sera plus associé "
-"à des cibles."
+"La suppression de cette cible signifie que %s résultat ne sera plus associé à "
+"des cibles."
 msgstr[1] ""
 "La suppression de cette cible signifie que %s résultats ne seront plus "
 "associés à des cibles."
@@ -66,7 +66,7 @@ msgstr "Succès"
 #: js/pages/tola_management_pages/country/models.js:438
 #: js/pages/tola_management_pages/country/models.js:473
 #: js/pages/tola_management_pages/country/models.js:505
-#: js/pages/tola_management_pages/program/models.js:280
+#: js/pages/tola_management_pages/program/models.js:292
 msgid "Warning"
 msgstr "Attention"
 
@@ -97,7 +97,7 @@ msgstr ""
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
 #: js/pages/tola_management_pages/country/models.js:510
-#: js/pages/tola_management_pages/program/models.js:284
+#: js/pages/tola_management_pages/program/models.js:296
 msgid "Are you sure you want to continue?"
 msgstr "Voulez-vous vraiment continuer ?"
 
@@ -179,8 +179,8 @@ msgstr[0] ""
 "%s indicateur est prêt à être importé. Voulez-vous finaliser le processus "
 "d’importation ? Cette action est irréversible."
 msgstr[1] ""
-"%s indicateurs sont prêts à être importés. Voulez-vous finaliser le "
-"processus d’importation ? Cette action est irréversible."
+"%s indicateurs sont prêts à être importés. Voulez-vous finaliser le processus "
+"d’importation ? Cette action est irréversible."
 
 #. Translators: Button to confirm and complete the import process
 #: js/components/ImportIndicatorsPopover.js:595
@@ -202,13 +202,11 @@ msgid_plural ""
 "%s indicators were successfully imported, but require additional details "
 "before results can be submitted."
 msgstr[0] ""
-"%s indicateur a bien été importé. Toutefois, des informations "
-"supplémentaires sont nécessaires pour que les résultats puissent être "
-"envoyés."
+"%s indicateur a bien été importé. Toutefois, des informations supplémentaires "
+"sont nécessaires pour que les résultats puissent être envoyés."
 msgstr[1] ""
 "%s indicateurs ont bien été importés. Toutefois, des informations "
-"supplémentaires sont nécessaires pour que les résultats puissent être "
-"envoyés."
+"supplémentaires sont nécessaires pour que les résultats puissent être envoyés."
 
 #. Translators: Message with the count of indicators that were successfully imported but they require additional details before they can be submitted. Message to the user to close this popover message to see their new imported indicators.
 #: js/components/ImportIndicatorsPopover.js:659
@@ -222,9 +220,9 @@ msgid_plural ""
 "before results can be submitted. Close this message to view your imported "
 "indicators."
 msgstr[0] ""
-"%s indicateur a bien été importé. Toutefois, des informations "
-"supplémentaires sont nécessaires pour que les résultats puissent être "
-"envoyés. Fermez ce message pour consulter l’indicateur importé."
+"%s indicateur a bien été importé. Toutefois, des informations supplémentaires "
+"sont nécessaires pour que les résultats puissent être envoyés. Fermez ce "
+"message pour consulter l’indicateur importé."
 msgstr[1] ""
 "%s indicateurs ont bien été importés. Toutefois, des informations "
 "supplémentaires sont nécessaires pour que les résultats puissent être "
@@ -259,16 +257,16 @@ msgid ""
 "By default, the template will include 10 or 20 indicator rows per result "
 "level. Adjust the numbers if you need more or fewer rows."
 msgstr ""
-"Par défaut, le modèle comprend entre 10 et 20 lignes d’indicateurs par "
-"niveau de résultat. Vous pouvez ajouter ou supprimer des lignes en fonction "
-"de vos besoins."
+"Par défaut, le modèle comprend entre 10 et 20 lignes d’indicateurs par niveau "
+"de résultat. Vous pouvez ajouter ou supprimer des lignes en fonction de vos "
+"besoins."
 
 #. Translators: Message to user that we cannot import the their file. This could be caused by the wrong file being selected, or the structure of the file was changed, or the results framework was updated and does not match the template anymore.
 #: js/components/ImportIndicatorsPopover.js:912
 msgid ""
 "We can’t import indicators from this file. This can happen if the wrong file "
-"is selected, the template structure is modified, or the results framework "
-"was updated and no longer matches the template."
+"is selected, the template structure is modified, or the results framework was "
+"updated and no longer matches the template."
 msgstr ""
 "Impossible d’importer des indicateurs à partir de ce fichier. Cette erreur "
 "peut survenir lorsque le fichier sélectionné n’est pas le bon, que la "
@@ -315,6 +313,54 @@ msgstr ""
 "Nous ne reconnaissons pas ce type de fichier. Veuillez importer un fichier "
 "Excel."
 
+#: js/components/ReactDatepicker.js:9
+msgid "January"
+msgstr "janvier"
+
+#: js/components/ReactDatepicker.js:10
+msgid "March"
+msgstr "mars"
+
+#: js/components/ReactDatepicker.js:11
+msgid "February"
+msgstr "février"
+
+#: js/components/ReactDatepicker.js:12
+msgid "April"
+msgstr "avril"
+
+#: js/components/ReactDatepicker.js:13
+msgid "May"
+msgstr "mai"
+
+#: js/components/ReactDatepicker.js:14
+msgid "June"
+msgstr "juin"
+
+#: js/components/ReactDatepicker.js:15
+msgid "July"
+msgstr "juillet"
+
+#: js/components/ReactDatepicker.js:16
+msgid "August"
+msgstr "août"
+
+#: js/components/ReactDatepicker.js:17
+msgid "September"
+msgstr "septembre"
+
+#: js/components/ReactDatepicker.js:18
+msgid "October"
+msgstr "octobre"
+
+#: js/components/ReactDatepicker.js:19
+msgid "November"
+msgstr "novembre"
+
+#: js/components/ReactDatepicker.js:20
+msgid "December"
+msgstr "décembre"
+
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
 #: js/components/actionButtons.js:38
@@ -357,7 +403,7 @@ msgstr "Rôle"
 #: js/pages/iptt_quickstart/components/selects.js:22
 #: js/pages/iptt_quickstart/components/selects.js:39
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:14
-#: js/pages/tola_management_pages/program/views.js:232
+#: js/pages/tola_management_pages/program/views.js:234
 msgid "Program"
 msgstr "Programme"
 
@@ -415,6 +461,13 @@ msgstr "sélectionné(s)"
 #. Translators: for a dropdown menu with no options checked:
 #: js/components/changesetNotice.js:257 js/components/selectWidgets.js:143
 #: js/components/selectWidgets.js:148
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:362
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:377
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:384
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:400
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:406
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:421
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:427
 msgid "None selected"
 msgstr "Aucun sélectionné"
 
@@ -637,7 +690,7 @@ msgstr "Projet"
 
 #: js/pages/document_list/components/document_list.js:175
 #: js/pages/results_framework/components/level_cards.js:213
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:131
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:132
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -861,8 +914,8 @@ msgstr "N/A"
 #: js/pages/iptt_report/components/report/tableRows.js:77
 msgid "Results cannot be added because the indicator is missing targets."
 msgstr ""
-"Les résultats ne peuvent pas être ajoutés car les cibles de l’indicateur "
-"sont manquantes."
+"Les résultats ne peuvent pas être ajoutés car les cibles de l’indicateur sont "
+"manquantes."
 
 #. Translators: a button that lets the user add a new result
 #: js/pages/iptt_report/components/report/tableRows.js:106
@@ -930,7 +983,7 @@ msgstr "Types"
 #. Translators: labels sectors (i.e. 'Food Security') that an indicator can be categorized as */
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:106
 #: js/pages/tola_management_pages/organization/views.js:54
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:187
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:393
 #: js/pages/tola_management_pages/program/views.js:54
 msgid "Sectors"
 msgstr "Secteurs"
@@ -1079,13 +1132,14 @@ msgid "Find an indicator:"
 msgstr "Rechercher un indicateur :"
 
 #: js/pages/program_page/components/indicator_list.js:136
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:156
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:169
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:240
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:250
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:253
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:263
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:266
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:293
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:308
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:470
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:477
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:482
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:495
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:500
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:508
 msgid "None"
 msgstr "Aucun"
 
@@ -1115,11 +1169,11 @@ msgstr "Cibles de l’indicateur manquantes"
 
 #: js/pages/program_page/components/indicator_list.js:359
 msgid ""
-"Some indicators have missing targets. To enter these values, click the "
-"target icon near the indicator name."
+"Some indicators have missing targets. To enter these values, click the target "
+"icon near the indicator name."
 msgstr ""
-"Certains indicateurs ont des cibles manquantes. Pour enregistrer ces "
-"valeurs, veuillez cliquer sur l’icône de cible qui se situe près du nom de "
+"Certains indicateurs ont des cibles manquantes. Pour enregistrer ces valeurs, "
+"veuillez cliquer sur l’icône de cible qui se situe près du nom de "
 "l’indicateur."
 
 #: js/pages/program_page/components/program_metrics.js:138
@@ -1147,8 +1201,8 @@ msgid ""
 "target is 100 and your result is 110, the indicator is 10% above target and "
 "on track.  <br><br>Please note that if your indicator has a decreasing "
 "direction of change, then “above” and “below” are switched. In that case, if "
-"your target is 100 and your result is 200, your indicator is 50% below "
-"target and not on track.<br>"
+"your target is 100 and your result is 200, your indicator is 50% below target "
+"and not on track.<br>"
 msgstr ""
 "La valeur réelle correspond à la valeur cible à 15 % près. Ainsi, si votre "
 "cible est 100 et votre résultat 110, l’indicateur est 10 % au-dessus de la "
@@ -1181,8 +1235,8 @@ msgstr ""
 #: js/pages/program_page/components/program_metrics.js:240
 msgid "Unavailable until the first target period ends with results reported."
 msgstr ""
-"Indisponible jusqu’à la fin de la première période cible avec publication "
-"des résultats."
+"Indisponible jusqu’à la fin de la première période cible avec publication des "
+"résultats."
 
 #. Translators: title of a graphic showing indicators with targets */
 #: js/pages/program_page/components/program_metrics.js:261
@@ -1281,13 +1335,13 @@ msgid ""
 "The indicator tracking start date must be later than or equal to the IDAA "
 "start date."
 msgstr ""
-"La date de début de suivi des indicateurs doit être postérieure ou égale à "
-"la date de début d’IDAA."
+"La date de début de suivi des indicateurs doit être postérieure ou égale à la "
+"date de début d’IDAA."
 
 #: js/pages/program_page/components/program_period.js:185
 msgid ""
-"The indicator tracking end date must be earlier than or equal to the IDAA "
-"end date."
+"The indicator tracking end date must be earlier than or equal to the IDAA end "
+"date."
 msgstr ""
 "La date de fin de suivi des indicateurs doit être antérieure ou égale à la "
 "date de fin d’IDAA."
@@ -1326,8 +1380,8 @@ msgstr ""
 
 #: js/pages/program_page/components/program_period.js:440
 msgid ""
-"The program period is used as the default for the initial setup of time-"
-"based target periods (e.g., annually, quarterly, etc.) and in the Indicator "
+"The program period is used as the default for the initial setup of time-based "
+"target periods (e.g., annually, quarterly, etc.) and in the Indicator "
 "Performance Tracking Tables (IPTTs). The Program Period is based on the "
 "program’s official start and end dates as recorded in the Identification "
 "Assignment Assistant (IDAA) system and cannot be adjusted in TolaData."
@@ -1337,8 +1391,8 @@ msgstr ""
 "annuellement, trimestriellement, etc.) et dans les tableaux de suivi des "
 "performances des indicateurs (IPTTs). La période du programme est basée sur "
 "les dates officielles de début et de fin du programme telles qu’enregistrées "
-"dans le système Assistant pour l’Attribution de l’Identification (IDAA) et "
-"ne peut pas être ajustée dans TolaData."
+"dans le système Assistant pour l’Attribution de l’Identification (IDAA) et ne "
+"peut pas être ajustée dans TolaData."
 
 #: js/pages/program_page/components/program_period.js:446
 msgid "IDAA program dates"
@@ -1368,11 +1422,10 @@ msgstr "Période de suivi des indicateurs"
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:108
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:530
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:120
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:125
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:126
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:69
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:210
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:217
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:279
 #: js/pages/tola_management_pages/program/components/program_history.js:64
 #: js/pages/tola_management_pages/program/components/program_settings.js:130
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:74
@@ -1380,6 +1433,9 @@ msgid "Save Changes"
 msgstr "Enregistrer les modifications"
 
 #: js/pages/program_page/components/program_period.js:504
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:121
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:127
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:553
 msgid "Cancel changes"
 msgstr "Annuler les changements"
 
@@ -1392,10 +1448,10 @@ msgid ""
 "of change when thinking about whether the indicator is on track.</em></p>"
 msgstr ""
 "<p><strong>La valeur réelle représente %(percent)s de la valeur cible.</"
-"strong> Un indicateur est sur la bonne voie si le résultat n’est ni "
-"inférieur à 85 % de la cible, ni supérieur à 115 % de la cible. </"
-"p><p><em>Pensez à prendre en compte la direction du changement souhaité "
-"lorsque vous réfléchissez au statut d’un indicateur.</em></p>"
+"strong> Un indicateur est sur la bonne voie si le résultat n’est ni inférieur "
+"à 85 % de la cible, ni supérieur à 115 % de la cible. </p><p><em>Pensez à "
+"prendre en compte la direction du changement souhaité lorsque vous "
+"réfléchissez au statut d’un indicateur.</em></p>"
 
 #. Translators: Label for an indicator that is within a target range
 #: js/pages/program_page/components/resultsTable.js:47
@@ -1431,29 +1487,28 @@ msgid ""
 msgstr ""
 "<strong>Les cibles, les réelles, et les résultats sont non-cumulatifs.</"
 "strong> Les réelles de la période cible sont la somme de tous les résultats "
-"de cette période cible. Les cibles et les réelles de la vie du programme "
-"sont la somme de toutes les périodes cibles."
+"de cette période cible. Les cibles et les réelles de la vie du programme sont "
+"la somme de toutes les périodes cibles."
 
 #. Translators: brief description of summing rules a series of numbers
 #: js/pages/program_page/components/resultsTable.js:238
 msgid "Targets and actuals are cumulative; results are non-cumulative."
 msgstr ""
-"Les cibles et les réelles sont cumulatives; les résultats sont non-"
-"cumulatifs."
+"Les cibles et les réelles sont cumulatives; les résultats sont non-cumulatifs."
 
 #. Translators: explanation of the summing rules for the totals row on a list of results
 #: js/pages/program_page/components/resultsTable.js:240
 msgid ""
 "<strong>Targets and actuals are cumulative; results are non-cumulative.</"
-"strong> Target period actuals are the sum of the results from the current "
-"and all previous target periods. The Life of Program target mirrors the last "
+"strong> Target period actuals are the sum of the results from the current and "
+"all previous target periods. The Life of Program target mirrors the last "
 "target, and the Life of Program actual mirrors the most recent actual."
 msgstr ""
 "<strong>Les cibles et les réelles sont cumulatives; les résultats sont non-"
 "cumulatifs.</strong> Les réelles de la période cible sont la somme des "
 "résultats de la période cible actuelle et de toutes les périodes cibles "
-"précédentes. La cible de la vie du programme reflète la dernière cible, et "
-"la réelle de la vie du programme reflète la réelle la plus récente."
+"précédentes. La cible de la vie du programme reflète la dernière cible, et la "
+"réelle de la vie du programme reflète la réelle la plus récente."
 
 #. Translators: brief description of summing rules a series of numbers
 #: js/pages/program_page/components/resultsTable.js:244
@@ -1464,10 +1519,9 @@ msgstr "Les cibles, les réelles, et les résultats sont cumulatifs."
 #: js/pages/program_page/components/resultsTable.js:246
 msgid ""
 "<strong>Targets, actuals, and results are cumulative.</strong> Target period "
-"actuals mirror the most recent result for that target period; no "
-"calculations are performed with results or actuals. The Life of Program "
-"target mirrors the last target, and the Life of Program actual mirrors the "
-"most recent actual."
+"actuals mirror the most recent result for that target period; no calculations "
+"are performed with results or actuals. The Life of Program target mirrors the "
+"last target, and the Life of Program actual mirrors the most recent actual."
 msgstr ""
 "<strong>Les cibles, les réelles, et les résultats sont cumulatifs.</strong> "
 "Les réelles de la période cible reflètent le résultat le plus récent pour "
@@ -1530,7 +1584,7 @@ msgstr ""
 "Attention : cette action est irréversible. Voulez-vous vraiment supprimer ce "
 "rapport épinglé ?"
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:20
+#: js/pages/results_form_PC/components/ActualValueFields.js:26
 #: js/pages/results_form_PC/resultsFormPC.js:102
 msgid ""
 "Direct/indirect without double counting should be equal to or lower than "
@@ -1539,11 +1593,11 @@ msgstr ""
 "Le champ Direct/indirect sans double comptage doit être inférieur ou égal au "
 "champ Direct/indirect avec double comptage."
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:34
+#: js/pages/results_form_PC/components/ActualValueFields.js:40
 msgid "Total Participant Actual Values"
 msgstr "Valeurs réelles du total de participants"
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:36
+#: js/pages/results_form_PC/components/ActualValueFields.js:42
 msgid ""
 "Include the participants with double counting on the left and participants "
 "without double counting across programs on the right. Double counting a "
@@ -1552,10 +1606,9 @@ msgid ""
 "participants, only discount double counting in one program!<br/><br/"
 "><strong>Direct participants</strong> – are those who have received a "
 "tangible benefit from the program, either as the actual program participants "
-"or the intended recipients of the program benefits.<br/><br/"
-"><strong>Indirect participants</strong> – are those who received a tangible "
-"benefit through their proximity to or contact with program participants or "
-"activities."
+"or the intended recipients of the program benefits.<br/><br/><strong>Indirect "
+"participants</strong> – are those who received a tangible benefit through "
+"their proximity to or contact with program participants or activities."
 msgstr ""
 "Intégrez les participants en double comptage sur la gauche et les "
 "participants en comptage unique dans les programmes sur la droite. Compter "
@@ -1569,17 +1622,17 @@ msgstr ""
 "strong> sont ceux qui ont reçu un avantage tangible basé sur leur lien avec "
 "des activités ou des participants du programme."
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:40
-#: js/pages/results_form_PC/components/DisaggregationFields.js:100
+#: js/pages/results_form_PC/components/ActualValueFields.js:46
+#: js/pages/results_form_PC/components/DisaggregationFields.js:106
 msgid "Without double counting across programs"
 msgstr "Sans double comptage dans les programmes"
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:41
-#: js/pages/results_form_PC/components/DisaggregationFields.js:102
+#: js/pages/results_form_PC/components/ActualValueFields.js:47
+#: js/pages/results_form_PC/components/DisaggregationFields.js:108
 msgid "With double counting across programs"
 msgstr "Avec double comptage dans les programmes"
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:99
+#: js/pages/results_form_PC/components/ActualValueFields.js:105
 msgid "Total Participants"
 msgstr "Nombre total de participants"
 
@@ -1587,8 +1640,7 @@ msgstr "Nombre total de participants"
 #: js/pages/results_form_PC/resultsFormPC.js:81
 msgid "This date should be within the fiscal year of the reporting period."
 msgstr ""
-"Cette date doit être comprise dans l’année fiscale de la période de "
-"reporting."
+"Cette date doit être comprise dans l’année fiscale de la période de reporting."
 
 #: js/pages/results_form_PC/components/CommonFields.js:56
 #: js/pages/results_form_PC/resultsFormPC.js:89
@@ -1607,9 +1659,9 @@ msgid ""
 "was collected. If data collection occurred after the end of the fiscal year, "
 "enter the last day of the fiscal year (June 30)."
 msgstr ""
-"Si la collecte de données est réalisée au cours de l’année fiscale, "
-"saisissez la date à laquelle les données sont collectées. Si cette collecte "
-"est réalisée après la fin de l’année fiscale, saisissez le dernier jour de "
+"Si la collecte de données est réalisée au cours de l’année fiscale, saisissez "
+"la date à laquelle les données sont collectées. Si cette collecte est "
+"réalisée après la fin de l’année fiscale, saisissez le dernier jour de "
 "l’année fiscale (le 30 juin)."
 
 #: js/pages/results_form_PC/components/CommonFields.js:84
@@ -1619,8 +1671,8 @@ msgstr "Année fiscale"
 #: js/pages/results_form_PC/components/CommonFields.js:86
 msgid "Fiscal years run from July 1 to June 30 of the following year."
 msgstr ""
-"Les années fiscales correspondent aux périodes comprises entre le "
-"1er juillet et le 30 juin de l’année suivante."
+"Les années fiscales correspondent aux périodes comprises entre le 1er juillet "
+"et le 30 juin de l’année suivante."
 
 #: js/pages/results_form_PC/components/CommonFields.js:105
 msgid "Outcome theme"
@@ -1634,12 +1686,12 @@ msgid ""
 "\">[link: https://library.mercycorps.org/record/16929?ln=en]</a> for a "
 "description of outcome themes.<span>"
 msgstr ""
-"Les thèmes de résultat correspondent aux principales sections d’un "
-"programme. Pour obtenir une description des thèmes de résultat, veuillez "
-"consulter le guide: Guidelines on Counting and Reporting Participant Numbers "
-"<a tabIndex=\"1\" href=\"https://library.mercycorps.org/record/16929?ln=en\" "
-"target=\"_blank\">[link: https://library.mercycorps.org/record/16929?ln=en]</"
-"a> (Compter et consigner les nombres de participants) rédigé par MEL.<span>"
+"Les thèmes de résultat correspondent aux principales sections d’un programme. "
+"Pour obtenir une description des thèmes de résultat, veuillez consulter le "
+"guide: Guidelines on Counting and Reporting Participant Numbers <a tabIndex="
+"\"1\" href=\"https://library.mercycorps.org/record/16929?ln=en\" target="
+"\"_blank\">[link: https://library.mercycorps.org/record/16929?ln=en]</a> "
+"(Compter et consigner les nombres de participants) rédigé par MEL.<span>"
 
 #. Translators: This is the default option for a dropdown menu
 #. Translators: Nothing selected by user
@@ -1653,15 +1705,13 @@ msgstr ""
 #: js/pages/tola_management_pages/organization/views.js:47
 #: js/pages/tola_management_pages/organization/views.js:59
 #: js/pages/tola_management_pages/organization/views.js:78
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:191
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:212
 #: js/pages/tola_management_pages/program/views.js:23
 #: js/pages/tola_management_pages/program/views.js:35
 #: js/pages/tola_management_pages/program/views.js:47
 #: js/pages/tola_management_pages/program/views.js:59
 #: js/pages/tola_management_pages/program/views.js:76
 #: js/pages/tola_management_pages/program/views.js:88
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:203
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:204
 #: js/pages/tola_management_pages/user/views.js:16
 msgid "None Selected"
 msgstr "Aucun sélectionné"
@@ -1682,14 +1732,14 @@ msgid ""
 "record/16929?ln=en]</a> for a description of sectors."
 msgstr ""
 "Indiquez une désagrégation de participants atteinte par secteur. Indiquez "
-"uniquement les chiffres avec un double comptage. Pour obtenir une "
-"description des secteurs, veuillez consulter le guide: Guidelines on "
-"Counting and Reporting Participant Numbers <a href='https://library."
-"mercycorps.org/record/16929?ln=en' target='_blank'>[link: https://library."
-"mercycorps.org/record/16929?ln=en]</a> (Compter et consigner les nombres de "
-"participants) rédigé par MEL."
+"uniquement les chiffres avec un double comptage. Pour obtenir une description "
+"des secteurs, veuillez consulter le guide: Guidelines on Counting and "
+"Reporting Participant Numbers <a href='https://library.mercycorps.org/"
+"record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/"
+"record/16929?ln=en]</a> (Compter et consigner les nombres de participants) "
+"rédigé par MEL."
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:55
+#: js/pages/results_form_PC/components/DisaggregationFields.js:61
 msgid ""
 "The 'SADD without double counting' value should be less than or equal to the "
 "'Direct without double counting' value."
@@ -1697,7 +1747,7 @@ msgstr ""
 "La somme du champ Données ‘SADD sans double comptage’ doit être égale à la "
 "somme du champ ‘Direct sans double comptage’."
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:72
+#: js/pages/results_form_PC/components/DisaggregationFields.js:78
 #: js/pages/results_form_PC/resultsFormPC.js:117
 msgid ""
 "Sector values should be less than or equal to the 'Direct/Indirect with "
@@ -1706,23 +1756,23 @@ msgstr ""
 "Les valeurs des secteurs doivent être inférieures ou égales à la valeur "
 "“Direct/Indirect avec double comptage”."
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:87
+#: js/pages/results_form_PC/components/DisaggregationFields.js:93
 msgid "SADD (including unknown)"
 msgstr "SADD (inconnu)"
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:95
+#: js/pages/results_form_PC/components/DisaggregationFields.js:101
 msgid "Needs Attention"
 msgstr "Requiert votre attention"
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:138
+#: js/pages/results_form_PC/components/DisaggregationFields.js:144
 msgid "Sum"
 msgstr "Somme"
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:154
+#: js/pages/results_form_PC/components/DisaggregationFields.js:160
 msgid "Total Direct Participants"
 msgstr "Total de participantes directs"
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:154
+#: js/pages/results_form_PC/components/DisaggregationFields.js:160
 msgid "Total Indirect Participants"
 msgstr "Total de participantes indirects"
 
@@ -1806,11 +1856,11 @@ msgstr ""
 
 #: js/pages/results_form_PC/resultsFormPC.js:96
 msgid ""
-"Direct total participants with double counting is required. Please "
-"complete these fields."
+"Direct total participants with double counting is required. Please complete "
+"these fields."
 msgstr ""
-"Le champ Total de participants directs avec double comptage est "
-"requis. Veuillez renseigner ces champs."
+"Le champ Total de participants directs avec double comptage est requis. "
+"Veuillez renseigner ces champs."
 
 #: js/pages/results_form_PC/resultsFormPC.js:279
 #: js/pages/results_framework/components/level_cards.js:406
@@ -1840,8 +1890,8 @@ msgstr "Importer l’objectif du programme"
 #: js/pages/results_framework/components/level_cards.js:68
 msgid ""
 "Import text from a Program Objective. <strong class='program-objective-"
-"import__popover-strong-text'>Make sure to remove levels and numbers from "
-"your text, because they are automatically displayed.</strong>"
+"import__popover-strong-text'>Make sure to remove levels and numbers from your "
+"text, because they are automatically displayed.</strong>"
 msgstr ""
 "Importer le texte d’un objectif de programme. <strong class='program-"
 "objective-import__popover-strong-text'>Assurez-vous de supprimer les niveaux "
@@ -1943,14 +1993,13 @@ msgstr "Excel"
 #. Translators: A alert to let users know that instead of entering indicators one at a time, they can use an Excel template to enter multiple indicators at the same time. First step is to build the result framework below, then click the 'Import indicators' button above
 #: js/pages/results_framework/components/level_list.js:207
 msgid ""
-"Instead of entering indicators one at a time, use an Excel template to "
-"import multiple indicators! First, build your results framework below. Next, "
-"click the “Import indicators” button above."
+"Instead of entering indicators one at a time, use an Excel template to import "
+"multiple indicators! First, build your results framework below. Next, click "
+"the “Import indicators” button above."
 msgstr ""
-"Au lieu de saisir les indicateurs un par un, utilisez un modèle Excel pour "
-"en importer plusieurs à la fois. Commencez par créer votre cadre de "
-"résultats ci-dessous, puis cliquez sur le bouton « Importer des "
-"indicateurs » ci-dessus."
+"Au lieu de saisir les indicateurs un par un, utilisez un modèle Excel pour en "
+"importer plusieurs à la fois. Commencez par créer votre cadre de résultats ci-"
+"dessous, puis cliquez sur le bouton « Importer des indicateurs » ci-dessus."
 
 #. Translators: this refers to an imperative verb on a button ("Apply filters")*/}
 #: js/pages/results_framework/components/level_tier_lists.js:32
@@ -1958,7 +2007,7 @@ msgstr ""
 #: js/pages/tola_management_pages/country/views.js:66
 #: js/pages/tola_management_pages/organization/views.js:83
 #: js/pages/tola_management_pages/program/views.js:143
-#: js/pages/tola_management_pages/program/views.js:200
+#: js/pages/tola_management_pages/program/views.js:202
 #: js/pages/tola_management_pages/user/views.js:162
 #: js/pages/tola_management_pages/user/views.js:230
 msgid "Apply"
@@ -1988,9 +2037,9 @@ msgstr ""
 "<span class=\"text-danger\"><strong>Le modèle de cadre de résultats se "
 "verrouille dès que le premier %(secondTier)s est enregistré.</strong></span> "
 "Pour modifier les modèles, tous les niveaux enregistrés doivent être "
-"supprimés, à l'exception du %(firstTier)s original. Un niveau peut "
-"uniquement être supprimé lorsqu'il ne dispose d'aucun sous-niveau ni "
-"d'indicateur associé."
+"supprimés, à l'exception du %(firstTier)s original. Un niveau peut uniquement "
+"être supprimé lorsqu'il ne dispose d'aucun sous-niveau ni d'indicateur "
+"associé."
 
 #: js/pages/results_framework/components/leveltier_picker.js:66
 msgid "Results framework template"
@@ -2085,7 +2134,7 @@ msgstr "Utilisateur"
 
 #: js/pages/tola_management_pages/audit_log/views.js:244
 #: js/pages/tola_management_pages/organization/views.js:110
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:195
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:196
 #: js/pages/tola_management_pages/user/views.js:202
 #: js/pages/tola_management_pages/user/views.js:261
 msgid "Organization"
@@ -2115,15 +2164,15 @@ msgstr "entrées"
 #: js/pages/tola_management_pages/country/components/country_editor.js:23
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:114
 #: js/pages/tola_management_pages/organization/components/organization_editor.js:26
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:95
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:278
 #: js/pages/tola_management_pages/program/components/program_editor.js:27
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:144
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:145
 #: js/pages/tola_management_pages/user/components/user_editor.js:26
 msgid "Profile"
 msgstr "Profil"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:32
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:216
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:217
 msgid "Strategic Objectives"
 msgstr "Objectifs stratégiques"
 
@@ -2154,19 +2203,17 @@ msgstr "Code pays"
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:103
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:109
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:533
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:126
 #: js/pages/tola_management_pages/country/views.js:67
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:70
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:212
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:218
 #: js/pages/tola_management_pages/organization/views.js:84
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:280
 #: js/pages/tola_management_pages/program/components/program_history.js:65
 #: js/pages/tola_management_pages/program/components/program_settings.js:131
-#: js/pages/tola_management_pages/program/views.js:201
+#: js/pages/tola_management_pages/program/views.js:203
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:75
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:261
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:267
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:262
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:268
 #: js/pages/tola_management_pages/user/views.js:231
 msgid "Reset"
 msgstr "Réinitialiser"
@@ -2177,8 +2224,8 @@ msgstr "Supprimer"
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:63
 msgid ""
-"This category cannot be edited or removed because it was used to "
-"disaggregate a result."
+"This category cannot be edited or removed because it was used to disaggregate "
+"a result."
 msgstr ""
 "Cette catégorie ne peut pas être modifiée ou supprimée car elle a été "
 "utilisée pour désagréger un résultat."
@@ -2190,15 +2237,15 @@ msgstr "Explication justifiant l'absence d'un bouton de suppression"
 #. Translators: This is text provided when a user clicks a help link.  It allows users to select which elements they want to apply the changes to.
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:228
 msgid ""
-"<p>Select a program if you plan to disaggregate all or most of its "
-"indicators by these categories.</p><p><span class=\"text-danger"
-"\"><strong>This bulk assignment cannot be undone.</strong></span> But you "
-"can always manually remove the disaggregation from individual indicators.</p>"
+"<p>Select a program if you plan to disaggregate all or most of its indicators "
+"by these categories.</p><p><span class=\"text-danger\"><strong>This bulk "
+"assignment cannot be undone.</strong></span> But you can always manually "
+"remove the disaggregation from individual indicators.</p>"
 msgstr ""
 "<p>Sélectionnez un programme si vous souhaitez désagréger tous ou la plupart "
 "de ses indicateurs en fonction de ces catégories.</p><p><span class=\"text-"
-"danger\"><strong>Ce bloc ne peut être annulé.</strong></span> Cependant, "
-"vous pouvez supprimer manuellement la désagrégation à partir d'indicateurs "
+"danger\"><strong>Ce bloc ne peut être annulé.</strong></span> Cependant, vous "
+"pouvez supprimer manuellement la désagrégation à partir d'indicateurs "
 "individuels.</p>"
 
 #. Translators: This feature allows a user to apply changes to existing programs as well as ones created in the future */}
@@ -2232,8 +2279,8 @@ msgid ""
 "default for every program in %s. The disaggregation can be manually removed "
 "from an indicator on the indicator setup form."
 msgstr ""
-"Lors de l’ajout d’un nouvel indicateur de programme, cette désagrégation "
-"sera sélectionnée par défaut pour chaque programme dans %s. La désagrégation "
+"Lors de l’ajout d’un nouvel indicateur de programme, cette désagrégation sera "
+"sélectionnée par défaut pour chaque programme dans %s. La désagrégation "
 "pourra être supprimée manuellement d’un indicateur à partir du formulaire de "
 "configuration de l’indicateur."
 
@@ -2272,10 +2319,10 @@ msgid "Archive disaggregation"
 msgstr "Archiver la désagrégation"
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:590
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:160
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:161
 #: js/pages/tola_management_pages/country/models.js:262
 #: js/pages/tola_management_pages/organization/models.js:115
-#: js/pages/tola_management_pages/program/models.js:73
+#: js/pages/tola_management_pages/program/models.js:78
 #: js/pages/tola_management_pages/user/models.js:192
 msgid "You have unsaved changes. Are you sure you want to discard them?"
 msgstr ""
@@ -2335,8 +2382,8 @@ msgstr "Proposé"
 #: js/pages/tola_management_pages/organization/views.js:190
 #: js/pages/tola_management_pages/program/components/program_history.js:9
 #: js/pages/tola_management_pages/program/views.js:66
-#: js/pages/tola_management_pages/program/views.js:158
-#: js/pages/tola_management_pages/program/views.js:164
+#: js/pages/tola_management_pages/program/views.js:160
+#: js/pages/tola_management_pages/program/views.js:166
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:8
 #: js/pages/tola_management_pages/user/models.js:75
 #: js/pages/tola_management_pages/user/views.js:355
@@ -2363,19 +2410,19 @@ msgstr "Nom court"
 #: js/pages/tola_management_pages/organization/views.js:113
 #: js/pages/tola_management_pages/program/components/program_history.js:53
 #: js/pages/tola_management_pages/program/views.js:70
-#: js/pages/tola_management_pages/program/views.js:235
+#: js/pages/tola_management_pages/program/views.js:237
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:64
 #: js/pages/tola_management_pages/user/views.js:211
 #: js/pages/tola_management_pages/user/views.js:265
 msgid "Status"
 msgstr "Statut"
 
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:193
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:194
 msgid "Delete Strategic Objective?"
 msgstr "Supprimer l’objectif stratégique ?"
 
 #. Translators: This is a button that allows the user to add a strategic objective. */}
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:235
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:236
 msgid "Add strategic objective"
 msgstr "Ajouter un objectif stratégique"
 
@@ -2399,7 +2446,7 @@ msgstr[1] ""
 #: js/pages/tola_management_pages/country/models.js:215
 #: js/pages/tola_management_pages/country/models.js:219
 #: js/pages/tola_management_pages/organization/models.js:111
-#: js/pages/tola_management_pages/program/models.js:195
+#: js/pages/tola_management_pages/program/models.js:200
 #: js/pages/tola_management_pages/user/models.js:208
 msgid "Successfully saved"
 msgstr "Enregistré avec succès"
@@ -2407,7 +2454,7 @@ msgstr "Enregistré avec succès"
 #. Translators: Saving to the server failed
 #: js/pages/tola_management_pages/country/models.js:226
 #: js/pages/tola_management_pages/organization/models.js:106
-#: js/pages/tola_management_pages/program/models.js:200
+#: js/pages/tola_management_pages/program/models.js:205
 #: js/pages/tola_management_pages/user/models.js:203
 msgid "Saving failed"
 msgstr "Échec de l’enregistrement"
@@ -2491,7 +2538,7 @@ msgstr "Rechercher un pays"
 #: js/pages/tola_management_pages/country/views.js:96
 #: js/pages/tola_management_pages/organization/views.js:89
 #: js/pages/tola_management_pages/program/views.js:42
-#: js/pages/tola_management_pages/program/views.js:233
+#: js/pages/tola_management_pages/program/views.js:235
 msgid "Organizations"
 msgstr "Organisations"
 
@@ -2499,7 +2546,7 @@ msgstr "Organisations"
 #: js/pages/tola_management_pages/country/views.js:97
 #: js/pages/tola_management_pages/organization/views.js:30
 #: js/pages/tola_management_pages/organization/views.js:111
-#: js/pages/tola_management_pages/program/views.js:206
+#: js/pages/tola_management_pages/program/views.js:208
 #: js/pages/tola_management_pages/user/views.js:59
 #: js/pages/tola_management_pages/user/views.js:262
 msgid "Programs"
@@ -2507,14 +2554,14 @@ msgstr "Programmes"
 
 #: js/pages/tola_management_pages/country/views.js:72
 #: js/pages/tola_management_pages/organization/views.js:89
-#: js/pages/tola_management_pages/program/views.js:206
+#: js/pages/tola_management_pages/program/views.js:208
 #: js/pages/tola_management_pages/user/views.js:236
 msgid "Admin:"
 msgstr "Administrateur :"
 
 #: js/pages/tola_management_pages/country/views.js:72
 #: js/pages/tola_management_pages/organization/views.js:18
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:165
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:371
 #: js/pages/tola_management_pages/program/views.js:30
 msgid "Countries"
 msgstr "Pays"
@@ -2526,7 +2573,7 @@ msgstr "Ajouter un pays"
 #: js/pages/tola_management_pages/country/views.js:98
 #: js/pages/tola_management_pages/organization/views.js:112
 #: js/pages/tola_management_pages/program/views.js:18
-#: js/pages/tola_management_pages/program/views.js:234
+#: js/pages/tola_management_pages/program/views.js:236
 #: js/pages/tola_management_pages/user/views.js:236
 msgid "Users"
 msgstr "Utilisateurs"
@@ -2564,7 +2611,7 @@ msgstr "0 programme"
 #. Translators: preceded by a number, i.e. "3 users" or "1 user"
 #: js/pages/tola_management_pages/country/views.js:229
 #: js/pages/tola_management_pages/organization/views.js:182
-#: js/pages/tola_management_pages/program/views.js:322
+#: js/pages/tola_management_pages/program/views.js:327
 #, python-format
 msgid "%s user"
 msgid_plural "%s users"
@@ -2574,7 +2621,7 @@ msgstr[1] "%s utilisateurs"
 #. Translators: when no users are connected to the item
 #: js/pages/tola_management_pages/country/views.js:234
 #: js/pages/tola_management_pages/organization/views.js:187
-#: js/pages/tola_management_pages/program/views.js:326
+#: js/pages/tola_management_pages/program/views.js:331
 msgid "0 users"
 msgstr "0 utilisateur"
 
@@ -2587,8 +2634,8 @@ msgstr "pays"
 #: js/pages/tola_management_pages/organization/views.js:190
 #: js/pages/tola_management_pages/program/components/program_history.js:10
 #: js/pages/tola_management_pages/program/views.js:67
-#: js/pages/tola_management_pages/program/views.js:159
-#: js/pages/tola_management_pages/program/views.js:164
+#: js/pages/tola_management_pages/program/views.js:161
+#: js/pages/tola_management_pages/program/views.js:166
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:9
 #: js/pages/tola_management_pages/user/models.js:76
 #: js/pages/tola_management_pages/user/views.js:355
@@ -2620,7 +2667,7 @@ msgid "Primary Contact Phone Number"
 msgstr "Numéro de téléphone du contact principal"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:200
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:248
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:249
 msgid "Preferred Mode of Contact"
 msgstr "Moyen de contact préféré"
 
@@ -2648,7 +2695,55 @@ msgstr "Ajouter une organisation"
 msgid "organizations"
 msgstr "organisations"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:99
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:112
+msgid "This field may not be left blank."
+msgstr "Ce champ ne peut pas être laissé vide."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:127
+msgid "The program start date may not be more than 10 years in the past."
+msgstr ""
+"La date de début du programme ne doit pas se situer plus de 10 ans dans le "
+"passé."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:131
+msgid "The program start date may not be after the program end date."
+msgstr ""
+"La date de début du programme ne doit pas être postérieure à la date de fin "
+"du programme."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:137
+msgid "The program end date may not be more than 10 years in the future."
+msgstr ""
+"La date de fin du programme ne doit pas se situer plus de 10 ans dans le "
+"futur."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:141
+msgid "The program end date may not be before the program start date."
+msgstr ""
+"La date de fin du programme ne doit pas être antérieure à la date de début du "
+"programme."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:157
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:176
+msgid "GAIT IDs may not be left blank."
+msgstr "IDs GAIT ne peut pas être laissé vide."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:165
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:166
+msgid "Duplicate GAIT ID numbers are not allowed."
+msgstr "Les doublons de numéros d’identification GAIT ne sont pas autorisés."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:186
+msgid "Fund codes may only be 5 digits long."
+msgstr "Les codes de fonds ne peuvent être composés que de 5 chiffres."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:190
+msgid "Fund codes may only begin with a 3, 7, or 9 (e.g., 30000)."
+msgstr ""
+"Les codes de fonds ne peuvent commencer que par un 3, 7, ou 9 (par exemple, "
+"30000)."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:282
 msgid ""
 "The fields on this tab are auto-populated with data from Identification "
 "Assignment Assistant (IDAA). These fields cannot be edited in TolaData. If "
@@ -2656,46 +2751,61 @@ msgid ""
 "reflected in IDAA first."
 msgstr ""
 "Les champs de cet onglet sont remplis automatiquement avec les données de "
-"l’Assistant pour l’Attribution d’Identification (IDAA). Ces champs ne "
-"peuvent pas être modifiés dans TolaData. Si des modifications de ces "
-"informations de programme sont nécessaires, elles doivent d’abord être "
-"reflétées dans l’IDAA."
+"l’Assistant pour l’Attribution d’Identification (IDAA). Ces champs ne peuvent "
+"pas être modifiés dans TolaData. Si des modifications de ces informations de "
+"programme sont nécessaires, elles doivent d’abord être reflétées dans l’IDAA."
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:105
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:288
 msgid "Program name"
 msgstr "Nom du programme"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:117
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:303
 msgid "Program ID"
 msgstr "Identifiant du programme"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:129
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:318
 msgid "Program start date"
 msgstr "Date de début du programme"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:141
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:338
 msgid "Program end date"
 msgstr "Date de fin du programme"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:153
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:358
 msgid "Program funding status"
 msgstr "Statut de financement du programme"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:209
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:414
 msgid "Outcome themes"
 msgstr "Thèmes de résultats"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:223
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:439
 msgid "GAIT IDs"
 msgstr "IDs GAIT"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:226
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:442
 msgid "Fund codes"
 msgstr "Codes de fonds"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:229
-msgid "Donors"
-msgstr "Bailleurs de fonds"
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:445
+#: tola/db_translations.js:132
+msgid "Donor"
+msgstr "Donateur"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:449
+msgid "Donor dept"
+msgstr "Département des bailleurs de fonds"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:546
+msgid "Add another row"
+msgstr "Ajouter une autre rangée"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:552
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:260
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:267
+msgid "Save changes"
+msgstr "Enregistrer les modifications"
 
 #: js/pages/tola_management_pages/program/components/program_settings.js:69
 msgid "Indicator grouping"
@@ -2713,10 +2823,10 @@ msgid ""
 "setting affects the program page, indicator plan, and IPTT reports."
 msgstr ""
 "Une fois que vous avez défini un cadre de résultats pour ce programme et que "
-"des indicateurs lui ont été attribués, sélectionnez cette option pour "
-"retirer les niveaux d’indicateurs originaux et afficher les indicateurs en "
-"fonction des niveaux du cadre de résultats. Ce réglage affecte la page du "
-"programme, le plan des indicateurs et les rapports IPTT."
+"des indicateurs lui ont été attribués, sélectionnez cette option pour retirer "
+"les niveaux d’indicateurs originaux et afficher les indicateurs en fonction "
+"des niveaux du cadre de résultats. Ce réglage affecte la page du programme, "
+"le plan des indicateurs et les rapports IPTT."
 
 #: js/pages/tola_management_pages/program/components/program_settings.js:92
 msgid "Indicator numbering"
@@ -2741,8 +2851,8 @@ msgstr "Numéroter manuellement les indicateurs"
 
 #: js/pages/tola_management_pages/program/components/program_settings.js:123
 msgid ""
-"If your donor requires a special numbering convention, you can enter a "
-"custom number for each indicator."
+"If your donor requires a special numbering convention, you can enter a custom "
+"number for each indicator."
 msgstr ""
 "Si votre donateur nécessite une convention de numérotation spécifique, vous "
 "pouvez saisir un numéro personnalisé pour chaque indicateur."
@@ -2757,34 +2867,33 @@ msgstr ""
 "d’affichage."
 
 #. Translators: Notify user that the program start and end date were successfully retrieved from the GAIT service and added to the newly saved Program
-#: js/pages/tola_management_pages/program/models.js:205
+#: js/pages/tola_management_pages/program/models.js:210
 msgid "Successfully synced GAIT program start and end dates"
 msgstr ""
 "Les dates de début et de fin du programme GAIT ont été synchronisées avec "
 "succès"
 
 #. Translators: Notify user that the program start and end date failed to be retrieved from the GAIT service with a specific reason appended after the :
-#: js/pages/tola_management_pages/program/models.js:211
+#: js/pages/tola_management_pages/program/models.js:216
 msgid "Failed to sync GAIT program start and end dates: "
 msgstr ""
 "Échec de la synchronisation des dates de début et de fin du programme GAIT : "
 
 #. Translators: A request failed, ask the user if they want to try the request again
-#: js/pages/tola_management_pages/program/models.js:219
+#: js/pages/tola_management_pages/program/models.js:224
 msgid "Retry"
 msgstr "Réessayer"
 
 #. Translators: button label - ignore the current warning modal on display
-#: js/pages/tola_management_pages/program/models.js:228
+#: js/pages/tola_management_pages/program/models.js:233
 msgid "Ignore"
 msgstr "Ignorer"
 
-#: js/pages/tola_management_pages/program/models.js:276
+#: js/pages/tola_management_pages/program/models.js:288
 msgid "The GAIT ID for this program is shared with at least one other program."
-msgstr ""
-"L’ID GAIT de ce programme est partagé avec au moins un autre programme."
+msgstr "L’ID GAIT de ce programme est partagé avec au moins un autre programme."
 
-#: js/pages/tola_management_pages/program/models.js:277
+#: js/pages/tola_management_pages/program/models.js:289
 msgid "View programs with this ID in GAIT."
 msgstr "Afficher les programmes avec cet ID dans GAIT."
 
@@ -2807,21 +2916,29 @@ msgstr "Sélectionner…"
 msgid "No options"
 msgstr "Aucune option"
 
-#: js/pages/tola_management_pages/program/views.js:168
+#: js/pages/tola_management_pages/program/views.js:156
+msgid "Funded"
+msgstr "Financé"
+
+#: js/pages/tola_management_pages/program/views.js:156
+msgid "Completed"
+msgstr "Complété"
+
+#: js/pages/tola_management_pages/program/views.js:170
 msgid "Set program status"
 msgstr "Définir le statut du programme"
 
-#: js/pages/tola_management_pages/program/views.js:213
+#: js/pages/tola_management_pages/program/views.js:215
 msgid "Add Program"
 msgstr "Ajouter un programme"
 
 #. Translators: Label for a freshly created program before the name is entered
-#: js/pages/tola_management_pages/program/views.js:296
-#: js/pages/tola_management_pages/program/views.js:309
+#: js/pages/tola_management_pages/program/views.js:301
+#: js/pages/tola_management_pages/program/views.js:314
 msgid "New Program"
 msgstr "Nouveau programme"
 
-#: js/pages/tola_management_pages/program/views.js:336
+#: js/pages/tola_management_pages/program/views.js:341
 msgid "programs"
 msgstr "programmes"
 
@@ -2834,36 +2951,31 @@ msgstr "Renvoyer l’e-mail d’inscription"
 msgid "Mercy Corps -- managed by Okta"
 msgstr "Mercy Corps — géré par Okta"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:147
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:148
 msgid "Preferred First Name"
 msgstr "Prénom d’usage"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:163
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:164
 msgid "Preferred Last Name"
 msgstr "Nom d’usage"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:179
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:180
 msgid "Username"
 msgstr "Nom d’utilisateur"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:212
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:213
 msgid "Title"
 msgstr "Titre"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:223
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:224
 msgid "Email"
 msgstr "Adresse e-mail"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:238
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:239
 msgid "Phone"
 msgstr "Numéro de téléphone"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:259
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:266
-msgid "Save changes"
-msgstr "Enregistrer les modifications"
-
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:260
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:261
 msgid "Save And Add Another"
 msgstr "Enregistrer et ajouter un autre"
 
@@ -3297,11 +3409,6 @@ msgid "DIG - Testing"
 msgstr "DIG - en cours de validation"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
-#: tola/db_translations.js:132
-msgid "Donor"
-msgstr "Donateur"
-
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:134
 msgid "Key Performance Indicator (KPI)"
 msgstr "Indicateur clé de performance"
@@ -3389,6 +3496,9 @@ msgstr "Paix, gouvernance, et partenariats"
 msgid "Public Health (non - nutrition, non - WASH)"
 msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
+#~ msgid "Donors"
+#~ msgstr "Bailleurs de fonds"
+
 #~ msgid "Fund Code"
 #~ msgstr "Code du fonds"
 
@@ -3432,10 +3542,10 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "program participants or activities."
 #~ msgstr ""
 #~ "Les participants directs sont ceux qui ont reçu des avantages tangibles "
-#~ "dans le cadre du programme, en tant que participant actuel du programme "
-#~ "ou destinataire des avantages du programme prévu. Les participants "
-#~ "indirects sont ceux qui ont reçu un avantage tangible basé sur leur lien "
-#~ "avec des activités ou des participants du programme."
+#~ "dans le cadre du programme, en tant que participant actuel du programme ou "
+#~ "destinataire des avantages du programme prévu. Les participants indirects "
+#~ "sont ceux qui ont reçu un avantage tangible basé sur leur lien avec des "
+#~ "activités ou des participants du programme."
 
 #~ msgid ""
 #~ "Results are cumulative. The Life of Program result mirrors the latest "
@@ -3464,9 +3574,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "%s indicators have missing or invalid information. Please update your "
 #~ "indicator template and upload again."
 #~ msgstr[0] ""
-#~ "Les informations relatives à %s indicateur sont manquantes ou non "
-#~ "valides. Veuillez mettre à jour votre modèle d’indicateur avant de le "
-#~ "charger à nouveau."
+#~ "Les informations relatives à %s indicateur sont manquantes ou non valides. "
+#~ "Veuillez mettre à jour votre modèle d’indicateur avant de le charger à "
+#~ "nouveau."
 #~ msgstr[1] ""
 #~ "Les informations relatives à %s indicateurs sont manquantes ou non "
 #~ "valides. Veuillez mettre à jour votre modèle d’indicateur avant de le "
@@ -3504,10 +3614,10 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "enregistrées"
 
 #~ msgid ""
-#~ "<span class=\"text-danger\"><strong>Choose your results framework "
-#~ "template carefully!</strong></span> Once you begin building your "
-#~ "framework, it will not be possible to change templates without first "
-#~ "deleting all saved levels."
+#~ "<span class=\"text-danger\"><strong>Choose your results framework template "
+#~ "carefully!</strong></span> Once you begin building your framework, it will "
+#~ "not be possible to change templates without first deleting all saved "
+#~ "levels."
 #~ msgstr ""
 #~ "<span class=\"text-danger\"><strong>Choisissez bien la structure de votre "
 #~ "cadre de résultats !</strong></span> Lorsque vous commencez à concevoir "
@@ -3538,8 +3648,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "<strong className=\"text-danger\">Choose your results framework template "
-#~ "carefully!</strong> Once you begin building your framework, it will not "
-#~ "be possible to change templates without first deleting all saved levels."
+#~ "carefully!</strong> Once you begin building your framework, it will not be "
+#~ "possible to change templates without first deleting all saved levels."
 #~ msgstr ""
 #~ "<strong className=\"text-danger\">Choisissez bien la structure de votre "
 #~ "cadre de résultats !</strong> Lorsque vous commencez à concevoir votre "
@@ -3547,8 +3657,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "niveaux enregistrés au préalable."
 
 #~ msgid ""
-#~ "If we make these changes, %s data record will no longer be associated "
-#~ "with the Life of Program target, and will need to be reassigned to a new "
+#~ "If we make these changes, %s data record will no longer be associated with "
+#~ "the Life of Program target, and will need to be reassigned to a new "
 #~ "target.\n"
 #~ "\n"
 #~ " Proceed anyway?"
@@ -3592,10 +3702,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "Provide any additional details about how data quality will be ensured for "
-#~ "this specific indicator. Additional details may include specific roles "
-#~ "and responsibilities of team members for ensuring data quality and/or "
-#~ "specific data sources to be verified, reviewed, or triangulated, for "
-#~ "example."
+#~ "this specific indicator. Additional details may include specific roles and "
+#~ "responsibilities of team members for ensuring data quality and/or specific "
+#~ "data sources to be verified, reviewed, or triangulated, for example."
 #~ msgstr ""
 #~ "Fournissez des informations supplémentaires sur la façon dont la qualité "
 #~ "des données sera assurée pour cet indicateur spécifique. Ces informations "
@@ -3632,9 +3741,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "1. Indicator rows are provided for each result level. You can delete "
 #~ "indicator rows you do not need. You can also leave them empty and they "
 #~ "will be ignored.\n"
-#~ "2. Required columns are highlighted with a dark background and an "
-#~ "asterisk (*) in the header row. Unrequired columns can be left empty but "
-#~ "cannot be deleted.\n"
+#~ "2. Required columns are highlighted with a dark background and an asterisk "
+#~ "(*) in the header row. Unrequired columns can be left empty but cannot be "
+#~ "deleted.\n"
 #~ "3. When you are done, upload the template to the results framework or "
 #~ "program page."
 #~ msgstr ""
@@ -3651,8 +3760,7 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid "Enter indicators"
 #~ msgstr "Saisir des indicateurs"
 
-#~ msgid ""
-#~ "This number is automatically generated through the results framework."
+#~ msgid "This number is automatically generated through the results framework."
 #~ msgstr ""
 #~ "Ce numéro est automatiquement généré par le biais du cadre de résultats."
 
@@ -3663,8 +3771,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "The {field_name} you selected is unavailable. Please select a different "
 #~ "{field_name}."
 #~ msgstr ""
-#~ "Le {field_name} sélectionné n’est pas disponible. Veuillez sélectionner "
-#~ "un autre {field_name}."
+#~ "Le {field_name} sélectionné n’est pas disponible. Veuillez sélectionner un "
+#~ "autre {field_name}."
 
 #~ msgid "Indicator rows cannot be skipped."
 #~ msgstr "Les lignes d’indicateurs ne peuvent pas être ignorées."
@@ -3745,8 +3853,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "Indicators are currently grouped by an older version of indicator levels. "
-#~ "To group indicators according to the results framework, an admin will "
-#~ "need to adjust program settings."
+#~ "To group indicators according to the results framework, an admin will need "
+#~ "to adjust program settings."
 #~ msgstr ""
 #~ "Les indicateurs sont actuellement regroupés selon une précédente version "
 #~ "de niveaux d’indicateur. Afin de regrouper les indicateurs selon le cadre "
@@ -3757,8 +3865,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "This disaggregation cannot be unselected, because it was already used in "
 #~ "submitted program results."
 #~ msgstr ""
-#~ "Cette désagrégation a déjà été utilisée au sein des résultats du "
-#~ "programme envoyés, c'est pourquoi elle ne peut pas être désélectionnée."
+#~ "Cette désagrégation a déjà été utilisée au sein des résultats du programme "
+#~ "envoyés, c'est pourquoi elle ne peut pas être désélectionnée."
 
 #~ msgid "%(country_name)s disaggregations"
 #~ msgstr "Désagrégations %(country_name)s"
@@ -3788,8 +3896,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "You can begin entering results on {program_start_date}, the program start "
 #~ "date"
 #~ msgstr ""
-#~ "Vous pouvez commencer à saisir des résultats le {program_start_date}, "
-#~ "date de début du programme"
+#~ "Vous pouvez commencer à saisir des résultats le {program_start_date}, date "
+#~ "de début du programme"
 
 #~ msgid ""
 #~ "Please select a date between {program_start_date} and {program_end_date}"
@@ -4032,19 +4140,16 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "administrator."
 #~ msgstr ""
 #~ "Identifier les objectifs stratégiques du pays auquel un indicateur "
-#~ "contribue nous permet de filtrer et d’analyser les ensembles "
-#~ "d’indicateurs liés. Les objectifs stratégiques du pays sont gérés par "
-#~ "l’administrateur de pays TolaData."
+#~ "contribue nous permet de filtrer et d’analyser les ensembles d’indicateurs "
+#~ "liés. Les objectifs stratégiques du pays sont gérés par l’administrateur "
+#~ "de pays TolaData."
 
 #~ msgid ""
-#~ "Provide an indicator statement of the precise information needed to "
-#~ "assess whether intended changes have occurred."
+#~ "Provide an indicator statement of the precise information needed to assess "
+#~ "whether intended changes have occurred."
 #~ msgstr ""
 #~ "Fournir un relevé d’indicateur des informations précises nécessaires pour "
 #~ "évaluer si les changements prévus ont eu lieu."
-
-#~ msgid "Number"
-#~ msgstr "Nombre"
 
 #~ msgid ""
 #~ "This number is displayed in place of the indicator number automatically "
@@ -4104,8 +4209,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "Select all relevant disaggregations. Disaggregations are managed by the "
-#~ "TolaData country administrator. Mercy Corps required disaggregations (e."
-#~ "g. SADD) are selected by default, but can be deselected when they are not "
+#~ "TolaData country administrator. Mercy Corps required disaggregations (e.g. "
+#~ "SADD) are selected by default, but can be deselected when they are not "
 #~ "applicable to the indicator."
 #~ msgstr ""
 #~ "Sélectionnez toutes les désagrégations pertinentes. Les désagrégations "
@@ -4121,8 +4226,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr ""
 #~ "Veuillez saisir une valeur numérique pour la mesure de base. Si vous ne "
 #~ "connaissez pas encore la mesure de base ou si elle n’est pas applicable, "
-#~ "veuillez saisir un zéro ou cocher la case « Non applicable ». La mesure "
-#~ "de base pourra être modifiée plus tard."
+#~ "veuillez saisir un zéro ou cocher la case « Non applicable ». La mesure de "
+#~ "base pourra être modifiée plus tard."
 
 #~ msgid "Life of Program (LoP) target"
 #~ msgstr "Cible de la vie du programme (LoP)"
@@ -4199,12 +4304,12 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "utilisées par l’indicateur pour la collecte de données."
 
 #~ msgid ""
-#~ "How frequently will you collect data for this indicator? The frequency "
-#~ "and timing of data collection should be based on how often data are "
-#~ "needed for management purposes, the cost of data collection, and the pace "
-#~ "of change anticipated. If an indicator requires multiple data sources "
-#~ "collected at varying frequencies, then it is recommended to select the "
-#~ "frequency at which all data will be collected for calculation."
+#~ "How frequently will you collect data for this indicator? The frequency and "
+#~ "timing of data collection should be based on how often data are needed for "
+#~ "management purposes, the cost of data collection, and the pace of change "
+#~ "anticipated. If an indicator requires multiple data sources collected at "
+#~ "varying frequencies, then it is recommended to select the frequency at "
+#~ "which all data will be collected for calculation."
 #~ msgstr ""
 #~ "À quelle fréquence comptez-vous recueillir des données pour cet "
 #~ "indicateur ? Établissez votre calendrier de collecte des données en "
@@ -4216,12 +4321,11 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "seront collectées et traitées."
 
 #~ msgid ""
-#~ "List all data points required for reporting. While some indicators "
-#~ "require a single data point (# of students attending training), others "
-#~ "require multiple data points for calculation. For example, to calculate "
-#~ "the % of students graduated from a training course, the two data points "
-#~ "would be # of students graduated (numerator) and # of students enrolled "
-#~ "(denominator)."
+#~ "List all data points required for reporting. While some indicators require "
+#~ "a single data point (# of students attending training), others require "
+#~ "multiple data points for calculation. For example, to calculate the % of "
+#~ "students graduated from a training course, the two data points would be # "
+#~ "of students graduated (numerator) and # of students enrolled (denominator)."
 #~ msgstr ""
 #~ "Établissez une liste de tous les points de données nécessaires à la "
 #~ "présentation du rapport. Bien que certains indicateurs ne requirent qu’un "
@@ -4248,28 +4352,28 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "The method of analysis should be detailed enough to allow an auditor or "
-#~ "third party to reproduce the analysis or calculation and generate the "
-#~ "same result."
+#~ "third party to reproduce the analysis or calculation and generate the same "
+#~ "result."
 #~ msgstr ""
 #~ "La méthode d’analyse doit être suffisamment détaillée pour permettre à un "
-#~ "auditeur ou à une tierce partie de reproduire l’analyse ou le calcul et "
-#~ "de générer le même résultat."
+#~ "auditeur ou à une tierce partie de reproduire l’analyse ou le calcul et de "
+#~ "générer le même résultat."
 
 #~ msgid ""
-#~ "Describe the primary uses of the indicator and its intended audience. "
-#~ "This is the most important field in an indicator plan, because it "
-#~ "explains the utility of the indicator. If an indicator has no clear "
-#~ "informational purpose, then it should not be tracked or measured. By "
-#~ "articulating who needs the indicator data, why and what they need it for, "
-#~ "teams ensure that only useful indicators are included in the program."
+#~ "Describe the primary uses of the indicator and its intended audience. This "
+#~ "is the most important field in an indicator plan, because it explains the "
+#~ "utility of the indicator. If an indicator has no clear informational "
+#~ "purpose, then it should not be tracked or measured. By articulating who "
+#~ "needs the indicator data, why and what they need it for, teams ensure that "
+#~ "only useful indicators are included in the program."
 #~ msgstr ""
 #~ "Décrivez les principales utilisations qui sont faites de l’indicateur et "
 #~ "de son public cible. Ce champ est le plus important dans un plan "
-#~ "d’indicateurs car il justifie l’utilité de l’indicateur. Un indicateur "
-#~ "qui ne possède aucun but informatif clair ne devrait pas être suivi ou "
-#~ "mesuré. En précisant qui a besoin des données de l’indicateur, pour "
-#~ "quelle raison et dans quel but, les équipes peuvent s’assurer que seuls "
-#~ "les indicateurs utiles sont ajoutés au programme."
+#~ "d’indicateurs car il justifie l’utilité de l’indicateur. Un indicateur qui "
+#~ "ne possède aucun but informatif clair ne devrait pas être suivi ou mesuré. "
+#~ "En précisant qui a besoin des données de l’indicateur, pour quelle raison "
+#~ "et dans quel but, les équipes peuvent s’assurer que seuls les indicateurs "
+#~ "utiles sont ajoutés au programme."
 
 #~ msgid ""
 #~ "This frequency should make sense in relation to the data collection "
@@ -4284,15 +4388,15 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid ""
 #~ "List any limitations of the data used to calculate this indicator (e.g., "
 #~ "issues with validity, reliability, accuracy, precision, and/or potential "
-#~ "for double counting.) Data issues can be related to indicator design, "
-#~ "data collection methods, and/or data analysis methods. Please be specific "
-#~ "and explain how data issues were addressed."
+#~ "for double counting.) Data issues can be related to indicator design, data "
+#~ "collection methods, and/or data analysis methods. Please be specific and "
+#~ "explain how data issues were addressed."
 #~ msgstr ""
 #~ "Établissez la liste des données utilisées pour calculer cet indicateur "
 #~ "(par ex. : les problèmes de validité, de fiabilité, d’exactitude, de "
 #~ "précision et/ou en cas de double comptage). Les problèmes relatifs aux "
-#~ "données peuvent être liés à la conception de l’indicateur, aux méthodes "
-#~ "de collecte de données et/ou aux méthodes d’analyse des données. Veuillez "
+#~ "données peuvent être liés à la conception de l’indicateur, aux méthodes de "
+#~ "collecte de données et/ou aux méthodes d’analyse des données. Veuillez "
 #~ "être le plus précis possible et expliquer comment ces problèmes ont été "
 #~ "abordés."
 
@@ -4529,9 +4633,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr ""
 #~ "\n"
 #~ "<p>\n"
-#~ "    Un problème est survenu lors du chargement de cette page, "
-#~ "probablement à cause de la demande envoyée par votre navigateur Web. Nous "
-#~ "sommes désolés pour la gêne occasionnée.\n"
+#~ "    Un problème est survenu lors du chargement de cette page, probablement "
+#~ "à cause de la demande envoyée par votre navigateur Web. Nous sommes "
+#~ "désolés pour la gêne occasionnée.\n"
 #~ "</p>\n"
 #~ "<p>\n"
 #~ "    Veuillez essayer de recharger la page. Si ce problème persiste, <a "
@@ -4595,8 +4699,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "</p>\n"
 #~ "<p>\n"
 #~ "    If you need assistance, please <a href=\"https://learn.mercycorps.org/"
-#~ "index.php/TOLA:Section_06/en\" target=\"_blank\">contact the TolaData "
-#~ "team.</a>\n"
+#~ "index.php/TOLA:Section_06/en\" target=\"_blank\">contact the TolaData team."
+#~ "</a>\n"
 #~ "</p>\n"
 #~ "<p>\n"
 #~ "    <code class=\"text-secondary\">[Error 500: internal server error]</"
@@ -4605,9 +4709,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr ""
 #~ "\n"
 #~ "<p>\n"
-#~ "    Un problème est survenu lors du chargement de cette page, "
-#~ "probablement avec le serveur. Nous sommes désolés pour la gêne "
-#~ "occasionnée.\n"
+#~ "    Un problème est survenu lors du chargement de cette page, probablement "
+#~ "avec le serveur. Nous sommes désolés pour la gêne occasionnée.\n"
 #~ "</p>\n"
 #~ "<p>\n"
 #~ "    Si vous avez besoin d'aide, veuillez <a href=\"https://learn."
@@ -4629,9 +4732,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "You are authenticated as %(username)s, but are not authorized to access "
 #~ "this page. Would you like to log in to a different account?"
 #~ msgstr ""
-#~ "Vous êtes connecté en tant que %(username)s, mais vous n’êtes pas "
-#~ "autorisé à accéder à cette page. Souhaitez-vous vous connecter à un autre "
-#~ "compte ?"
+#~ "Vous êtes connecté en tant que %(username)s, mais vous n’êtes pas autorisé "
+#~ "à accéder à cette page. Souhaitez-vous vous connecter à un autre compte ?"
 
 #~ msgid "Forgotten your password or username?"
 #~ msgstr "Mot de passe ou nom d’utilisateur oublié ?"
@@ -4818,8 +4920,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid "Program metrics <small>for target periods completed to date</small>"
 #~ msgstr ""
-#~ "Les statistiques du programme <small>pour les périodes cibles complétées "
-#~ "à cette date</small>"
+#~ "Les statistiques du programme <small>pour les périodes cibles complétées à "
+#~ "cette date</small>"
 
 #~ msgid ""
 #~ "\n"
@@ -4829,8 +4931,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "                        "
 #~ msgstr ""
 #~ "\n"
-#~ "                        <h4>Tous les indicateurs ont des cibles "
-#~ "manquantes.</h4>\n"
+#~ "                        <h4>Tous les indicateurs ont des cibles manquantes."
+#~ "</h4>\n"
 #~ "                        <p>Rendez-vous sur la <a href="
 #~ "\"%(program_page_url)s\">page du programme</a> pour définir des cibles.</"
 #~ "p>\n"
@@ -4952,8 +5054,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "All details about this indicator and results recorded to the indicator "
-#~ "will be permanently removed. For future reference, please provide a "
-#~ "reason for deleting this indicator."
+#~ "will be permanently removed. For future reference, please provide a reason "
+#~ "for deleting this indicator."
 #~ msgstr ""
 #~ "Les détails concernant cet indicateur ainsi que les résultats enregistrés "
 #~ "seront définitivement supprimés. À titre de référence, veuillez justifier "
@@ -4963,9 +5065,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "Modifying target values will affect program metrics for this indicator. "
 #~ "For future reference, please provide a reason for modifying target values."
 #~ msgstr ""
-#~ "La modification des valeurs cibles affectera les statistiques du "
-#~ "programme pour cet indicateur. À titre de référence, veuillez justifier "
-#~ "la modification des valeurs cibles."
+#~ "La modification des valeurs cibles affectera les statistiques du programme "
+#~ "pour cet indicateur. À titre de référence, veuillez justifier la "
+#~ "modification des valeurs cibles."
 
 #~ msgid "All details about this indicator will be permanently removed."
 #~ msgstr ""
@@ -4983,8 +5085,7 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "For future reference, please provide a reason for deleting this target."
-#~ msgstr ""
-#~ "À titre de référence, veuillez justifier la suppression de la cible."
+#~ msgstr "À titre de référence, veuillez justifier la suppression de la cible."
 
 #~ msgid "This indicator is missing required details and cannot be saved."
 #~ msgstr ""
@@ -4993,8 +5094,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid ""
 #~ "Modifying target values will affect program metrics for this indicator."
 #~ msgstr ""
-#~ "La modification des valeurs cibles affectera les statistiques du "
-#~ "programme pour cet indicateur."
+#~ "La modification des valeurs cibles affectera les statistiques du programme "
+#~ "pour cet indicateur."
 
 #~ msgid "Your changes will be recorded in a change log."
 #~ msgstr ""
@@ -5013,14 +5114,14 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr "Indicateurs en pourcentage (%%)"
 
 #~ msgid ""
-#~ "Life of Program (LoP) targets are now automatically displayed. The "
-#~ "current LoP target does not match what was manually entered in the past "
-#~ "-- %%s. You may need to update your target values."
+#~ "Life of Program (LoP) targets are now automatically displayed. The current "
+#~ "LoP target does not match what was manually entered in the past -- %%s. "
+#~ "You may need to update your target values."
 #~ msgstr ""
 #~ "Les cibles de vie du programme (LoP) s’affichent désormais "
 #~ "automatiquement. La cible LoP actuelle ne correspond pas aux données "
-#~ "précédemment saisies  — %%s. Il se peut que vos valeurs cibles "
-#~ "nécessitent une mise à jour."
+#~ "précédemment saisies  — %%s. Il se peut que vos valeurs cibles nécessitent "
+#~ "une mise à jour."
 
 #~ msgid ""
 #~ "This program previously had a LoP target of %%s. Life of Program (LoP) "
@@ -5060,8 +5161,7 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr "Veuillez remplir tous les champs obligatoires dans l’onglet Résumé."
 
 #~ msgid "Please complete all required fields in the Performance tab."
-#~ msgstr ""
-#~ "Veuillez compléter tous les champs requis dans l’onglet Performance."
+#~ msgstr "Veuillez compléter tous les champs requis dans l’onglet Performance."
 
 #~ msgid "Summary"
 #~ msgstr "Résumé"
@@ -5078,8 +5178,7 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid "Indicator Plan"
 #~ msgstr "Plan de l’indicateur"
 
-#~ msgid ""
-#~ "Program reporting dates are required in order to view program metrics"
+#~ msgid "Program reporting dates are required in order to view program metrics"
 #~ msgstr ""
 #~ "Les dates de rapport du programme sont requises pour afficher les "
 #~ "statistiques du programme"
@@ -5087,12 +5186,12 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid ""
 #~ "\n"
 #~ "                                While a program may begin and end any day "
-#~ "of the month, program periods must begin on the first day of the month "
-#~ "and end on the last day of the month. Please note that the program start "
-#~ "date can only be adjusted <span class=\"color-red\">before periodic "
-#~ "targets are set up and a program begins submitting performance results.</"
-#~ "span> The program end date can be moved later at any time, but can't be "
-#~ "moved earlier once periodic targets are set up.\n"
+#~ "of the month, program periods must begin on the first day of the month and "
+#~ "end on the last day of the month. Please note that the program start date "
+#~ "can only be adjusted <span class=\"color-red\">before periodic targets are "
+#~ "set up and a program begins submitting performance results.</span> The "
+#~ "program end date can be moved later at any time, but can't be moved "
+#~ "earlier once periodic targets are set up.\n"
 #~ "                                "
 #~ msgstr ""
 #~ "\n"
@@ -5110,24 +5209,23 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid ""
 #~ "\n"
 #~ "                                While a program may begin and end any day "
-#~ "of the month, program periods must begin on the first day of the month "
-#~ "and end on the last day of the month. Please note that the program start "
-#~ "date can only be adjusted <span class=\"color-red\">before targets are "
-#~ "set up and a program begins submitting performance results.</span> "
-#~ "Because this program already has periodic targets set up, only the "
-#~ "program end date can be moved later.\n"
+#~ "of the month, program periods must begin on the first day of the month and "
+#~ "end on the last day of the month. Please note that the program start date "
+#~ "can only be adjusted <span class=\"color-red\">before targets are set up "
+#~ "and a program begins submitting performance results.</span> Because this "
+#~ "program already has periodic targets set up, only the program end date can "
+#~ "be moved later.\n"
 #~ "                                "
 #~ msgstr ""
 #~ "\n"
-#~ "                                Alors qu’un programme peut commencer et "
-#~ "se terminer n’importe quel jour du mois, les périodes du programme "
-#~ "doivent débuter le premier jour du mois et se terminer le dernier jour du "
-#~ "mois. Veuillez noter que la date de début du programme peut seulement "
-#~ "être ajustée <span class=\"color-red\">avant que des cibles ont été "
-#~ "spécifiées et qu’un programme commence à transmettre des résultats de "
-#~ "performance.</span> Puisque ce programme a déjà des cibles périodiques "
-#~ "définies, seule la date de fin de programme peut être déplacée "
-#~ "ultérieurement.\n"
+#~ "                                Alors qu’un programme peut commencer et se "
+#~ "terminer n’importe quel jour du mois, les périodes du programme doivent "
+#~ "débuter le premier jour du mois et se terminer le dernier jour du mois. "
+#~ "Veuillez noter que la date de début du programme peut seulement être "
+#~ "ajustée <span class=\"color-red\">avant que des cibles ont été spécifiées "
+#~ "et qu’un programme commence à transmettre des résultats de performance.</"
+#~ "span> Puisque ce programme a déjà des cibles périodiques définies, seule "
+#~ "la date de fin de programme peut être déplacée ultérieurement.\n"
 #~ "                                "
 
 #~ msgid "Back to Homepage"
@@ -5156,24 +5254,24 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "                    "
 #~ msgstr ""
 #~ "\n"
-#~ "                    <strong>Non cumulatif (NC) :</strong> Les résultats "
-#~ "de la période cible sont calculés automatiquement à partir des données "
+#~ "                    <strong>Non cumulatif (NC) :</strong> Les résultats de "
+#~ "la période cible sont calculés automatiquement à partir des données "
 #~ "collectées durant la période. Le résultat de la vie du programme est la "
 #~ "somme des valeurs de la période cible.\n"
 #~ "                    "
 
 #~ msgid ""
 #~ "\n"
-#~ "                    <strong>Cumulative (C):</strong> Target period "
-#~ "results automatically include data from previous periods. The Life of "
-#~ "Program result mirrors the latest period value.\n"
+#~ "                    <strong>Cumulative (C):</strong> Target period results "
+#~ "automatically include data from previous periods. The Life of Program "
+#~ "result mirrors the latest period value.\n"
 #~ "                    "
 #~ msgstr ""
 #~ "\n"
 #~ "                    <strong>Cumulatif (C) :</strong> Les résultats de la "
 #~ "période cible incluent automatiquement les données des périodes "
-#~ "précédentes. Le résultat de la vie du programme reflète la dernière "
-#~ "valeur de période.\n"
+#~ "précédentes. Le résultat de la vie du programme reflète la dernière valeur "
+#~ "de période.\n"
 #~ "                    "
 
 #~ msgid ""
@@ -5184,9 +5282,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "                    "
 #~ msgstr ""
 #~ "\n"
-#~ "                    <strong>Cumulatif (C) :</strong> Le résultat de la "
-#~ "vie du programme reflète le dernier résultat de période. Aucun calcul "
-#~ "n’est effectué avec les résultats.\n"
+#~ "                    <strong>Cumulatif (C) :</strong> Le résultat de la vie "
+#~ "du programme reflète le dernier résultat de période. Aucun calcul n’est "
+#~ "effectué avec les résultats.\n"
 #~ "                    "
 
 #~ msgid ""
@@ -5223,16 +5321,15 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr "Créer un rapport IPTT"
 
 #~ msgid "Reports will be available after the program start date."
-#~ msgstr ""
-#~ "Les rapports seront disponibles après la date de début du programme."
+#~ msgstr "Les rapports seront disponibles après la date de début du programme."
 
 #~ msgid "Program setup"
 #~ msgstr "Installation du programme"
 
 #~ msgid ""
 #~ "\n"
-#~ "    Before adding indicators and performance results, we need to know "
-#~ "your program's\n"
+#~ "    Before adding indicators and performance results, we need to know your "
+#~ "program's\n"
 #~ "    <a\n"
 #~ "        class=\"pl-1\"\n"
 #~ "        href=\"#\"\n"
@@ -5247,8 +5344,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "    "
 #~ msgstr ""
 #~ "\n"
-#~ "    Avant d’ajouter des indicateurs et des résultats de performances, "
-#~ "nous devons connaître les\n"
+#~ "    Avant d’ajouter des indicateurs et des résultats de performances, nous "
+#~ "devons connaître les\n"
 #~ "    <a\n"
 #~ "        class=\"pl-1\"\n"
 #~ "        href=\"#\"\n"
@@ -5266,8 +5363,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "Only completed target periods are included in the “indicators on "
 #~ "track” calculations."
 #~ msgstr ""
-#~ "Seules les périodes cibles complétées sont incluses dans les calculs des "
-#~ "« indicateurs en bonne voie »."
+#~ "Seules les périodes cibles complétées sont incluses dans les calculs des « "
+#~ "indicateurs en bonne voie »."
 
 #~ msgid "Last completed target period"
 #~ msgstr "Dernière période cible terminée"
@@ -5289,9 +5386,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "For midline/endline and event-based target periods, we begin tracking "
 #~ "performance as soon as the first result is submitted."
 #~ msgstr ""
-#~ "Pour les périodes cibles de mi-parcours, de fin de programme et basées "
-#~ "sur les évènements, nous commençons à suivre la performance dès que le "
-#~ "premier résultat est enregistré."
+#~ "Pour les périodes cibles de mi-parcours, de fin de programme et basées sur "
+#~ "les évènements, nous commençons à suivre la performance dès que le premier "
+#~ "résultat est enregistré."
 
 #~ msgid ""
 #~ "The result value and any information associated with it will be "
@@ -5333,9 +5430,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "should only be done to correct a data entry error. For future reference, "
 #~ "please provide a reason for modifying this result."
 #~ msgstr ""
-#~ "La modification des résultats affectera les statistiques du programme "
-#~ "pour cet indicateur, et ne doit être réalisée qu’en vue de corriger une "
-#~ "erreur d’entrée de données. À titre de référence, veuillez justifier la "
+#~ "La modification des résultats affectera les statistiques du programme pour "
+#~ "cet indicateur, et ne doit être réalisée qu’en vue de corriger une erreur "
+#~ "d’entrée de données. À titre de référence, veuillez justifier la "
 #~ "modification de ce résultat."
 
 #~ msgid "One or more fields needs attention."
@@ -5400,16 +5497,16 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "This date determines where the result appears in indicator performance "
 #~ "tracking tables. If data collection occurred within the target period, we "
 #~ "recommend entering the last day you collected data. If data collection "
-#~ "occurred after the target period ended, we recommend entering the last "
-#~ "day of the <i>target period in which you want the result to appear.</i>"
+#~ "occurred after the target period ended, we recommend entering the last day "
+#~ "of the <i>target period in which you want the result to appear.</i>"
 #~ msgstr ""
 #~ "Cette date détermine l’endroit où le résultat apparaît dans les tableaux "
 #~ "de suivi des indicateurs de performance. Si la collecte des données a eu "
 #~ "lieu pendant la période cible, nous vous recommandons de renseigner le "
-#~ "dernier jour où vous avez collecté des données. Si la collecte des "
-#~ "données a eu lieu après la fin de la période cible, nous vous "
-#~ "recommandons de renseigner le dernier jour de la <i>période cible au sein "
-#~ "de laquelle vous souhaitez voir apparaître le résultat</i>"
+#~ "dernier jour où vous avez collecté des données. Si la collecte des données "
+#~ "a eu lieu après la fin de la période cible, nous vous recommandons de "
+#~ "renseigner le dernier jour de la <i>période cible au sein de laquelle vous "
+#~ "souhaitez voir apparaître le résultat</i>"
 
 #~ msgid ""
 #~ "All results for this indicator will be measured against the Life of "
@@ -5478,21 +5575,21 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid ""
 #~ "The actual value matches the target value, plus or minus 15%%. So if your "
 #~ "target is 100 and your result is 110, the indicator is 10%% above target "
-#~ "and on track.  <br><br>Please note that if your indicator has a "
-#~ "decreasing direction of change, then “above” and “below” are switched. In "
-#~ "that case, if your target is 100 and your result is 200, your indicator "
-#~ "is 50%% below target and not on track.<br><br><a href='https://docs."
-#~ "google.com/document/d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' "
-#~ "target='_blank'>See our documentation for more information.</a>"
+#~ "and on track.  <br><br>Please note that if your indicator has a decreasing "
+#~ "direction of change, then “above” and “below” are switched. In that case, "
+#~ "if your target is 100 and your result is 200, your indicator is 50%% below "
+#~ "target and not on track.<br><br><a href='https://docs.google.com/document/"
+#~ "d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' target='_blank'>See our "
+#~ "documentation for more information.</a>"
 #~ msgstr ""
-#~ "La valeur réelle correspond à la valeur cible à 15%% près. Ainsi, si "
-#~ "votre cible est 100 et votre résultat 110, l’indicateur est 10%% au-"
-#~ "dessus de la cible et est donc sur la bonne voie.  <br><br>Veuillez noter "
-#~ "que si le sens de changement de votre indicateur est décroissant, les "
-#~ "indicateurs « au-dessus » et « en dessous » sont alors inversés. Dans ce "
-#~ "cas, si votre cible est 100 et votre résultat 200, votre indicateur est "
-#~ "50%% en dessous de la cible, ce qui veut dire qu’il n’est pas sur la "
-#~ "bonne voie.<br><br><a href='https://docs.google.com/document/"
+#~ "La valeur réelle correspond à la valeur cible à 15%% près. Ainsi, si votre "
+#~ "cible est 100 et votre résultat 110, l’indicateur est 10%% au-dessus de la "
+#~ "cible et est donc sur la bonne voie.  <br><br>Veuillez noter que si le "
+#~ "sens de changement de votre indicateur est décroissant, les indicateurs « "
+#~ "au-dessus » et « en dessous » sont alors inversés. Dans ce cas, si votre "
+#~ "cible est 100 et votre résultat 200, votre indicateur est 50%% en dessous "
+#~ "de la cible, ce qui veut dire qu’il n’est pas sur la bonne voie.<br><br><a "
+#~ "href='https://docs.google.com/document/"
 #~ "d/1Gl9bxJJ6hdhCXeoOCoR1mnVKZa2FlEOhaJcjexiHzY0' target='_blank'>Consultez "
 #~ "notre documentation pour plus d’informations.</a>"
 
@@ -5503,8 +5600,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "                        "
 #~ msgstr ""
 #~ "\n"
-#~ "                         <strong>%(low)s %%</strong> sont >%(margin)s%% "
-#~ "en dessous de la cible\n"
+#~ "                         <strong>%(low)s %%</strong> sont >%(margin)s%% en "
+#~ "dessous de la cible\n"
 #~ "                    "
 
 #~ msgid ""
@@ -5523,8 +5620,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "                data-read-only=\"%(read_only)s\">\n"
 #~ "                Program period\n"
 #~ "            </a>\n"
-#~ "            is <br><strong class=\"text-dark\">%(program."
-#~ "percent_complete)s%% complete</strong>\n"
+#~ "            is <br><strong class=\"text-dark\">%(program.percent_complete)s"
+#~ "%% complete</strong>\n"
 #~ "        "
 #~ msgstr ""
 #~ "\n"
@@ -5556,18 +5653,17 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "                "
 #~ msgstr ""
 #~ "\n"
-#~ "            <p><strong>La valeur réelle représente %(percent_met)s%% de "
-#~ "la valeur cible.</strong> Un indicateur est en bonne voie si le résultat "
-#~ "n’est ni inférieur à 85%% de la cible, ni supérieur à 115%% de la cible. "
-#~ "</p>\n"
+#~ "            <p><strong>La valeur réelle représente %(percent_met)s%% de la "
+#~ "valeur cible.</strong> Un indicateur est en bonne voie si le résultat "
+#~ "n’est ni inférieur à 85%% de la cible, ni supérieur à 115%% de la cible. </"
+#~ "p>\n"
 #~ "            <p><em>Pensez à prendre en compte la direction du changement "
 #~ "souhaité lorsque vous réfléchissez au statut d’un indicateur.</em></p>\n"
 #~ "            "
 
 #~ msgid "An error occured while logging in with your Okta account."
 #~ msgstr ""
-#~ "Une erreur est survenue lors de la connexion à l’aide de votre compte "
-#~ "Okta."
+#~ "Une erreur est survenue lors de la connexion à l’aide de votre compte Okta."
 
 #~ msgid "Please contact the TolaData team for assistance."
 #~ msgstr "Veuillez contacter l’équipe TolaData pour obtenir de l’aide."
@@ -5591,8 +5687,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid "You can request an account from your TolaData administrator."
 #~ msgstr ""
-#~ "Vous pouvez faire une demande de compte en contactant votre "
-#~ "administrateur TolaData."
+#~ "Vous pouvez faire une demande de compte en contactant votre administrateur "
+#~ "TolaData."
 
 #~ msgid ""
 #~ "\n"
@@ -5630,16 +5726,16 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "\n"
-#~ "                <p>Please enter a correct username and password. Note "
-#~ "that both fields may be case-sensitive. Did you forget your password? <a "
-#~ "href=\"%(password_reset_url)s\">Click here to reset it.</a></p>\n"
+#~ "                <p>Please enter a correct username and password. Note that "
+#~ "both fields may be case-sensitive. Did you forget your password? <a href="
+#~ "\"%(password_reset_url)s\">Click here to reset it.</a></p>\n"
 #~ "                "
 #~ msgstr ""
 #~ "\n"
-#~ "                <p>Veuillez saisir un nom d’utilisateur et un mot de "
-#~ "passe valides. Notez que chaque champ peut être sensible à la casse. Vous "
-#~ "avez oublié votre mot de passe ? <a href=\"%(password_reset_url)s"
-#~ "\">Cliquez ici pour le réinitialiser.</a></p>\n"
+#~ "                <p>Veuillez saisir un nom d’utilisateur et un mot de passe "
+#~ "valides. Notez que chaque champ peut être sensible à la casse. Vous avez "
+#~ "oublié votre mot de passe ? <a href=\"%(password_reset_url)s\">Cliquez ici "
+#~ "pour le réinitialiser.</a></p>\n"
 #~ "                "
 
 #~ msgid "Need help logging in?"
@@ -5662,8 +5758,7 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid ""
 #~ "\n"
 #~ "    <p>Your password has been changed.</p>\n"
-#~ "    <p><a href=\"%(login_url)s\" class=\"btn btn-primary\">Log in</a></"
-#~ "p>\n"
+#~ "    <p><a href=\"%(login_url)s\" class=\"btn btn-primary\">Log in</a></p>\n"
 #~ "    "
 #~ msgstr ""
 #~ "\n"
@@ -5690,8 +5785,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "    <ul>\n"
 #~ "        <li>Check your spam or junk mail folder.</li>\n"
 #~ "        <li>Verify that you entered your email address correctly.</li>\n"
-#~ "        <li>Verify that you entered the email address associated with "
-#~ "your TolaData account.</li>\n"
+#~ "        <li>Verify that you entered the email address associated with your "
+#~ "TolaData account.</li>\n"
 #~ "    </ul>\n"
 #~ "\n"
 #~ "    <h4>If you are using a mercycorps.org address to log in:</h4>\n"
@@ -5705,8 +5800,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "    "
 #~ msgstr ""
 #~ "\n"
-#~ "    <p>Nous avons envoyé un e-mail à l’adresse que vous nous avez "
-#~ "indiquée.</p>\n"
+#~ "    <p>Nous avons envoyé un e-mail à l’adresse que vous nous avez indiquée."
+#~ "</p>\n"
 #~ "\n"
 #~ "    <h4>Si vous n’avez pas reçu d’e-mail, veuillez suivre la procédure "
 #~ "suivante :</h4>\n"
@@ -5714,23 +5809,22 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "    <ul>\n"
 #~ "        <li>Sur votre compte e-mail, vérifiez les dossiers Spams ou "
 #~ "Courrier indésirable.</li>\n"
-#~ "        <li>Assurez-vous d’avoir correctement saisi votre adresse e-mail."
-#~ "</li>\n"
+#~ "        <li>Assurez-vous d’avoir correctement saisi votre adresse e-mail.</"
+#~ "li>\n"
 #~ "        <li>Assurez-vous d’avoir saisi l’adresse e-mail associée à votre "
 #~ "compte TolaData.</li>\n"
 #~ "    </ul>\n"
 #~ "\n"
 #~ "    <h4>Si vous vous connectez à l’aide d’une adresse e-mail mercycorps."
 #~ "org :</h4>\n"
-#~ "    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> "
-#~ "et cliquez sur <strong>Se connecter avec une adresse e-mail mercycorps."
-#~ "org.</strong></p>\n"
+#~ "    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> et "
+#~ "cliquez sur <strong>Se connecter avec une adresse e-mail mercycorps.org.</"
+#~ "strong></p>\n"
 #~ "\n"
-#~ "    <h4>Si vous vous connectez à l’aide d’une adresse e-mail Gmail :</"
-#~ "h4>\n"
-#~ "    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> "
-#~ "et cliquez sur <strong>Se connecter avec Gmail.</strong> <em>Nous ne "
-#~ "pouvons pas réinitialiser votre mot de passe Gmail.</em></p>\n"
+#~ "    <h4>Si vous vous connectez à l’aide d’une adresse e-mail Gmail :</h4>\n"
+#~ "    <p>Retournez sur la <a href=\"%(login_url)s\">page de connexion</a> et "
+#~ "cliquez sur <strong>Se connecter avec Gmail.</strong> <em>Nous ne pouvons "
+#~ "pas réinitialiser votre mot de passe Gmail.</em></p>\n"
 #~ "    "
 
 #~ msgid ""
@@ -5750,8 +5844,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "général, cela se produit lorsque vous cliquez sur le lien « oubli du mot "
 #~ "de passe ».\n"
 #~ "\n"
-#~ "Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet "
-#~ "e-mail.\n"
+#~ "Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-"
+#~ "mail.\n"
 #~ "\n"
 #~ "Si vous souhaitez modifier votre mot de passe, veuillez cliquer sur le "
 #~ "lien suivant et définir un nouveau mot de passe :\n"
@@ -5788,8 +5882,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr ""
 #~ "Votre sélection de langue détermine le format de nombre attendu lorsque "
 #~ "vous saisissez des cibles et des résultats. Votre langue détermine "
-#~ "également la façon dont les nombres sont affichés sur la page du "
-#~ "programme et les rapports, y compris les exportations Excel."
+#~ "également la façon dont les nombres sont affichés sur la page du programme "
+#~ "et les rapports, y compris les exportations Excel."
 
 #~ msgid "Number formatting conventions"
 #~ msgstr "Conventions de formatage des nombres"
@@ -5826,8 +5920,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr "Espace"
 
 #~ msgid ""
-#~ "Warning: This may be a badly formatted web address. It should be "
-#~ "something like https://domain.com/path/to/file or https://docs.google.com/"
+#~ "Warning: This may be a badly formatted web address. It should be something "
+#~ "like https://domain.com/path/to/file or https://docs.google.com/"
 #~ "spreadsheets/d/OIjwljwoihgIHOEies"
 #~ msgstr ""
 #~ "Avertissement : Cette adresse Web semble ne pas être formatée "
@@ -5847,9 +5941,9 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "on your hard drive.  The link you provided does not appear to be a file "
 #~ "path or web link."
 #~ msgstr ""
-#~ "Vous devez fournir un emplacement ou un chemin du fichier qui ne se "
-#~ "trouve pas sur votre disque dur local. Le lien que vous avez fourni ne "
-#~ "semble pas être un chemin du fichier ni un lien Web."
+#~ "Vous devez fournir un emplacement ou un chemin du fichier qui ne se trouve "
+#~ "pas sur votre disque dur local. Le lien que vous avez fourni ne semble pas "
+#~ "être un chemin du fichier ni un lien Web."
 
 #~ msgid "Filter by:"
 #~ msgstr "Filtrer par :"
@@ -6108,8 +6202,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "connecter en utilisant leur nom d’utilisateur et leur mot de passe Okta."
 
 #~ msgid ""
-#~ "Mercy Corps accounts are managed by Okta. Mercy Corps employees should "
-#~ "log in using their Okta username and password."
+#~ "Mercy Corps accounts are managed by Okta. Mercy Corps employees should log "
+#~ "in using their Okta username and password."
 #~ msgstr ""
 #~ "Les comptes Mercy Corps sont gérés par Okta. Les employés de Mercy Corps "
 #~ "doivent se connecter en utilisant leur nom d’utilisateur et leur mot de "
@@ -6148,9 +6242,6 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid "Places"
 #~ msgstr "Lieux"
-
-#~ msgid "Map"
-#~ msgstr "Carte"
 
 #~ msgid "Demographic Information"
 #~ msgstr "Informations démographiques"
@@ -6552,9 +6643,6 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid "User programs updated"
 #~ msgstr "Programmes de l’utilisateur mis à jour"
 
-#~ msgid "This field must be unique"
-#~ msgstr "Ce champ doit être unique"
-
 #~ msgid "Direction of change (not applicable)"
 #~ msgstr "Direction du changement (non applicable)"
 
@@ -6610,8 +6698,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 
 #~ msgid ""
 #~ "Standard disaggregations are entered by the administrator for the entire "
-#~ "organizations.  If you are not seeing any here, please contact your "
-#~ "system administrator."
+#~ "organizations.  If you are not seeing any here, please contact your system "
+#~ "administrator."
 #~ msgstr ""
 #~ "Les désagrégations standard sont entrées par l’administrateur pour "
 #~ "l’ensemble des organisations. Si vous n’en voyez aucun ici, veuillez "
@@ -6747,8 +6835,7 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid "Filtered by <b>(Status): %(status|default_if_none:'')s</b>"
 #~ msgstr "Filtré par <b>(Status) : %(status|default_if_none:'')s</ b>"
 
-#~ msgid ""
-#~ "Filtered by <b>(Program): %(filtered_program|default_if_none:'')s</b>"
+#~ msgid "Filtered by <b>(Program): %(filtered_program|default_if_none:'')s</b>"
 #~ msgstr ""
 #~ "Filtré par <b>(Programme) : %(filtered_program|default_if_none:'')s</ b>"
 
@@ -6896,9 +6983,6 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid "User with Approval Authority"
 #~ msgstr "Utilisateur avec autorité d’approbation"
 
-#~ msgid "Fund"
-#~ msgstr "Fonds"
-
 #~ msgid "Tola Approval Authority"
 #~ msgstr "Autorité d’approbation de Tola"
 
@@ -6981,8 +7065,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr "Date de demande"
 
 #~ msgid ""
-#~ "Please be specific in your name.  Consider that your Project Name "
-#~ "includes WHO, WHAT, WHERE, HOW"
+#~ "Please be specific in your name.  Consider that your Project Name includes "
+#~ "WHO, WHAT, WHERE, HOW"
 #~ msgstr ""
 #~ "Veuillez être précis dans votre nom. Considérez que votre nom de projet "
 #~ "inclut QUI, QUOI, OÙ, COMMENT"
@@ -7056,8 +7140,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr "Nombre estimé de bénéficiaires indirects"
 
 #~ msgid ""
-#~ "This is a calculation - multiply direct beneficiaries by average "
-#~ "household size"
+#~ "This is a calculation - multiply direct beneficiaries by average household "
+#~ "size"
 #~ msgstr ""
 #~ "C’est un calcul - multipliez les bénéficiaires directs par la taille "
 #~ "moyenne des ménages"
@@ -7304,9 +7388,6 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgid "site"
 #~ msgstr "site"
 
-#~ msgid "Complete"
-#~ msgstr "Achevée"
-
 #~ msgid "Project Components"
 #~ msgstr "Composants du projet"
 
@@ -7360,8 +7441,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ "de rapport se situe dans le futur."
 
 #~ msgid ""
-#~ "Your program administrator must initialize this program before you will "
-#~ "be able to view or edit it"
+#~ "Your program administrator must initialize this program before you will be "
+#~ "able to view or edit it"
 #~ msgstr ""
 #~ "Ce programme doit être initialisé par votre administrateur de programme "
 #~ "avant de pouvoir être visible ou modifié"
@@ -7494,8 +7575,8 @@ msgstr "Santé publique (ne se rapporte ni à la nutrition ni à WASH)"
 #~ msgstr "Cibles vs réels"
 
 #~ msgid ""
-#~ "View results organized by target period for indicators that share the "
-#~ "same target frequency."
+#~ "View results organized by target period for indicators that share the same "
+#~ "target frequency."
 #~ msgstr ""
 #~ "Voir les résultats organisés par période cible pour les indicateurs qui "
 #~ "partagent la même fréquence cible."

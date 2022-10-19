@@ -152,6 +152,8 @@ export const IndexView = observer(
         const countryFilterOptions = sortObjectListByValue(Object.entries(store.countries).map(([id, country]) => ({value: country.id, label: country.name})))
         const organizationFilterOptions = sortObjectListByValue(Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name})))
         const idaaSectorFilterOptions = sortObjectListByValue(store.idaa_sectors.map(x => ({value: x.id, label: x.name})));
+        const idaaOutcomeThemesOptions = sortObjectListByValue(store.idaa_outcome_themes.map(x => ({value: x.id, label: x.name})));
+        const fundingStatusOptions = [{value: 0, label: gettext("Funded")}, {value: 1, label: gettext("Completed")}];
         const programFilterOptions = sortObjectListByValue(Object.entries(store.programFilterPrograms).map(([id, program]) => ({value: program.id, label: program.name})))
         const userFilterOptions = sortObjectListByValue(Object.entries(store.users).map(([id, user]) => ({value: user.id, label: user.name})))
         const bulkProgramStatusOptions = [
@@ -253,7 +255,10 @@ export const IndexView = observer(
                                                             onUpdate={(id, data) => store.updateProgram(id, data)}
                                                             onCreate={(new_program_data) => store.saveNewProgram(new_program_data)}
                                                             idaaSectorOptions={idaaSectorFilterOptions}
+                                                            idaaOutcomeThemesOptions={idaaOutcomeThemesOptions}
                                                             countryOptions={allCountryOptions}
+                                                            fundingStatusOptions={fundingStatusOptions}
+                                                            isLoading={store.saving}
                                                             errors={store.editing_errors} />
                                                 </LoadingSpinner>
                                             )}

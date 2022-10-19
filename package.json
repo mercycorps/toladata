@@ -83,6 +83,7 @@
         "qs": "^6.11.0",
         "react": "^16.14.0",
         "react-autosize-textarea": "^7.1.0",
+        "react-datepicker": "^4.8.0",
         "react-beautiful-dnd": "^12.2.0",
         "react-bootstrap-table-next": "^2.2.0",
         "react-bootstrap-table2-paginator": "^2.1.2",

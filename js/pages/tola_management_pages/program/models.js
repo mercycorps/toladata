@@ -253,53 +253,23 @@ export class ProgramStore {
             let new_program_data = {
                 id: "new",
                 name: "",
-                gaitid: "",
-                fundcode: "",
-                funding_status: "Funded",
-                description: "",
+                external_program_id: "",
+                start_date: "",
+                end_date: "",
+                funding_status: "",
                 country: [],
                 idaa_sector: [],
                 idaa_outcome_theme: [],
+                gaitid: [{
+                    gaitid: "",
+                    donor: "",
+                    donor_dept: "",
+                    fund_code: [],
+                }],
+                description: "",
             }
             this.programs.unshift(new_program_data)
             this.editing_target = 'new'
-        }
-    }
-
-    /*
-     * if there is no GAIT Id, resolve and move on,
-     * if there is a GAIT ID, call to see if it is unique, and if not confirm that the user wants to enter a
-     * duplicate GAIT ID for this program (displaying the link to view programs with the same ID in GAIT)
-     */
-
-    validateGaitId(program_data) {
-        if (program_data.gaitid) {
-            let id = program_data.id || 0;
-            return new Promise((resolve, reject) => {
-                    this.api.validateGaitId(program_data.gaitid, id).then(response => {
-                        if (response.data.unique === false) {
-                        let message_intro = gettext('The GAIT ID for this program is shared with at least one other program.')
-                        let link_text = gettext('View programs with this ID in GAIT.');
-                        let preamble_text = `${message_intro} <a href="${response.data.gait_link}" target="_blank">${link_text}</a>`;
-                        window.create_unified_changeset_notice({
-                            header: gettext('Warning'),
-                            show_icon: true,
-                            rationale_required: false,
-                            include_rationale: false,
-                            message_text: gettext('Are you sure you want to continue?'),
-                            notice_type: 'error',
-                            on_submit: resolve,
-                            on_cancel: reject,
-                            preamble: preamble_text
-                        });
-                        } else {
-                            resolve();
-                        }
-                    }
-                ).catch(e => reject(e))
-            });
-        } else {
-            return new Promise((resolve, reject) => resolve());
         }
     }
 
@@ -307,21 +277,17 @@ export class ProgramStore {
     saveNewProgram(program_data) {
         program_data.id = null
         this.saving = true
-        this.validateGaitId(
-            program_data
-        ).then(() => {
-            // create program
-            return this.api.createProgram(program_data).catch(error => {
-                // form validation error handling
-                if (error.response) {
-                    runInAction(() => {
-                        this.editing_errors = error.response.data
-                    })
-                }
-
-                // propagate error to avoid trying to continue
-                return Promise.reject('program creation failed')
-            })
+        // create program
+        this.api.createProgram(program_data)
+        .catch(error => {
+            // form validation error handling
+            if (error.response) {
+                runInAction(() => {
+                    this.editing_errors = error.response.data
+                })
+            }
+            // propagate error to avoid trying to continue
+            return Promise.reject('program creation failed')
         }).then(response => {
             // now pull history data of newly created program
             return Promise.all([response, this.api.fetchProgramHistory(response.data.id)])

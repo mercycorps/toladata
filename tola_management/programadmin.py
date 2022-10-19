@@ -305,7 +305,7 @@ class ProgramAdminSerializer(ModelSerializer):
 
     def validate_country(self, values):
         if not values:
-            raise ValidationError("This field may not be blank.")
+            raise ValidationError(_("This field may not be blank."))
         return values
 
     def validate_dates(self, start_date, end_date):
