@@ -822,7 +822,7 @@ class ProgramAdminAuditLog(models.Model, DiffableLog):
     def field_map(self):
         return {
             'gaitid': _("GAIT ID"),
-            'name': _("Name"),
+            'name': _("Program name"),
             'funding_status': _("Funding status"),
             'cost_center': _("Cost center"),
             'description': _("Description"),

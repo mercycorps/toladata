@@ -2738,7 +2738,7 @@ msgstr "Nombre del programa"
 
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:303
 msgid "Program ID"
-msgstr "Identificador de Programa"
+msgstr "Identificador de programa"
 
 #: js/pages/tola_management_pages/program/components/edit_program_profile.js:318
 msgid "Program start date"
