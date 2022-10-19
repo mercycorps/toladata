@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-07 08:17-0700\n"
-"PO-Revision-Date: 2022-10-07 09:06-0600\n"
+"POT-Creation-Date: 2022-10-18 12:41-0700\n"
+"PO-Revision-Date: 2022-10-18 13:49-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -65,7 +65,7 @@ msgstr "Desagregación del País"
 
 #: indicators/export_renderers.py:54 tola_management/models.py:831
 msgid "Program ID"
-msgstr "Identificador de Programa"
+msgstr "Identificador de programa"
 
 #: indicators/export_renderers.py:55
 msgid "Indicator ID"
@@ -195,7 +195,7 @@ msgstr "N/A"
 #. Translators: Sheet title for a log of all changes to indicators over a program's history
 #. Translators: Page title for a log of all changes to indicators over a program's history
 #: indicators/export_renderers.py:406 tola_management/programadmin.py:129
-#: tola_management/programadmin.py:765 tola_management/views.py:353
+#: tola_management/programadmin.py:769 tola_management/views.py:353
 msgid "Program change log"
 msgstr "Registro de cambios en el programa"
 
@@ -532,12 +532,12 @@ msgstr "Tipo de indicador"
 #: indicators/models.py:79 indicators/models.py:102 indicators/models.py:124
 #: indicators/models.py:400 indicators/models.py:730 indicators/models.py:1296
 #: tola_management/models.py:135 tola_management/models.py:404
-#: tola_management/models.py:825 tola_management/models.py:891
+#: tola_management/models.py:891
 msgid "Name"
 msgstr "Nombre"
 
 #: indicators/models.py:80 workflow/models.py:147 workflow/models.py:190
-#: workflow/models.py:544 workflow/models.py:1021
+#: workflow/models.py:544 workflow/models.py:1024
 msgid "Country"
 msgstr "País"
 
@@ -1747,14 +1747,14 @@ msgstr ""
 "La suma de ‘SADD sin cómputo doble’ debe ser igual a la suma de ‘Directo sin "
 "cómputo doble’."
 
-#. Translators: An error message detailing that the fields Direct and Indirect total participants with double counting is required
+#. Translators: An error message detailing that the field Direct total participants with double counting is required
 #: indicators/serializers_new/participant_count_serializers.py:302
 msgid ""
-"Direct total participants with double counting is required. Please "
-"complete these fields."
+"Direct total participants with double counting is required. Please complete "
+"these fields."
 msgstr ""
-"Se requiere un total de participantes directos con cómputo doble. "
-"Por favor, complete estos campos."
+"Se requiere un total de participantes directos con cómputo doble. Por favor, "
+"complete estos campos."
 
 #. Translators: An error message detailing that the Direct and Indirect without double counting should be equal to or lower than the value of Direct and Indirect with double counting
 #: indicators/serializers_new/participant_count_serializers.py:306
@@ -1767,8 +1767,25 @@ msgstr ""
 
 #. Translators: An error message detailing that the Sector values should be less to or equal to the sum of Direct and Indirect with double counting value
 #: indicators/serializers_new/participant_count_serializers.py:310
+#, fuzzy
+#| msgid ""
+#| "Sector values should be less than or equal to the 'Direct/Indirect with "
+#| "double counting' value."
 msgid ""
-"Sector values should be less than or equal to the 'Direct/Indirect with "
+"Direct sector values should be less than or equal to the 'Direct with double "
+"counting' value."
+msgstr ""
+"Los valores del sector deben ser menores o iguales al valor ‘Directo/"
+"Indirecto con cómputo doble’."
+
+#. Translators: An error message detailing that the Sector values should be less to or equal to the sum of Direct and Indirect with double counting value
+#: indicators/serializers_new/participant_count_serializers.py:314
+#, fuzzy
+#| msgid ""
+#| "Sector values should be less than or equal to the 'Direct/Indirect with "
+#| "double counting' value."
+msgid ""
+"Indirect sector values should be less than or equal to the 'Indirect with "
 "double counting' value."
 msgstr ""
 "Los valores del sector deben ser menores o iguales al valor ‘Directo/"
@@ -2676,7 +2693,7 @@ msgstr "En general"
 
 #: templates/indicators/disaggregation_print.html:58
 #: templates/indicators/disaggregation_report.html:97
-#: templates/indicators/disaggregation_report.html:145 workflow/models.py:973
+#: templates/indicators/disaggregation_report.html:145 workflow/models.py:976
 msgid "Type"
 msgstr "Tipo"
 
@@ -4685,11 +4702,11 @@ msgstr "Salud pública (no nutricional/no WASH)"
 msgid "Form Errors"
 msgstr "Errores en el Formulario"
 
-#: tola/views.py:99
+#: tola/views.py:107
 msgid "You are not logged in."
 msgstr "No ha iniciado sesión."
 
-#: tola/views.py:143
+#: tola/views.py:151
 msgid "Your profile has been updated."
 msgstr "Su perfil se ha actualizado."
 
@@ -4932,6 +4949,10 @@ msgstr "indicador de programa"
 msgid "GAIT ID"
 msgstr "ID GAIT"
 
+#: tola_management/models.py:825
+msgid "Program name"
+msgstr "Nombre del programa"
+
 #: tola_management/models.py:826
 msgid "Funding status"
 msgstr "Estado de la financiación"
@@ -5090,30 +5111,19 @@ msgstr "Nueva entrada"
 msgid "Rationale"
 msgstr "Justificación"
 
-#: tola_management/programadmin.py:320
+#: tola_management/programadmin.py:314
 msgid "The program start date may not be after the program end date."
 msgstr ""
 "La fecha de inicio del programa no puede ser posterior a la fecha de "
 "finalización del programa."
 
-#: tola_management/programadmin.py:322
+#: tola_management/programadmin.py:316
 msgid "The program end date may not be before the program start date."
 msgstr ""
 "La fecha de finalización del programa no puede ser anterior a la fecha de "
 "inicio del programa."
 
-#: tola_management/programadmin.py:331
-msgid "The program start date may not be more than 10 years in the past."
-msgstr ""
-"La fecha de inicio del programa no puede ser más de 10 años en el pasado."
-
-#: tola_management/programadmin.py:337
-msgid "The program end date may not be more than 10 years in the future."
-msgstr ""
-"La fecha de finalización del programa no puede ser más de 10 años en el "
-"futuro."
-
-#: tola_management/programadmin.py:344
+#: tola_management/programadmin.py:339
 msgid "Duplicate GAIT ID numbers are not allowed."
 msgstr "No se permite duplicar los números de identificación GAIT."
 
@@ -5252,7 +5262,7 @@ msgstr "Alfabetización"
 msgid "Demographic Info Data Source"
 msgstr "Origen de los Datos de Información Demográfica"
 
-#: workflow/forms.py:181 workflow/models.py:975
+#: workflow/forms.py:181 workflow/models.py:978
 msgid "Date of First Contact"
 msgstr "Fecha del primer contacto"
 
@@ -5406,7 +5416,7 @@ msgstr "Nombre del programa"
 msgid "Funding Status"
 msgstr "Estado de financiamiento"
 
-#: workflow/models.py:528 workflow/models.py:884
+#: workflow/models.py:528 workflow/models.py:887
 msgid "Fund Code"
 msgstr "Código del fondo"
 
@@ -5484,270 +5494,270 @@ msgstr "Ninguno"
 msgid "GAIT IDs"
 msgstr "ID GAIT"
 
-#: workflow/models.py:885
+#: workflow/models.py:888
 msgid "Fund Codes"
 msgstr "Código del fondo"
 
 #. Translators: Refers to a user permission role with limited access to view data only
-#: workflow/models.py:893
+#: workflow/models.py:896
 msgid "Low (view only)"
 msgstr "Bajo (solo ver)"
 
 #. Translators: Refers to a user permission role with limited access to add or edit result data
-#: workflow/models.py:895
+#: workflow/models.py:898
 msgid "Medium (add and edit results)"
 msgstr "Medio (agregar y editar resultados)"
 
 #. Translators: Refers to a user permission role with access to edit any data
-#: workflow/models.py:897
+#: workflow/models.py:900
 msgid "High (edit anything)"
 msgstr "Alto (editar todo)"
 
-#: workflow/models.py:916 workflow/models.py:917
+#: workflow/models.py:919 workflow/models.py:920
 #, fuzzy
 #| msgid "Programs"
 msgid "Program Access"
 msgstr "Programas"
 
-#: workflow/models.py:921 workflow/models.py:926
+#: workflow/models.py:924 workflow/models.py:929
 msgid "Profile Type"
 msgstr "Tipo de perfil"
 
-#: workflow/models.py:927
+#: workflow/models.py:930
 #, fuzzy
 #| msgid "Profile Type"
 msgid "Profile Types"
 msgstr "Tipo de perfil"
 
-#: workflow/models.py:945
+#: workflow/models.py:948
 msgid "Land Classification"
 msgstr "Clasificación de tierras"
 
-#: workflow/models.py:945
+#: workflow/models.py:948
 msgid "Rural, Urban, Peri-Urban"
 msgstr "Rural, urbano, periurbano"
 
-#: workflow/models.py:950
+#: workflow/models.py:953
 msgid "Land Type"
 msgstr "Tipo de tierra"
 
-#: workflow/models.py:972
+#: workflow/models.py:975
 msgid "Site Name"
 msgstr "Nombre del sitio"
 
-#: workflow/models.py:974
+#: workflow/models.py:977
 msgid "Contact Name"
 msgstr "Nombre de contacto"
 
-#: workflow/models.py:976
+#: workflow/models.py:979
 msgid "Contact Number"
 msgstr "Número de contacto"
 
-#: workflow/models.py:977
+#: workflow/models.py:980
 msgid "Number of Members"
 msgstr "Número de miembros"
 
-#: workflow/models.py:978
+#: workflow/models.py:981
 msgid "Data Source"
 msgstr "Fuente de datos"
 
-#: workflow/models.py:979
+#: workflow/models.py:982
 msgid "Total # Households"
 msgstr "Número total de hogares"
 
-#: workflow/models.py:980
+#: workflow/models.py:983
 msgid "Average Household Size"
 msgstr "Tamaño promedio del hogar"
 
-#: workflow/models.py:981
+#: workflow/models.py:984
 msgid "Male age 0-5"
 msgstr "Hombre de 0-5 años"
 
-#: workflow/models.py:982
+#: workflow/models.py:985
 msgid "Female age 0-5"
 msgstr "Mujer de 0-5 años"
 
-#: workflow/models.py:983
+#: workflow/models.py:986
 msgid "Male age 6-9"
 msgstr "Hombre de 6-9 años"
 
-#: workflow/models.py:984
+#: workflow/models.py:987
 msgid "Female age 6-9"
 msgstr "Mujer de 6-9 años"
 
-#: workflow/models.py:985
+#: workflow/models.py:988
 msgid "Male age 10-14"
 msgstr "Hombre de 10-14 años"
 
-#: workflow/models.py:986
+#: workflow/models.py:989
 msgid "Female age 10-14"
 msgstr "Mujer de 10-14 años"
 
-#: workflow/models.py:987
+#: workflow/models.py:990
 msgid "Male age 15-19"
 msgstr "Hombre de 15-19 años"
 
-#: workflow/models.py:988
+#: workflow/models.py:991
 msgid "Female age 15-19"
 msgstr "Mujer de 15-19 años"
 
-#: workflow/models.py:989
+#: workflow/models.py:992
 msgid "Male age 20-24"
 msgstr "Hombre de 20-24 años"
 
-#: workflow/models.py:990
+#: workflow/models.py:993
 msgid "Female age 20-24"
 msgstr "Mujer de 20-24 años"
 
-#: workflow/models.py:991
+#: workflow/models.py:994
 msgid "Male age 25-34"
 msgstr "Hombre de 25-34 años"
 
-#: workflow/models.py:992
+#: workflow/models.py:995
 msgid "Female age 25-34"
 msgstr "Mujer de 25-34 años"
 
-#: workflow/models.py:993
+#: workflow/models.py:996
 msgid "Male age 35-49"
 msgstr "Hombre de 35-49 años"
 
-#: workflow/models.py:994
+#: workflow/models.py:997
 msgid "Female age 35-49"
 msgstr "Mujer de 35-49 años"
 
-#: workflow/models.py:995
+#: workflow/models.py:998
 msgid "Male Over 50"
 msgstr "Hombre mayor de 50 años"
 
-#: workflow/models.py:996
+#: workflow/models.py:999
 msgid "Female Over 50"
 msgstr "Mujer mayor de 50 años"
 
-#: workflow/models.py:997
+#: workflow/models.py:1000
 msgid "Total population"
 msgstr "Población total"
 
-#: workflow/models.py:998
+#: workflow/models.py:1001
 msgid "Total male"
 msgstr "Total masculino"
 
-#: workflow/models.py:999
+#: workflow/models.py:1002
 msgid "Total female"
 msgstr "Total femenino"
 
-#: workflow/models.py:1001
+#: workflow/models.py:1004
 msgid "Classify land"
 msgstr "Clasificar la tierra"
 
-#: workflow/models.py:1002
+#: workflow/models.py:1005
 msgid "Total Land"
 msgstr "Tierra total"
 
-#: workflow/models.py:1004
+#: workflow/models.py:1007
 msgid "Total Agricultural Land"
 msgstr "Tierra agrícola total"
 
-#: workflow/models.py:1006
+#: workflow/models.py:1009
 msgid "Total Rain-fed Land"
 msgstr "Tierra total alimentada por la lluvia"
 
-#: workflow/models.py:1008
+#: workflow/models.py:1011
 msgid "Total Horticultural Land"
 msgstr "Tierra hortícola total"
 
-#: workflow/models.py:1009
+#: workflow/models.py:1012
 msgid "Total Literate People"
 msgstr "Total de personas alfabetizadas"
 
-#: workflow/models.py:1010
+#: workflow/models.py:1013
 #, python-format
 msgid "% of Literate Males"
 msgstr "% de hombres alfabetizados"
 
-#: workflow/models.py:1011
+#: workflow/models.py:1014
 #, python-format
 msgid "% of Literate Females"
 msgstr "% de mujeres alfabetizadas"
 
-#: workflow/models.py:1012
+#: workflow/models.py:1015
 msgid "Literacy Rate (%)"
 msgstr "Tasa de alfabetización (%)"
 
-#: workflow/models.py:1013
+#: workflow/models.py:1016
 msgid "Households Owning Land"
 msgstr "Hogares que poseen tierras"
 
-#: workflow/models.py:1015
+#: workflow/models.py:1018
 msgid "Average Landholding Size"
 msgstr "Tamaño promedio de propiedad"
 
-#: workflow/models.py:1016
+#: workflow/models.py:1019
 msgid "In hectares/jeribs"
 msgstr "En hectáreas/jeribs"
 
-#: workflow/models.py:1018
+#: workflow/models.py:1021
 msgid "Households Owning Livestock"
 msgstr "Hogares que son propietarios de ganado"
 
-#: workflow/models.py:1020
+#: workflow/models.py:1023
 msgid "Animal Types"
 msgstr "Tipos de animales"
 
-#: workflow/models.py:1020
+#: workflow/models.py:1023
 msgid "List Animal Types"
 msgstr "Lista de tipos de animales"
 
-#: workflow/models.py:1023
+#: workflow/models.py:1026
 msgid "Latitude (Decimal Coordinates)"
 msgstr "Latitud (coordenadas decimales)"
 
-#: workflow/models.py:1025
+#: workflow/models.py:1028
 msgid "Longitude (Decimal Coordinates)"
 msgstr "Longitud (coordenadas decimales)"
 
-#: workflow/models.py:1026
+#: workflow/models.py:1029
 msgid "Site Active"
 msgstr "Sitio activo"
 
-#: workflow/models.py:1027
+#: workflow/models.py:1030
 msgid "Approval"
 msgstr "Aprobación"
 
-#: workflow/models.py:1027
+#: workflow/models.py:1030
 msgid "in progress"
 msgstr "en progreso"
 
-#: workflow/models.py:1029
+#: workflow/models.py:1032
 msgid "This is the Provincial Line Manager"
 msgstr "Este es el gerente de línea provincial"
 
-#: workflow/models.py:1030
+#: workflow/models.py:1033
 msgid "Approved by"
 msgstr "Aprobado por"
 
-#: workflow/models.py:1032
+#: workflow/models.py:1035
 msgid "This is the originator"
 msgstr "Este es el creador"
 
-#: workflow/models.py:1033
+#: workflow/models.py:1036
 msgid "Filled by"
 msgstr "Llenado por"
 
-#: workflow/models.py:1035
+#: workflow/models.py:1038
 msgid "This should be GIS Manager"
 msgstr "Esto debería ser gerente de SIG"
 
-#: workflow/models.py:1036
+#: workflow/models.py:1039
 msgid "Location verified by"
 msgstr "Ubicación verificada por"
 
-#: workflow/models.py:1045
+#: workflow/models.py:1048
 #, fuzzy
 #| msgid "Profile"
 msgid "Site Profile"
 msgstr "Perfil"
 
-#: workflow/models.py:1046
+#: workflow/models.py:1049
 #, fuzzy
 #| msgid "Site Projects"
 msgid "Site Profiles"
@@ -5867,6 +5877,15 @@ msgstr "Encontrar"
 #: workflow/widgets.py:133
 msgid "City, Country:"
 msgstr "Ciudad, País:"
+
+#~ msgid "The program start date may not be more than 10 years in the past."
+#~ msgstr ""
+#~ "La fecha de inicio del programa no puede ser más de 10 años en el pasado."
+
+#~ msgid "The program end date may not be more than 10 years in the future."
+#~ msgstr ""
+#~ "La fecha de finalización del programa no puede ser más de 10 años en el "
+#~ "futuro."
 
 #~ msgid "Program does not have a GAIT id"
 #~ msgstr "El programa no tiene un identificador GAIT"
@@ -8622,9 +8641,6 @@ msgstr "Ciudad, País:"
 
 #~ msgid "organizations"
 #~ msgstr "organizaciones"
-
-#~ msgid "Program name"
-#~ msgstr "Nombre del programa"
 
 #~ msgid "Indicator grouping"
 #~ msgstr "Agrupación de indicadores"
