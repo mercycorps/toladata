@@ -370,7 +370,7 @@ export default class EditProgramProfile extends React.Component {
                         />
                         <ErrorFeedback errorMessages={this.state.formErrors['funding_status']} />
                     </div>
-                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedCountries)}>
+                    <div className={classNames("form-group react-multiselect-checkbox", {'is-invalid': this.state.formErrors['country']})} data-toggle="tooltip" title={this.createDisplayList(selectedCountries)}>
                         <label htmlFor="program-country-input" className="label--required">{gettext("Countries")}</label>
                         {!this.state.formEditable ?
                             <input
