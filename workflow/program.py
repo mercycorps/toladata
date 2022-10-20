@@ -732,41 +732,25 @@ class ProgramUpload(ProgramValidation):
 
         if updated_dates:
             subject_line = "Attention: Official program dates were updated in TolaData - Attention: Les dates officielles du programme ont été mises à jour dans TolaData - Atención: Las fechas oficiales del programa fueron actualizadas en TolaData"
-            # plain_message shows if the browser/email client does not support html
-            plain_message = (
-                "Dear TolaData Country Administrator,\n"
-                f"The official program dates of {tola_program.name} were updated based on new information from the Identification Assignment Assistant (IDAA). As a result, the Indicator Tracking Period may need to be updated too. Please coordinate with the program team members to review and update the Indicator Tracking Period, if necessary.\n"
-                "For instructions on how to perform Country Administrator functions, please visit the TolaData User Guide. https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide \n\n"
-                "Cher administrateur de pays TolaData,\n"
-                f"Les dates officielles du programme {tola_program.name} ont été mises à jour sur la base de nouvelles informations provenant de l'Assistant pour l'Attribution de l'Identification (IDAA). Par conséquent, il se peut que la Période de Suivi des Indicateurs doive également être mise à jour. Veuillez vous coordonner avec les membres de l'équipe du programme pour revoir et mettre à jour la Période de Suivi des Indicateurs, si nécessaire.\n"
-                "Pour obtenir des instructions sur la façon d'exécuter les fonctions de l'administrateur de pays, veuillez consulter le Guide de l'Utilisateur de TolaData. https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide \n\n"
-                "Estimado Administrador de País de TolaData,\n"
-                f"Las fechas oficiales del programa {tola_program.name} fueron actualizadas en base a la nueva información del Asistente de Asignación de Identificación (IDAA). Como resultado, el Período de Seguimiento del Indicador puede necesitar ser actualizado también. Por favor, coordine con los miembros del equipo del programa para revisar y actualizar el Período de Seguimiento del Indicador, si es necesario.\n"
-                "Para obtener instrucciones sobre cómo realizar las funciones de Administrador del País, por favor visite la Guía del Usuario de TolaData. https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide"
-            )
-            html_message = (
-                "<p>Dear TolaData Country Administrator,</p>"
-                f"<p>The official program dates of {tola_program.name} were updated based on new information from the Identification Assignment Assistant (IDAA). As a result, the Indicator Tracking Period may need to be updated too. Please coordinate with the program team members to review and update the Indicator Tracking Period, if necessary.</p>"
-                "<p>For instructions on how to perform Country Administrator functions, please visit the <a href='https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide'>TolaData User Guide.</a></p>"
-                "<p style='margin-top:36px'>Cher administrateur de pays TolaData,</p>"
-                f"<p>Les dates officielles du programme {tola_program.name} ont été mises à jour sur la base de nouvelles informations provenant de l'Assistant pour l'Attribution de l'Identification (IDAA). Par conséquent, il se peut que la Période de Suivi des Indicateurs doive également être mise à jour. Veuillez vous coordonner avec les membres de l'équipe du programme pour revoir et mettre à jour la Période de Suivi des Indicateurs, si nécessaire.</p>"
-                "<p>Pour obtenir des instructions sur la façon d'exécuter les fonctions de l'administrateur de pays, veuillez consulter <a href='https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide'>le Guide de l'Utilisateur de TolaData.</a></p>"
-                "<p style='margin-top:36px'>Estimado Administrador de País de TolaData,</p>"
-                f"<p>Las fechas oficiales del programa {tola_program.name} fueron actualizadas en base a la nueva información del Asistente de Asignación de Identificación (IDAA). Como resultado, el Período de Seguimiento del Indicador puede necesitar ser actualizado también. Por favor, coordine con los miembros del equipo del programa para revisar y actualizar el Período de Seguimiento del Indicador, si es necesario.</p>"
-                "<p>Para obtener instrucciones sobre cómo realizar las funciones de Administrador del País, por favor visite <a href='https://mercycorpsemea.sharepoint.com/sites/TolaDataUserGuide'>la Guía del Usuario de TolaData.</a></p>"
-            )
+            context = {'program_name': tola_program.name}
+            text_email_template_name = 'workflow/updated_dates_email_notification.txt'
+            html_email_template_name = 'workflow/updated_dates_email_notification.html'
+            text_email = loader.render_to_string(text_email_template_name, context)
+            html_email = loader.render_to_string(html_email_template_name, context)
             admin_emails = self.get_country_admin_emails(tola_program)
             if len(admin_emails) > 0:
                 try:
                     if not settings.SKIP_USER_EMAILS:
-                        send_mail(subject_line, plain_message, settings.DEFAULT_FROM_EMAIL, admin_emails, html_message=html_message, fail_silently=False)
+                        send_mail(subject_line, text_email, settings.DEFAULT_FROM_EMAIL, admin_emails, html_message=html_email, fail_silently=False)
                     else:
                         # For QA log the email
-                        logger.info(f"To:{admin_emails}\n{subject_line}\n{plain_message}")
+                        logger.info(f"To:{admin_emails}\n{subject_line}\n{text_email}")
                 except SMTPException as e:
                     logger.exception(f"Unknown Error When Sending Email for Updated Dates.\nTolaData Program ID: {tola_program.id}\nReciepent List: {admin_emails}\nException: {e}")
             else:
-                logger.exception(f"{subject_line}\n{plain_message}\nNo Basic Administrators are assigned to {tola_program.countries}. Please assign a Basic Administrator(s) to this country.")
+                context['no_basic_admin'] = f"No Basic Administrators are assigned to {tola_program.countries}. Please assign a Basic Administrator(s) to this country."
+                text_email = loader.render_to_string(text_email_template_name, context)
+                logger.exception(f"{subject_line}\n{text_email}")
 
         if program_updated:
             ProgramAdminAuditLog.updated(tola_program, idaa_user, program_before_update, tola_program.idaa_logged_fields)
