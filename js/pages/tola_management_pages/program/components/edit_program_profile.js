@@ -36,7 +36,7 @@ export default class EditProgramProfile extends React.Component {
 
     componentDidMount() {
         // Set the form to editable for demo, dev2, dev, and localhost servers
-        let editableEnv = ["demo", "dev2", "dev", "local"].reduce((editable, env) => {
+        let editableEnv = ["demo", "dev", "local"].reduce((editable, env) => {
             if (!editable) editable = window.location.href.includes(env);
             return editable;
         }, false)
@@ -53,10 +53,10 @@ export default class EditProgramProfile extends React.Component {
             let today = new Date();
             let latest = new Date();
             latest.setHours(0,0,0,0);
-            latest.setFullYear(today.getFullYear() + 1);
+            latest.setFullYear(today.getFullYear() + 10);
             let earliest = new Date();
             earliest.setHours(0,0,0,0);
-            earliest.setFullYear(today.getFullYear() - 1);
+            earliest.setFullYear(today.getFullYear() - 10);
 
             // Program Start Date setup
             $("#program-start-date").datepicker({
