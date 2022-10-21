@@ -209,7 +209,10 @@ export const IndexView = observer(
                 </header>
                 <div className="admin-list__controls">
                     <BulkActions primaryOptions={bulk_actions.primary_options} secondaryOptions={bulk_actions.secondary_options}/>
-                    {["demo", "dev2", "dev", "local"].reduce((editable, env) => { if(!editable) return editable = window.location.href.includes(env) }, false) &&
+                    {["demo", "dev2", "dev", "local"].reduce((editable, env) => { 
+                        if(!editable) editable = window.location.href.includes(env)
+                        return editable;
+                    }, false) &&
                         <div className="controls__buttons">
                             <a href="#" className="btn btn-link btn-add" tabIndex="0" onClick={() => store.createProgram()}>
                                 <i className="fas fa-plus-circle"/>{gettext("Add Program")}
