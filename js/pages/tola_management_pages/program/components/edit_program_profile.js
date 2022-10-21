@@ -184,6 +184,19 @@ export default class EditProgramProfile extends React.Component {
         return listArray;
     }
 
+    // Function to create a alphabetically (by index order from backend) sorted selected list to display data from thier options
+    handleSelected = (selected, options) => {
+        let resultsObj = {};
+        selected.map((id) => {
+            let index;
+            let foundOption = options.find((option, idx) => {
+                index = idx;
+                return option.value == id;
+            });
+            resultsObj[index] = foundOption;
+        })
+        return Object.values(resultsObj);
+    }
     
 
     // ***** Validations *****
@@ -309,9 +322,9 @@ export default class EditProgramProfile extends React.Component {
     // ***** Render Componenent *****
     render() {
         const formdata = this.state.managed_data;
-        const selectedCountries = formdata.country.map(x=>this.props.countryOptions.find(y=>y.value==x));
-        const selectedIDAASectors = formdata.idaa_sector.map(x=>this.props.idaaSectorOptions.find(y=>y.value==x));
-        const selectedOutcomeThemes = formdata.idaa_outcome_theme.map(x=>this.props.idaaOutcomeThemesOptions.find(y=>y.value==x));
+        const selectedCountries = this.handleSelected(formdata.country, this.props.countryOptions);
+        const selectedIDAASectors = this.handleSelected(formdata.idaa_sector, this.props.idaaSectorOptions);
+        const selectedOutcomeThemes = this.handleSelected(formdata.idaa_outcome_theme, this.props.idaaOutcomeThemesOptions);
 
         return (
             <div className="tab-pane--react">
