@@ -36,7 +36,7 @@ export default class EditProgramProfile extends React.Component {
 
     componentDidMount() {
         // Set the form to editable for demo, dev, dev2, and localhost servers
-        let editableEnv = ["demo", "dev", "local"].reduce((editable, env) => {
+        let editableEnv = ["demo", "dev2", "dev", "local"].reduce((editable, env) => {
             if (!editable) editable = window.location.href.includes(env);
             return editable;
         }, false)
