@@ -4,8 +4,6 @@ import { observer } from "mobx-react";
 import CheckboxedMultiSelect from 'components/checkboxed-multi-select';
 import classNames from 'classnames';
 import HelpPopover from '../../../../components/helpPopover.js';
-import 'react-datepicker/dist/react-datepicker.css';
-import ReactDatepicker from "../../../../components/ReactDatepicker.js";
 
 
 const ErrorFeedback = observer(({errorMessages}) => {
@@ -45,7 +43,46 @@ export default class EditProgramProfile extends React.Component {
         this.setState({
             formEditable: editableEnv
         })
-        this.state.managed_data.gaitid.length === 0 && this.appendGaitRow(); // If there are no GAIT IDs on mount, add a empty Gait Row
+
+        // If there are no GAIT IDs on mount, add a empty Gait Row
+        this.state.managed_data.gaitid.length === 0 && this.appendGaitRow();
+
+        $(document).ready(() => {
+            let startDate = this.state.managed_data.start_date;
+            let endDate = this.state.managed_data.end_date;
+            let today = new Date();
+            let latest = new Date();
+            latest.setHours(0,0,0,0);
+            latest.setFullYear(today.getFullYear() + 1);
+            let earliest = new Date();
+            earliest.setHours(0,0,0,0);
+            earliest.setFullYear(today.getFullYear() - 1);
+
+            // Program Start Date setup
+            $("#program-start-date").datepicker({
+                dateFormat: "yy-mm-dd",
+                minDate: earliest,
+            });
+            if (this.state.managed_data) {
+                $('#program-start-date').datepicker("setDate", startDate);
+            };
+            $('#program-start-date').on('change', () => {
+                let updatedDate = $('#program-start-date').datepicker('getDate');
+                this.updateFormField('start_date', window.formatDate(updatedDate));
+            });
+            // Program End Date setup
+            $("#program-end-date").datepicker({
+                dateFormat: "yy-mm-dd",
+                maxDate: latest,
+            });
+            if (this.state.managed_data) {
+                $('#program-end-date').datepicker("setDate", endDate);
+            };
+            $('#program-end-date').on('change', () => {
+                let updatedDate = $('#program-end-date').datepicker('getDate');
+                this.updateFormField('end_date', window.formatDate(updatedDate));
+            });
+        });
     }
 
 
@@ -188,7 +225,7 @@ export default class EditProgramProfile extends React.Component {
             }
             if (formdata.end_date.length > 0 && startDate > endDate) {
                 isValid = false;
-                addErrorMessage("normal", "end_date", gettext("The program start date may not be after the program end date."));
+                addErrorMessage("normal", "start_date", gettext("The program start date may not be after the program end date."));
             }
         }
         if (formdata.end_date.length > 0) {
@@ -320,19 +357,12 @@ export default class EditProgramProfile extends React.Component {
                     <div className="form-group">
                         <label htmlFor="program-start-date" className="label--required">{gettext("Program start date")}</label>
                         <div className={ classNames( {'is-invalid': this.state.formErrors['start_date']} )}>
-                            <ReactDatepicker
+                            <input
                                 id="program-start-date"
-                                className={classNames('form-control', { 'is-invalid': this.state.formErrors['start_date'] })}                
-                                customDatesSelector={false}
+                                className={classNames('datepicker form-control', { 'is-invalid': this.state.formErrors['start_date'] })}                
+                                type="text"
+                                autoComplete="off"
                                 disabled={!this.state.formEditable}
-                                maxDate={formdata.end_date}
-                                date={formdata.start_date}
-                                onChange={(date) => {
-                                    let validDate;
-                                    try { validDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`; } 
-                                    catch { validDate = ""; }
-                                    this.updateFormField('start_date', validDate);
-                                }}
                             />
                         </div>
                         <ErrorFeedback errorMessages={this.state.formErrors['start_date']} />
@@ -340,19 +370,12 @@ export default class EditProgramProfile extends React.Component {
                     <div className="form-group">
                         <label htmlFor="program-end-date" className="label--required">{gettext("Program end date")}</label>
                         <div className={ classNames( {'is-invalid': this.state.formErrors['end_date']} )}>
-                            <ReactDatepicker
+                            <input
                                 id="program-end-date"
-                                className={classNames('form-control', { 'is-invalid': this.state.formErrors['end_date'] })}                
-                                customDatesSelector={false}
+                                className={classNames('datepicker form-control', { 'is-invalid': this.state.formErrors['end_date'] })}                
+                                type="text"
+                                autoComplete="off"
                                 disabled={!this.state.formEditable}
-                                minDate={formdata.start_date}
-                                date={formdata.end_date}
-                                onChange={(date) => {
-                                    let validDate;
-                                    try { validDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`; } 
-                                    catch { validDate = ""; }
-                                    this.updateFormField('end_date', validDate);
-                                }}
                             />
                         </div>
                         <ErrorFeedback errorMessages={this.state.formErrors['end_date']} />
@@ -413,7 +436,7 @@ export default class EditProgramProfile extends React.Component {
                             />
                         }
                     </div>
-                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(formdata.idaa_outcome_theme)}>
+                    <div className="form-group react-multiselect-checkbox" data-toggle="tooltip" title={this.createDisplayList(selectedOutcomeThemes)}>
                         <label htmlFor="program-outcome_themes-input">{gettext("Outcome themes")}</label>
                         {!this.state.formEditable ? 
                             <input
