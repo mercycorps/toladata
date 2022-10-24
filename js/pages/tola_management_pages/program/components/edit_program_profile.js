@@ -256,7 +256,6 @@ export default class EditProgramProfile extends React.Component {
         let detectedGaitRowErrors = {};
         let gaitRowErrorsFields = {};
         let uniqueGaitIds = {};
-        let hasDuplicates = false;
         
         formdata.gaitid.map((currentRow, idx) => {
             
@@ -271,7 +270,7 @@ export default class EditProgramProfile extends React.Component {
             // Duplicate Gait Ids validation
             if (currentRow.gaitid) {
                 if (uniqueGaitIds.hasOwnProperty(currentRow.gaitid)) {
-                    hasDuplicates = true;
+                    isValid = false;
                     addErrorMessage('gaitRow', 'gaitid', gettext('Duplicate GAIT ID numbers are not allowed.'), uniqueGaitIds[currentRow.gaitid]);
                     addErrorMessage('gaitRow', 'gaitid', gettext('Duplicate GAIT ID numbers are not allowed.'), idx);
                 } else {
