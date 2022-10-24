@@ -207,6 +207,7 @@ export default class EditProgramProfile extends React.Component {
 
         // Adds error message text to the detected errors object
         let addErrorMessage = (type, field, msg, idx) => {
+            isValid = false;
             if (type === 'normal') {
                 detectedErrors[field] ? detectedErrors[field].push(msg) : detectedErrors[field] = [msg];
             } else if (type === 'gaitRow') {
@@ -218,7 +219,6 @@ export default class EditProgramProfile extends React.Component {
         let requiredFields = ['name', 'external_program_id', 'start_date', 'end_date', 'funding_status', 'country'];
         requiredFields.map(field => {
             if (!formdata[field] || formdata[field].length === 0) {
-                isValid = false;
                 addErrorMessage("normal", field, gettext('This field may not be left blank.'));
             }
         })
@@ -233,21 +233,17 @@ export default class EditProgramProfile extends React.Component {
         latest.setFullYear(currentYear + 10);
         if (formdata.start_date.length > 0) {
             if (startDate < earliest) {
-                isValid = false;
                 addErrorMessage("normal", "start_date", gettext("The program start date may not be more than 10 years in the past."));
             }
             if (formdata.end_date.length > 0 && startDate > endDate) {
-                isValid = false;
                 addErrorMessage("normal", "start_date", gettext("The program start date may not be after the program end date."));
             }
         }
         if (formdata.end_date.length > 0) {
             if (endDate > latest) {
-                isValid = false;
                 addErrorMessage("normal", "end_date", gettext("The program end date may not be more than 10 years in the future."));
             }
             if (formdata.start_date.length > 0 && endDate < startDate) {
-                isValid = false;
                 addErrorMessage("normal", "end_date", gettext("The program end date may not be before the program start date."))
             }
         }
@@ -256,14 +252,12 @@ export default class EditProgramProfile extends React.Component {
         let detectedGaitRowErrors = {};
         let gaitRowErrorsFields = {};
         let uniqueGaitIds = {};
-        let hasDuplicates = false;
         
         formdata.gaitid.map((currentRow, idx) => {
             
             // The first row's GAIT ID is required
             if (idx === 0) {
                 if (currentRow.gaitid.length === 0) {
-                    isValid = false;
                     addErrorMessage("gaitRow", 'gaitid', gettext('GAIT IDs may not be left blank.'), idx);
                 }
             }
@@ -271,7 +265,6 @@ export default class EditProgramProfile extends React.Component {
             // Duplicate Gait Ids validation
             if (currentRow.gaitid) {
                 if (uniqueGaitIds.hasOwnProperty(currentRow.gaitid)) {
-                    hasDuplicates = true;
                     addErrorMessage('gaitRow', 'gaitid', gettext('Duplicate GAIT ID numbers are not allowed.'), uniqueGaitIds[currentRow.gaitid]);
                     addErrorMessage('gaitRow', 'gaitid', gettext('Duplicate GAIT ID numbers are not allowed.'), idx);
                 } else {
@@ -282,8 +275,7 @@ export default class EditProgramProfile extends React.Component {
             // Validation for if fund codes, donor, or donor dept is filled in but GAIT ID is left blank
             if (idx > 0 && currentRow.gaitid.length === 0) {
                 if (currentRow.fund_code.length > 0 || currentRow.donor.length > 0 || currentRow.donor_dept.length > 0) {
-                isValid = false;
-                addErrorMessage('gaitRow', "gaitid", gettext('GAIT IDs may not be left blank.'), idx);
+                    addErrorMessage('gaitRow', "gaitid", gettext('GAIT IDs may not be left blank.'), idx);
                 }
             }
 
@@ -292,11 +284,9 @@ export default class EditProgramProfile extends React.Component {
                 currentFundCode = currentFundCode.toString();
                 let firstDigit = parseInt(currentFundCode.slice(0, 1));
                 if (currentFundCode.length !== 5) {
-                    isValid = false;
                     addErrorMessage("gaitRow", "fund_code", gettext("Fund codes may only be 5 digits long."), idx);
                 }
                 if ([3, 7, 9].indexOf(firstDigit) === -1) {
-                    isValid = false;
                     addErrorMessage("gaitRow", "fund_code", gettext("Fund codes may only begin with a 3, 7, or 9 (e.g., 30000)."), idx);
                 }
             })
