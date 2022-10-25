@@ -391,7 +391,7 @@ export default class EditProgramProfile extends React.Component {
                             placeholder={ gettext("Select...") }
                             isDisabled={!this.state.formEditable}
                             options={this.props.fundingStatusOptions}
-                            value={this.props.fundingStatusOptions.find(y=>y.label===formdata.funding_status) || ""}
+                            value={this.props.fundingStatusOptions.find(y=>y.label === gettext(formdata.funding_status)) || ""}
                             onChange={(e) => this.updateFormField('funding_status', e.label) }
                         />
                         <ErrorFeedback errorMessages={this.state.formErrors['funding_status']} />
