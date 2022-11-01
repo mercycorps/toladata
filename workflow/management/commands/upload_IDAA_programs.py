@@ -95,8 +95,9 @@ class Command(BaseCommand):
         if self.report_date() or options['create_report']:
             report = GenerateDiscrepancyReport()
             report.generate()
-            end_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-            self.email_notifications(today, start_time, end_time, counts, uploaded_programs, created_countries)
+
+        end_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        self.email_notifications(today, start_time, end_time, counts, uploaded_programs, created_countries)
 
         if not options['supress_output']:
             print(f"Total IDAA Programs: {counts['total']}")
