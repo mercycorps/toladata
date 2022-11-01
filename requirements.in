@@ -1,6 +1,7 @@
 Django~=3.2.12              # 3.2 LTS, supported until Apr 2025
 dateparser                  # used in indicators to translate date strings to date objects
 beautifulsoup4              # used in testing to parse html response data
+django-admin-autocomplete-filter # used in Django admin for autocomplete filters
 django-admin-sortable2      # used in Django admin for sortable indicators
 django-crispy-forms         # used in old (siteprofile/formlibrary) forms - deprecated
 django-localflavor          # provides localization support for numbers/dates/formatting

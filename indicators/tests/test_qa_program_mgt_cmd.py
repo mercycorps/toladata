@@ -6,11 +6,14 @@ from django.core import management
 from django.urls import reverse
 from factories.indicators_models import (
     DisaggregationTypeFactory,
-    IndicatorTypeFactory
+    IndicatorTypeFactory,
+    IDAAOutcomeThemeFactory
 )
-from factories.workflow_models import OrganizationFactory, TolaUserFactory, SectorFactory, CountryFactory
+from factories.workflow_models import OrganizationFactory, TolaUserFactory, SectorFactory, CountryFactory,\
+    IDAASectorFactory
+from factories.indicators_models import  ReportingFrequencyFactory
 from workflow.models import Program, Country, ProgramAccess, TolaUser
-from indicators.models import Indicator
+from indicators.models import Indicator, IndicatorType, ReportingFrequency
 
 
 @test.tag('slow')
@@ -23,7 +26,11 @@ class TestQAScript(test.TestCase):
         OrganizationFactory(pk=1, name="Mercy Corps")
         DisaggregationTypeFactory(pk=109, disaggregation_type="Sex and Age Disaggregated Data (SADD)")
         cls.indicator_type = IndicatorTypeFactory()
+        IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
+        ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
         SectorFactory.create_batch(size=5)
+        IDAASectorFactory.create_batch(size=5)
+        IDAAOutcomeThemeFactory.create_batch(size=5)
         sys.stdout = io.StringIO()
         management.call_command('create_qa_programs', names='test_program', named_only=True)
         sys.stdout = sys.__stdout__
@@ -45,7 +52,14 @@ class TestQAScript(test.TestCase):
         sys.stdout = sys.__stdout__
 
     def test_null_values(self):
-        qa_indicator = self.program.indicator_set.first()
+        qa_indicators = self.program.indicator_set.all()
+
+        # Make sure first indicator is PC indicator
+        pc_indicator = qa_indicators[0]
+        self.assertEqual(pc_indicator.__dict__['name'], Indicator.PARTICIPANT_COUNT_INDICATOR_NAME)
+
+        # First test indicator
+        qa_indicator = qa_indicators[1]
         qa_data = {k: qa_indicator.__dict__[k] for k in qa_indicator.__dict__ if k in self.required_indicator_keys}
         qa_data['indicator_key'] = str(uuid.uuid4())
         qa_data['level'] = qa_indicator.level.id

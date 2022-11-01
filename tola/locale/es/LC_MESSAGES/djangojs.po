@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-24 10:03-0700\n"
-"PO-Revision-Date: 2022-05-18 11:48-0400\n"
+"POT-Creation-Date: 2022-10-17 09:49-0700\n"
+"PO-Revision-Date: 2022-10-17 14:24-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -11,14 +11,23 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #. Translators: This is the file name of an Excel template that will be used for batch imports
-#: js/apiv2.js:139 js/apiv2.js:172
+#: js/apiv2.js:152 js/apiv2.js:185
 msgid "Import indicators.xlsx"
 msgstr "Importar indicadores.xlsx"
 
-#: js/base.js:383 js/base.js:384
+#: js/base.js:17 js/pages/program_page/components/program_period.js:437
+msgid "Program period"
+msgstr "Período del programa"
+
+#: js/base.js:23
+msgid "Set the indicator tracking start and end dates."
+msgstr ""
+"Establezca las fechas de inicio y fin del seguimiento de los indicadores."
+
+#: js/base.js:402 js/base.js:403
 msgid ""
 "Your changes will be recorded in a change log. For future reference, please "
 "share your reason for these changes."
@@ -26,11 +35,11 @@ msgstr ""
 "Sus cambios serán guardados en un registro de cambios. Para referencia "
 "futura, indique la justificación para estos cambios."
 
-#: js/base.js:385
+#: js/base.js:404
 msgid "This action cannot be undone"
 msgstr "Advertencia: esta acción no se puede deshacer"
 
-#: js/base.js:395
+#: js/base.js:414
 #, python-format
 msgid ""
 "Removing this target means that %s result will no longer have targets "
@@ -46,23 +55,23 @@ msgstr[1] ""
 "asociados."
 
 #. Translators: the header of an alert after an action completed successfully
-#: js/base.js:415
+#: js/base.js:434
 msgid "Success"
 msgstr "Éxito"
 
 #. Translators: the header of an alert where additional warning info is provided
-#: js/base.js:434 js/pages/results_framework/components/level_cards.js:86
+#: js/base.js:453 js/pages/results_framework/components/level_cards.js:86
 #: js/pages/results_framework/models.js:635
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:657
 #: js/pages/tola_management_pages/country/models.js:438
 #: js/pages/tola_management_pages/country/models.js:473
 #: js/pages/tola_management_pages/country/models.js:505
-#: js/pages/tola_management_pages/program/models.js:279
+#: js/pages/tola_management_pages/program/models.js:292
 msgid "Warning"
 msgstr "Advertencia"
 
 #. Translators: the header of an alert after an action failed for some reason
-#: js/base.js:452
+#: js/base.js:471
 msgid "Error"
 msgstr "Error"
 
@@ -88,7 +97,7 @@ msgstr ""
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:661
 #: js/pages/tola_management_pages/country/models.js:478
 #: js/pages/tola_management_pages/country/models.js:510
-#: js/pages/tola_management_pages/program/models.js:283
+#: js/pages/tola_management_pages/program/models.js:296
 msgid "Are you sure you want to continue?"
 msgstr "¿Está seguro que quiere continuar?"
 
@@ -102,7 +111,7 @@ msgstr "Continuar"
 #: js/components/ImportIndicatorsPopover.js:419
 #: js/components/ImportIndicatorsPopover.js:631
 #: js/components/changesetNotice.js:66
-#: js/pages/results_form_PC/resultsFormPC.js:383
+#: js/pages/results_form_PC/resultsFormPC.js:386
 #: js/pages/results_framework/components/level_cards.js:578
 msgid "Cancel"
 msgstr "Cancelar"
@@ -299,6 +308,54 @@ msgid "We don’t recognize this file type. Please upload an Excel file."
 msgstr ""
 "No se ha reconocido el tipo de archivo. Por favor, suba un archivo de Excel."
 
+#: js/components/ReactDatepicker.js:9
+msgid "January"
+msgstr "enero"
+
+#: js/components/ReactDatepicker.js:10
+msgid "March"
+msgstr "marzo"
+
+#: js/components/ReactDatepicker.js:11
+msgid "February"
+msgstr "febrero"
+
+#: js/components/ReactDatepicker.js:12
+msgid "April"
+msgstr "abril"
+
+#: js/components/ReactDatepicker.js:13
+msgid "May"
+msgstr "mayo"
+
+#: js/components/ReactDatepicker.js:14
+msgid "June"
+msgstr "junio"
+
+#: js/components/ReactDatepicker.js:15
+msgid "July"
+msgstr "julio"
+
+#: js/components/ReactDatepicker.js:16
+msgid "August"
+msgstr "agosto"
+
+#: js/components/ReactDatepicker.js:17
+msgid "September"
+msgstr "septiembre"
+
+#: js/components/ReactDatepicker.js:18
+msgid "October"
+msgstr "octubre"
+
+#: js/components/ReactDatepicker.js:19
+msgid "November"
+msgstr "noviembre"
+
+#: js/components/ReactDatepicker.js:20
+msgid "December"
+msgstr "diciembre"
+
 #. Translators: button label to show the details of all items in a list */}
 #. Translators: button label to show the details of all rows in a list */}
 #: js/components/actionButtons.js:38
@@ -341,7 +398,7 @@ msgstr "Función"
 #: js/pages/iptt_quickstart/components/selects.js:22
 #: js/pages/iptt_quickstart/components/selects.js:39
 #: js/pages/iptt_report/components/sidebar/reportSelect.js:14
-#: js/pages/tola_management_pages/program/views.js:230
+#: js/pages/tola_management_pages/program/views.js:234
 msgid "Program"
 msgstr "Programa"
 
@@ -367,7 +424,8 @@ msgstr "Nuevo Valor"
 
 #. Translators: This is a label for a dropdown that presents several possible justifications for changing a value
 #: js/components/changesetNotice.js:19
-#: js/pages/results_form_PC/resultsFormPC.js:273
+#: js/pages/program_page/components/program_period.js:387
+#: js/pages/results_form_PC/resultsFormPC.js:276
 #: js/pages/results_framework/components/level_cards.js:404
 #: js/pages/tola_management_pages/audit_log/views.js:248
 msgid "Reason for change"
@@ -398,6 +456,13 @@ msgstr "seleccionado"
 #. Translators: for a dropdown menu with no options checked:
 #: js/components/changesetNotice.js:257 js/components/selectWidgets.js:143
 #: js/components/selectWidgets.js:148
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:362
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:377
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:384
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:400
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:406
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:421
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:427
 msgid "None selected"
 msgstr "Ninguno/a seleccionado/a"
 
@@ -435,13 +500,13 @@ msgstr "Línea media y línea final"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:39 js/pages/iptt_quickstart/models/ipttQSRootStore.js:32
-#: tola/db_translations.js:8
+#: tola/db_translations.js:14
 msgid "Annual"
 msgstr "Anual"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:40 js/pages/iptt_quickstart/models/ipttQSRootStore.js:33
-#: tola/db_translations.js:28
+#: tola/db_translations.js:6
 msgid "Semi-annual"
 msgstr "Semestral"
 
@@ -451,7 +516,7 @@ msgstr "Trienal"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: js/constants.js:42 js/pages/iptt_quickstart/models/ipttQSRootStore.js:35
-#: tola/db_translations.js:22
+#: tola/db_translations.js:24
 msgid "Quarterly"
 msgstr "Trimestral"
 
@@ -539,8 +604,6 @@ msgid "Impact"
 msgstr "Impacto"
 
 #: js/level_utils.js:29 js/level_utils.js:45 js/level_utils.js:53
-#, fuzzy
-#| msgid "Input"
 msgid "Input"
 msgstr "Entrada"
 
@@ -560,7 +623,7 @@ msgstr "Objetivo Específico"
 msgid "Purpose"
 msgstr "Finalidad"
 
-#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:295
+#: js/level_utils.js:36 js/pages/results_form_PC/resultsFormPC.js:298
 msgid "Result"
 msgstr "Resultado"
 
@@ -622,7 +685,7 @@ msgstr "Proyecto"
 
 #: js/pages/document_list/components/document_list.js:175
 #: js/pages/results_framework/components/level_cards.js:213
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:131
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:132
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -821,7 +884,7 @@ msgstr "# / %"
 #: js/pages/iptt_report/components/report/tableHeader.js:159
 #: js/pages/iptt_report/models/filterStore.js:737
 #: js/pages/program_page/components/indicator_list.js:206
-#: tola/db_translations.js:16
+#: tola/db_translations.js:2
 msgid "Baseline"
 msgstr "Base"
 
@@ -914,7 +977,7 @@ msgstr "Tipos"
 #. Translators: labels sectors (i.e. 'Food Security') that an indicator can be categorized as */
 #: js/pages/iptt_report/components/sidebar/reportFilter.js:106
 #: js/pages/tola_management_pages/organization/views.js:54
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:129
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:393
 #: js/pages/tola_management_pages/program/views.js:54
 msgid "Sectors"
 msgstr "Sectores"
@@ -1063,6 +1126,14 @@ msgid "Find an indicator:"
 msgstr "Encontrar un indicador:"
 
 #: js/pages/program_page/components/indicator_list.js:136
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:293
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:308
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:470
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:477
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:482
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:495
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:500
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:508
 msgid "None"
 msgstr "Ninguno"
 
@@ -1231,6 +1302,134 @@ msgstr "Indicadores sin evidencias"
 msgid "No evidence"
 msgstr "Sin evidencia"
 
+#: js/pages/program_page/components/program_period.js:164
+msgid ""
+"You must enter values for the indicator tracking period start date before "
+"saving."
+msgstr ""
+"Debe introducir valores para la fecha de inicio del período de seguimiento "
+"de los indicadores antes de grabar."
+
+#: js/pages/program_page/components/program_period.js:169
+msgid ""
+"You must enter values for the indicator tracking period end date before "
+"saving."
+msgstr ""
+"Debe introducir valores para la fecha de finalización del período de "
+"seguimiento de los indicadores antes de grabar."
+
+#: js/pages/program_page/components/program_period.js:174
+msgid "The end date must come after the start date."
+msgstr "La fecha de finalización siempre va después de la de comienzo."
+
+#: js/pages/program_page/components/program_period.js:180
+msgid ""
+"The indicator tracking start date must be later than or equal to the IDAA "
+"start date."
+msgstr ""
+"La fecha de inicio del seguimiento de los indicadores debe ser posterior o "
+"igual a la fecha de inicio de IDAA."
+
+#: js/pages/program_page/components/program_period.js:185
+msgid ""
+"The indicator tracking end date must be earlier than or equal to the IDAA "
+"end date."
+msgstr ""
+"La fecha de finalización del seguimiento de los indicadores debe ser "
+"anterior o igual a la fecha de finalización de IDAA."
+
+#: js/pages/program_page/components/program_period.js:296
+msgid ""
+"Error. Could not retrieve data from server. Please report this to the Tola "
+"team."
+msgstr ""
+"Error. No se pudieron recuperar los datos del servidor. Por favor informe "
+"esto al equipo de Tola."
+
+#. Translators: This is the text of an alert that is triggered upon a successful change to the the start and end dates of the reporting period
+#: js/pages/program_page/components/program_period.js:339
+msgid "Indicator tracking period is updated."
+msgstr "Se actualiza el periodo de seguimiento de los indicadores."
+
+#: js/pages/program_page/components/program_period.js:371
+msgid "There was a problem saving your changes."
+msgstr "Hubo un problema al guardar sus cambios."
+
+#: js/pages/program_page/components/program_period.js:381
+msgid ""
+"This action may result in changes to your periodic targets. If you have "
+"already set up periodic targets for your indicators, you may need to enter "
+"additional target values to cover the entire indicator tracking period. For "
+"future reference, please provide a reason for modifying the indicator "
+"tracking period."
+msgstr ""
+"Esta acción puede dar lugar a cambios en sus objetivos periódicos. Si ya ha "
+"establecido objetivos periódicos para sus indicadores, puede que tenga que "
+"introducir valores objetivo adicionales para cubrir todo el periodo de "
+"seguimiento del indicador. Para futuras referencias, indique la razón por la "
+"que ha modificado el periodo de seguimiento del indicador."
+
+#: js/pages/program_page/components/program_period.js:440
+msgid ""
+"The program period is used as the default for the initial setup of time-"
+"based target periods (e.g., annually, quarterly, etc.) and in the Indicator "
+"Performance Tracking Tables (IPTTs). The Program Period is based on the "
+"program’s official start and end dates as recorded in the Identification "
+"Assignment Assistant (IDAA) system and cannot be adjusted in TolaData."
+msgstr ""
+"El período del programa se utiliza por defecto para la configuración inicial "
+"de los períodos objetivo basados en el tiempo (por ejemplo, anualmente, "
+"trimestralmente, etc.) y en las Tablas de Seguimiento del Rendimiento de los "
+"Indicadores (IPTTs). El periodo del programa se basa en las fechas oficiales "
+"de inicio y finalización del programa, tal y como se registran en el sistema "
+"del Asistente para la Asignación de la Identificación (IDAA), y no puede "
+"ajustarse en TolaData."
+
+#: js/pages/program_page/components/program_period.js:446
+msgid "IDAA program dates"
+msgstr "Fechas del programa IDAA"
+
+#: js/pages/program_page/components/program_period.js:449
+#: js/pages/program_page/components/program_period.js:469
+msgid "Start date"
+msgstr "Fecha de inicio"
+
+#: js/pages/program_page/components/program_period.js:450
+#: js/pages/program_page/components/program_period.js:454
+msgid "Unavailable"
+msgstr "No disponible"
+
+#: js/pages/program_page/components/program_period.js:453
+#: js/pages/program_page/components/program_period.js:480
+msgid "End date"
+msgstr "Fecha final"
+
+#: js/pages/program_page/components/program_period.js:465
+msgid "Indicator tracking period"
+msgstr "Período de seguimiento de los indicadores"
+
+#: js/pages/program_page/components/program_period.js:500
+#: js/pages/tola_management_pages/country/components/edit_country_profile.js:101
+#: js/pages/tola_management_pages/country/components/edit_country_profile.js:108
+#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:530
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:120
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:126
+#: js/pages/tola_management_pages/organization/components/edit_organization_history.js:69
+#: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:210
+#: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:217
+#: js/pages/tola_management_pages/program/components/program_history.js:64
+#: js/pages/tola_management_pages/program/components/program_settings.js:130
+#: js/pages/tola_management_pages/user/components/edit_user_history.js:74
+msgid "Save Changes"
+msgstr "Guardar cambios"
+
+#: js/pages/program_page/components/program_period.js:504
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:121
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:127
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:553
+msgid "Cancel changes"
+msgstr "Cancelar cambios"
+
 #. Translators: Explains how performance is categorized as close to the target or not close to the target
 #: js/pages/program_page/components/resultsTable.js:41
 msgid ""
@@ -1378,8 +1577,8 @@ msgstr ""
 "Advertencia: esta acción no se puede deshacer. ¿Está seguro que quiere "
 "borrar este informe fijado?"
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:20
-#: js/pages/results_form_PC/resultsFormPC.js:101
+#: js/pages/results_form_PC/components/ActualValueFields.js:26
+#: js/pages/results_form_PC/resultsFormPC.js:102
 msgid ""
 "Direct/indirect without double counting should be equal to or lower than "
 "direct/indirect with double counting."
@@ -1387,11 +1586,11 @@ msgstr ""
 "Directo/Indirecto sin cómputo doble debe ser igual o menor a Directo/"
 "Indirecto con cómputo doble."
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:34
+#: js/pages/results_form_PC/components/ActualValueFields.js:40
 msgid "Total Participant Actual Values"
 msgstr "Valores reales del total de participantes"
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:36
+#: js/pages/results_form_PC/components/ActualValueFields.js:42
 msgid ""
 "Include the participants with double counting on the left and participants "
 "without double counting across programs on the right. Double counting a "
@@ -1417,28 +1616,28 @@ msgstr ""
 "recibieron una ventaja tangible por su proximidad o vínculo con los "
 "participantes o con las actividades del programa."
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:40
-#: js/pages/results_form_PC/components/DisaggregationFields.js:100
+#: js/pages/results_form_PC/components/ActualValueFields.js:46
+#: js/pages/results_form_PC/components/DisaggregationFields.js:106
 msgid "Without double counting across programs"
 msgstr "Sin cómputo doble entre programas"
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:41
-#: js/pages/results_form_PC/components/DisaggregationFields.js:102
+#: js/pages/results_form_PC/components/ActualValueFields.js:47
+#: js/pages/results_form_PC/components/DisaggregationFields.js:108
 msgid "With double counting across programs"
 msgstr "Con cómputo doble entre programas"
 
-#: js/pages/results_form_PC/components/ActualValueFields.js:99
+#: js/pages/results_form_PC/components/ActualValueFields.js:105
 msgid "Total Participants"
 msgstr "Participantes totales"
 
 #: js/pages/results_form_PC/components/CommonFields.js:47
-#: js/pages/results_form_PC/resultsFormPC.js:80
+#: js/pages/results_form_PC/resultsFormPC.js:81
 msgid "This date should be within the fiscal year of the reporting period."
 msgstr ""
 "Esta fecha debe estar dentro del año fiscal del período de notificación."
 
 #: js/pages/results_form_PC/components/CommonFields.js:56
-#: js/pages/results_form_PC/resultsFormPC.js:88
+#: js/pages/results_form_PC/resultsFormPC.js:89
 msgid "Please complete this field. You can select more than one outcome theme."
 msgstr ""
 "Por favor, complete este campo. Puede seleccionar más de un tema de "
@@ -1469,11 +1668,11 @@ msgstr ""
 "Los años fiscales se corresponden a los periodos comprendidos entre el 1 de "
 "julio y el 30 de junio del año siguiente."
 
-#: js/pages/results_form_PC/components/CommonFields.js:104
+#: js/pages/results_form_PC/components/CommonFields.js:105
 msgid "Outcome theme"
 msgstr "Tema de resultados"
 
-#: js/pages/results_form_PC/components/CommonFields.js:106
+#: js/pages/results_form_PC/components/CommonFields.js:107
 msgid ""
 "Outcome themes are the main areas of a program. Refer to MEL Tip Sheet: "
 "Guidelines on Counting and Reporting Participant Numbers <a tabIndex=\"1\" "
@@ -1489,7 +1688,7 @@ msgstr ""
 
 #. Translators: This is the default option for a dropdown menu
 #. Translators: Nothing selected by user
-#: js/pages/results_form_PC/components/CommonFields.js:110
+#: js/pages/results_form_PC/components/CommonFields.js:111
 #: js/pages/tola_management_pages/country/views.js:24
 #: js/pages/tola_management_pages/country/views.js:36
 #: js/pages/tola_management_pages/country/views.js:48
@@ -1505,7 +1704,7 @@ msgstr ""
 #: js/pages/tola_management_pages/program/views.js:59
 #: js/pages/tola_management_pages/program/views.js:76
 #: js/pages/tola_management_pages/program/views.js:88
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:203
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:204
 #: js/pages/tola_management_pages/user/views.js:16
 msgid "None Selected"
 msgstr "Ninguno/a seleccionado/a"
@@ -1530,7 +1729,7 @@ msgstr ""
 "record/16929?ln=en' target='_blank'>[link: https://library.mercycorps.org/"
 "record/16929?ln=en]</a>."
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:55
+#: js/pages/results_form_PC/components/DisaggregationFields.js:61
 msgid ""
 "The 'SADD without double counting' value should be less than or equal to the "
 "'Direct without double counting' value."
@@ -1538,8 +1737,8 @@ msgstr ""
 "El valor ‘SADD sin doble cómputo’ debe ser menor o igual que el valor "
 "‘Directo sin doble cómputo’."
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:72
-#: js/pages/results_form_PC/resultsFormPC.js:116
+#: js/pages/results_form_PC/components/DisaggregationFields.js:78
+#: js/pages/results_form_PC/resultsFormPC.js:117
 msgid ""
 "Sector values should be less than or equal to the 'Direct/Indirect with "
 "double counting' value."
@@ -1547,38 +1746,38 @@ msgstr ""
 "Los valores del sector deben ser menores o iguales al valor ‘Directo/"
 "Indirecto con cómputo doble’."
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:87
+#: js/pages/results_form_PC/components/DisaggregationFields.js:93
 msgid "SADD (including unknown)"
 msgstr "SADD (desconocido)"
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:95
+#: js/pages/results_form_PC/components/DisaggregationFields.js:101
 msgid "Needs Attention"
 msgstr "Requiere su atención"
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:138
+#: js/pages/results_form_PC/components/DisaggregationFields.js:144
 msgid "Sum"
 msgstr "Suma"
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:154
+#: js/pages/results_form_PC/components/DisaggregationFields.js:160
 msgid "Total Direct Participants"
 msgstr "Total de participantes directos"
 
-#: js/pages/results_form_PC/components/DisaggregationFields.js:154
+#: js/pages/results_form_PC/components/DisaggregationFields.js:160
 msgid "Total Indirect Participants"
 msgstr "Total de participantes indirectos"
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:16
-#: js/pages/results_form_PC/resultsFormPC.js:131
+#: js/pages/results_form_PC/resultsFormPC.js:132
 msgid "Please enter a valid evidence link."
 msgstr "Por favor, introduzca un enlace de prueba válido."
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:19
-#: js/pages/results_form_PC/resultsFormPC.js:134
+#: js/pages/results_form_PC/resultsFormPC.js:135
 msgid "A record name must be included along with the link."
 msgstr "Se debe incluir un nombre de registro junto con el enlace."
 
 #: js/pages/results_form_PC/components/EvidenceFields.js:23
-#: js/pages/results_form_PC/resultsFormPC.js:138
+#: js/pages/results_form_PC/resultsFormPC.js:139
 msgid "A link must be included along with the record name."
 msgstr "Debe incluir un enlace junto al nombre del registro."
 
@@ -1621,7 +1820,7 @@ msgstr "Nombre del registro"
 msgid "Give your record a short name that is easy to remember."
 msgstr "Dé a su registro un nombre corto que sea fácil de recordar."
 
-#: js/pages/results_form_PC/resultsFormPC.js:65
+#: js/pages/results_form_PC/resultsFormPC.js:66
 msgid ""
 "The sum of 'SADD with double counting' should be equal to the sum of 'Direct "
 "with double counting'."
@@ -1629,7 +1828,7 @@ msgstr ""
 "La suma de ‘SADD con cómputo doble’ debe ser igual a la suma de ‘Directo con "
 "cómputo doble’."
 
-#: js/pages/results_form_PC/resultsFormPC.js:68
+#: js/pages/results_form_PC/resultsFormPC.js:69
 msgid ""
 "The sum of 'SADD without double counting' should be equal to the sum of "
 "'Direct without double counting'."
@@ -1637,20 +1836,20 @@ msgstr ""
 "La suma de ‘SADD sin cómputo doble’ debe ser igual a la suma de ‘Directo sin "
 "cómputo doble’."
 
-#: js/pages/results_form_PC/resultsFormPC.js:84
-msgid "You cannot change the fiscal year during the current reporting period. "
+#: js/pages/results_form_PC/resultsFormPC.js:85
+msgid "You cannot change the fiscal year during the current reporting period."
 msgstr ""
 "No se puede cambiar el año fiscal durante el período de notificación actual."
 
-#: js/pages/results_form_PC/resultsFormPC.js:95
+#: js/pages/results_form_PC/resultsFormPC.js:96
 msgid ""
-"Direct total participants with double counting is required. Please "
-"complete these fields."
+"Direct total participants with double counting is required. Please complete "
+"these fields."
 msgstr ""
-"Se requiere un total de participantes directos con cómputo doble. "
-"Por favor, complete estos campos."
+"Se requiere un total de participantes directos con cómputo doble. Por favor, "
+"complete estos campos."
 
-#: js/pages/results_form_PC/resultsFormPC.js:276
+#: js/pages/results_form_PC/resultsFormPC.js:279
 #: js/pages/results_framework/components/level_cards.js:406
 msgid ""
 "Your changes will be recorded in a change log.  For future reference, please "
@@ -1659,11 +1858,11 @@ msgstr ""
 "Sus cambios serán guardados en un registro de cambios. Para referencia "
 "futura, indique la justificación para estos cambios."
 
-#: js/pages/results_form_PC/resultsFormPC.js:302
+#: js/pages/results_form_PC/resultsFormPC.js:305
 msgid "Participant Count"
 msgstr "Cómputo de participantes"
 
-#: js/pages/results_form_PC/resultsFormPC.js:376
+#: js/pages/results_form_PC/resultsFormPC.js:379
 #: js/pages/results_framework/components/level_cards.js:575
 msgid "Save and close"
 msgstr "Guardar y cerrar"
@@ -1795,7 +1994,7 @@ msgstr ""
 #: js/pages/tola_management_pages/country/views.js:66
 #: js/pages/tola_management_pages/organization/views.js:83
 #: js/pages/tola_management_pages/program/views.js:143
-#: js/pages/tola_management_pages/program/views.js:200
+#: js/pages/tola_management_pages/program/views.js:202
 #: js/pages/tola_management_pages/user/views.js:162
 #: js/pages/tola_management_pages/user/views.js:230
 msgid "Apply"
@@ -1919,7 +2118,7 @@ msgstr "Usuario"
 
 #: js/pages/tola_management_pages/audit_log/views.js:244
 #: js/pages/tola_management_pages/organization/views.js:110
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:195
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:196
 #: js/pages/tola_management_pages/user/views.js:202
 #: js/pages/tola_management_pages/user/views.js:261
 msgid "Organization"
@@ -1949,15 +2148,15 @@ msgstr "ítems"
 #: js/pages/tola_management_pages/country/components/country_editor.js:23
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:114
 #: js/pages/tola_management_pages/organization/components/organization_editor.js:26
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:70
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:278
 #: js/pages/tola_management_pages/program/components/program_editor.js:27
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:144
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:145
 #: js/pages/tola_management_pages/user/components/user_editor.js:26
 msgid "Profile"
 msgstr "Perfil"
 
 #: js/pages/tola_management_pages/country/components/country_editor.js:32
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:216
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:217
 msgid "Strategic Objectives"
 msgstr "Objetivos estratégicos"
 
@@ -1977,9 +2176,6 @@ msgstr "Nombre del país"
 
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:80
 #: js/pages/tola_management_pages/country/components/edit_objectives.js:94
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:108
-#, fuzzy
-#| msgid "Description/Notes"
 msgid "Description"
 msgstr "Descripción/Notas"
 
@@ -1987,40 +2183,21 @@ msgstr "Descripción/Notas"
 msgid "Country Code"
 msgstr "Código del País"
 
-#: js/pages/tola_management_pages/country/components/edit_country_profile.js:101
-#: js/pages/tola_management_pages/country/components/edit_country_profile.js:108
-#: js/pages/tola_management_pages/country/components/edit_disaggregations.js:530
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:120
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:125
-#: js/pages/tola_management_pages/organization/components/edit_organization_history.js:69
-#: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:210
-#: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:217
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:141
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:148
-#: js/pages/tola_management_pages/program/components/program_history.js:64
-#: js/pages/tola_management_pages/program/components/program_settings.js:130
-#: js/pages/tola_management_pages/user/components/edit_user_history.js:74
-msgid "Save Changes"
-msgstr "Guardar cambios"
-
 #. Translators:  Button label.  Allows users to undo whatever changes they have made.
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:103
 #: js/pages/tola_management_pages/country/components/edit_country_profile.js:109
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:533
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:126
 #: js/pages/tola_management_pages/country/views.js:67
 #: js/pages/tola_management_pages/organization/components/edit_organization_history.js:70
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:212
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:218
 #: js/pages/tola_management_pages/organization/views.js:84
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:143
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:149
 #: js/pages/tola_management_pages/program/components/program_history.js:65
 #: js/pages/tola_management_pages/program/components/program_settings.js:131
-#: js/pages/tola_management_pages/program/views.js:201
+#: js/pages/tola_management_pages/program/views.js:203
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:75
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:261
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:267
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:262
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:268
 #: js/pages/tola_management_pages/user/views.js:231
 msgid "Reset"
 msgstr "Reiniciar"
@@ -2125,10 +2302,10 @@ msgid "Archive disaggregation"
 msgstr "Archivar desagregación"
 
 #: js/pages/tola_management_pages/country/components/edit_disaggregations.js:590
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:160
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:161
 #: js/pages/tola_management_pages/country/models.js:262
 #: js/pages/tola_management_pages/organization/models.js:115
-#: js/pages/tola_management_pages/program/models.js:73
+#: js/pages/tola_management_pages/program/models.js:78
 #: js/pages/tola_management_pages/user/models.js:192
 msgid "You have unsaved changes. Are you sure you want to discard them?"
 msgstr "Tiene cambios sin guardar. ¿Está seguro que desea descartarlos?"
@@ -2185,8 +2362,8 @@ msgstr "Propuesto"
 #: js/pages/tola_management_pages/organization/views.js:190
 #: js/pages/tola_management_pages/program/components/program_history.js:9
 #: js/pages/tola_management_pages/program/views.js:66
-#: js/pages/tola_management_pages/program/views.js:158
-#: js/pages/tola_management_pages/program/views.js:164
+#: js/pages/tola_management_pages/program/views.js:160
+#: js/pages/tola_management_pages/program/views.js:166
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:8
 #: js/pages/tola_management_pages/user/models.js:75
 #: js/pages/tola_management_pages/user/views.js:355
@@ -2213,19 +2390,19 @@ msgstr "Nombre corto"
 #: js/pages/tola_management_pages/organization/views.js:113
 #: js/pages/tola_management_pages/program/components/program_history.js:53
 #: js/pages/tola_management_pages/program/views.js:70
-#: js/pages/tola_management_pages/program/views.js:233
+#: js/pages/tola_management_pages/program/views.js:237
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:64
 #: js/pages/tola_management_pages/user/views.js:211
 #: js/pages/tola_management_pages/user/views.js:265
 msgid "Status"
 msgstr "Estado"
 
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:193
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:194
 msgid "Delete Strategic Objective?"
 msgstr "¿Eliminar Objetivo Estratégico?"
 
 #. Translators: This is a button that allows the user to add a strategic objective. */}
-#: js/pages/tola_management_pages/country/components/edit_objectives.js:235
+#: js/pages/tola_management_pages/country/components/edit_objectives.js:236
 msgid "Add strategic objective"
 msgstr "Agregar objetivo estratégico"
 
@@ -2249,7 +2426,7 @@ msgstr[1] ""
 #: js/pages/tola_management_pages/country/models.js:215
 #: js/pages/tola_management_pages/country/models.js:219
 #: js/pages/tola_management_pages/organization/models.js:111
-#: js/pages/tola_management_pages/program/models.js:195
+#: js/pages/tola_management_pages/program/models.js:200
 #: js/pages/tola_management_pages/user/models.js:208
 msgid "Successfully saved"
 msgstr "Guardado exitosamente"
@@ -2257,7 +2434,7 @@ msgstr "Guardado exitosamente"
 #. Translators: Saving to the server failed
 #: js/pages/tola_management_pages/country/models.js:226
 #: js/pages/tola_management_pages/organization/models.js:106
-#: js/pages/tola_management_pages/program/models.js:200
+#: js/pages/tola_management_pages/program/models.js:205
 #: js/pages/tola_management_pages/user/models.js:203
 msgid "Saving failed"
 msgstr "Falló operación de guardado"
@@ -2340,7 +2517,7 @@ msgstr "Encontrar un País"
 #: js/pages/tola_management_pages/country/views.js:96
 #: js/pages/tola_management_pages/organization/views.js:89
 #: js/pages/tola_management_pages/program/views.js:42
-#: js/pages/tola_management_pages/program/views.js:231
+#: js/pages/tola_management_pages/program/views.js:235
 msgid "Organizations"
 msgstr "Organizaciones"
 
@@ -2348,7 +2525,7 @@ msgstr "Organizaciones"
 #: js/pages/tola_management_pages/country/views.js:97
 #: js/pages/tola_management_pages/organization/views.js:30
 #: js/pages/tola_management_pages/organization/views.js:111
-#: js/pages/tola_management_pages/program/views.js:206
+#: js/pages/tola_management_pages/program/views.js:208
 #: js/pages/tola_management_pages/user/views.js:59
 #: js/pages/tola_management_pages/user/views.js:262
 msgid "Programs"
@@ -2356,14 +2533,14 @@ msgstr "Programas"
 
 #: js/pages/tola_management_pages/country/views.js:72
 #: js/pages/tola_management_pages/organization/views.js:89
-#: js/pages/tola_management_pages/program/views.js:206
+#: js/pages/tola_management_pages/program/views.js:208
 #: js/pages/tola_management_pages/user/views.js:236
 msgid "Admin:"
 msgstr "Administrador:"
 
 #: js/pages/tola_management_pages/country/views.js:72
 #: js/pages/tola_management_pages/organization/views.js:18
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:118
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:371
 #: js/pages/tola_management_pages/program/views.js:30
 msgid "Countries"
 msgstr "Países"
@@ -2375,7 +2552,7 @@ msgstr "Agregar País"
 #: js/pages/tola_management_pages/country/views.js:98
 #: js/pages/tola_management_pages/organization/views.js:112
 #: js/pages/tola_management_pages/program/views.js:18
-#: js/pages/tola_management_pages/program/views.js:232
+#: js/pages/tola_management_pages/program/views.js:236
 #: js/pages/tola_management_pages/user/views.js:236
 msgid "Users"
 msgstr "Usuarios"
@@ -2413,7 +2590,7 @@ msgstr "0 programas"
 #. Translators: preceded by a number, i.e. "3 users" or "1 user"
 #: js/pages/tola_management_pages/country/views.js:229
 #: js/pages/tola_management_pages/organization/views.js:182
-#: js/pages/tola_management_pages/program/views.js:320
+#: js/pages/tola_management_pages/program/views.js:327
 #, python-format
 msgid "%s user"
 msgid_plural "%s users"
@@ -2423,7 +2600,7 @@ msgstr[1] "%s usuarios"
 #. Translators: when no users are connected to the item
 #: js/pages/tola_management_pages/country/views.js:234
 #: js/pages/tola_management_pages/organization/views.js:187
-#: js/pages/tola_management_pages/program/views.js:324
+#: js/pages/tola_management_pages/program/views.js:331
 msgid "0 users"
 msgstr "0 usuarios"
 
@@ -2436,8 +2613,8 @@ msgstr "países"
 #: js/pages/tola_management_pages/organization/views.js:190
 #: js/pages/tola_management_pages/program/components/program_history.js:10
 #: js/pages/tola_management_pages/program/views.js:67
-#: js/pages/tola_management_pages/program/views.js:159
-#: js/pages/tola_management_pages/program/views.js:164
+#: js/pages/tola_management_pages/program/views.js:161
+#: js/pages/tola_management_pages/program/views.js:166
 #: js/pages/tola_management_pages/user/components/edit_user_history.js:9
 #: js/pages/tola_management_pages/user/models.js:76
 #: js/pages/tola_management_pages/user/views.js:355
@@ -2469,7 +2646,7 @@ msgid "Primary Contact Phone Number"
 msgstr "Número Telefónico de Contacto Principal"
 
 #: js/pages/tola_management_pages/organization/components/edit_organization_profile.js:200
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:248
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:249
 msgid "Preferred Mode of Contact"
 msgstr "Forma de Contacto Preferida"
 
@@ -2497,17 +2674,115 @@ msgstr "Agregar Organización"
 msgid "organizations"
 msgstr "organizaciones"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:73
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:112
+msgid "This field may not be left blank."
+msgstr "Este campo no puede dejarse vacío."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:127
+msgid "The program start date may not be more than 10 years in the past."
+msgstr ""
+"La fecha de inicio del programa no puede ser más de 10 años en el pasado."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:131
+msgid "The program start date may not be after the program end date."
+msgstr ""
+"La fecha de inicio del programa no puede ser posterior a la fecha de "
+"finalización del programa."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:137
+msgid "The program end date may not be more than 10 years in the future."
+msgstr ""
+"La fecha de finalización del programa no puede ser más de 10 años en el "
+"futuro."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:141
+msgid "The program end date may not be before the program start date."
+msgstr ""
+"La fecha de finalización del programa no puede ser anterior a la fecha de "
+"inicio del programa."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:157
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:176
+msgid "GAIT IDs may not be left blank."
+msgstr "IDs GAIT no puede dejarse vacío."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:165
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:166
+msgid "Duplicate GAIT ID numbers are not allowed."
+msgstr "No se permite duplicar los números de identificación GAIT."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:186
+msgid "Fund codes may only be 5 digits long."
+msgstr "Los códigos de fondos sólo pueden tener 5 dígitos."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:190
+msgid "Fund codes may only begin with a 3, 7, or 9 (e.g., 30000)."
+msgstr ""
+"Los códigos de fondos sólo pueden empezar por 3, 7, o 9 (por ejemplo, 30000)."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:282
+msgid ""
+"The fields on this tab are auto-populated with data from Identification "
+"Assignment Assistant (IDAA). These fields cannot be edited in TolaData. If "
+"changes to this program information are required, then these changes must be "
+"reflected in IDAA first."
+msgstr ""
+"Los campos de esta pestaña se rellenan automáticamente con los datos del "
+"Asistente de Asignación de Identificación (IDAA). Estos campos no se pueden "
+"editar en TolaData. Si se requieren cambios en esta información del "
+"programa, estos cambios deben reflejarse primero en IDAA."
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:288
 msgid "Program name"
 msgstr "Nombre del programa"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:84
-msgid "GAIT ID"
-msgstr "ID GAIT"
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:303
+msgid "Program ID"
+msgstr "Identificador de programa"
 
-#: js/pages/tola_management_pages/program/components/edit_program_profile.js:96
-msgid "Fund Code"
-msgstr "Código del fondo"
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:318
+msgid "Program start date"
+msgstr "Fecha de inicio del programa"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:338
+msgid "Program end date"
+msgstr "Fecha de finalización del programa"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:358
+msgid "Program funding status"
+msgstr "Estado de la financiación del programa"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:414
+msgid "Outcome themes"
+msgstr "Temas de resultados"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:439
+msgid "GAIT IDs"
+msgstr "IDs GAIT"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:442
+msgid "Fund codes"
+msgstr "Códigos de fondos"
+
+#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:445
+#: tola/db_translations.js:132
+msgid "Donor"
+msgstr "Donante"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:449
+msgid "Donor dept"
+msgstr "Departamento de donantes"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:546
+msgid "Add another row"
+msgstr "Añadir otra fila"
+
+#: js/pages/tola_management_pages/program/components/edit_program_profile.js:552
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:260
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:267
+msgid "Save changes"
+msgstr "Guardar cambios"
 
 #: js/pages/tola_management_pages/program/components/program_settings.js:69
 msgid "Indicator grouping"
@@ -2568,42 +2843,37 @@ msgstr ""
 "los indicadores; su único fin es ser mostrados."
 
 #. Translators: Notify user that the program start and end date were successfully retrieved from the GAIT service and added to the newly saved Program
-#: js/pages/tola_management_pages/program/models.js:205
+#: js/pages/tola_management_pages/program/models.js:210
 msgid "Successfully synced GAIT program start and end dates"
 msgstr ""
 "Se sincronizaron satisfactoriamente las fechas de inicio y fin del programa "
 "desde el servicio GAIT"
 
 #. Translators: Notify user that the program start and end date failed to be retrieved from the GAIT service with a specific reason appended after the :
-#: js/pages/tola_management_pages/program/models.js:211
+#: js/pages/tola_management_pages/program/models.js:216
 msgid "Failed to sync GAIT program start and end dates: "
 msgstr ""
 "Hubo un fallo en la sincronización de las fechas de inicio y fin del "
 "programa desde el servicio GAIT: "
 
 #. Translators: A request failed, ask the user if they want to try the request again
-#: js/pages/tola_management_pages/program/models.js:219
+#: js/pages/tola_management_pages/program/models.js:224
 msgid "Retry"
 msgstr "Reintentar"
 
 #. Translators: button label - ignore the current warning modal on display
-#: js/pages/tola_management_pages/program/models.js:228
+#: js/pages/tola_management_pages/program/models.js:233
 msgid "Ignore"
 msgstr "Ignorar"
 
-#: js/pages/tola_management_pages/program/models.js:275
+#: js/pages/tola_management_pages/program/models.js:288
 msgid "The GAIT ID for this program is shared with at least one other program."
 msgstr ""
 "El ID GAIT para este programa está compartido con al menos un programa más."
 
-#: js/pages/tola_management_pages/program/models.js:276
+#: js/pages/tola_management_pages/program/models.js:289
 msgid "View programs with this ID in GAIT."
 msgstr "Ver programas con este ID en GAIT."
-
-#. Translators: error message when trying to connect to the server
-#: js/pages/tola_management_pages/program/models.js:316
-msgid "There was a network or server connection error."
-msgstr "Hubo un error de red o conectividad con el servidor."
 
 #: js/pages/tola_management_pages/program/views.js:83
 msgid "Find a Program"
@@ -2624,21 +2894,29 @@ msgstr "Seleccionar..."
 msgid "No options"
 msgstr "Sin opciones"
 
-#: js/pages/tola_management_pages/program/views.js:168
+#: js/pages/tola_management_pages/program/views.js:156
+msgid "Funded"
+msgstr "Financiado"
+
+#: js/pages/tola_management_pages/program/views.js:156
+msgid "Completed"
+msgstr "Completado"
+
+#: js/pages/tola_management_pages/program/views.js:170
 msgid "Set program status"
 msgstr "Definir estado del programa"
 
-#: js/pages/tola_management_pages/program/views.js:212
+#: js/pages/tola_management_pages/program/views.js:215
 msgid "Add Program"
 msgstr "Agregar Programa"
 
 #. Translators: Label for a freshly created program before the name is entered
-#: js/pages/tola_management_pages/program/views.js:294
-#: js/pages/tola_management_pages/program/views.js:307
+#: js/pages/tola_management_pages/program/views.js:301
+#: js/pages/tola_management_pages/program/views.js:314
 msgid "New Program"
 msgstr "Programa nuevo"
 
-#: js/pages/tola_management_pages/program/views.js:334
+#: js/pages/tola_management_pages/program/views.js:341
 msgid "programs"
 msgstr "programas"
 
@@ -2651,36 +2929,31 @@ msgstr "Reenviar Correo Electrónico de Registración"
 msgid "Mercy Corps -- managed by Okta"
 msgstr "Mercy Corps -- administrada por Okta"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:147
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:148
 msgid "Preferred First Name"
 msgstr "Nombre Preferido"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:163
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:164
 msgid "Preferred Last Name"
 msgstr "Apellido Preferido"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:179
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:180
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:212
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:213
 msgid "Title"
 msgstr "Título"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:223
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:224
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:238
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:239
 msgid "Phone"
 msgstr "Teléfono"
 
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:259
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:266
-msgid "Save changes"
-msgstr "Guardar cambios"
-
-#: js/pages/tola_management_pages/user/components/edit_user_profile.js:260
+#: js/pages/tola_management_pages/user/components/edit_user_profile.js:261
 msgid "Save And Add Another"
 msgstr "Guardar y Agregar otro"
 
@@ -2814,49 +3087,49 @@ msgid "users"
 msgstr "usuarios"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:2
-msgid "By training"
-msgstr "Por formación"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:4
-msgid "Endline"
-msgstr "Línea final"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:6
-msgid "Weekly"
-msgstr "Semanal"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:10
-msgid "Final evaluation"
-msgstr "Evaluación final"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:14
-msgid "Midline"
-msgstr "Línea media"
-
-#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:18
 msgid "By distribution"
 msgstr "Por distribución"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:20
-msgid "By batch"
-msgstr "Por lotes"
+#: tola/db_translations.js:8
+msgid "Post shock"
+msgstr "Posterior al desastre"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
-#: tola/db_translations.js:24
+#: tola/db_translations.js:10
 msgid "By event"
 msgstr "Por evento"
 
 #. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:16
+msgid "By training"
+msgstr "Por formación"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:18
+msgid "Final evaluation"
+msgstr "Evaluación final"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:20
+msgid "Midline"
+msgstr "Línea media"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:22
+msgid "Endline"
+msgstr "Línea final"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
 #: tola/db_translations.js:26
-msgid "Post shock"
-msgstr "Posterior al desastre"
+msgid "Weekly"
+msgstr "Semanal"
+
+#. Translators: One of several options for specifying how often data is collected or reported on over the life of a program
+#: tola/db_translations.js:28
+msgid "By batch"
+msgstr "Por lotes"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #: tola/db_translations.js:30
@@ -2865,7 +3138,7 @@ msgstr "Agroindustria"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:32 tola/db_translations.js:154
+#: tola/db_translations.js:32 tola/db_translations.js:150
 msgid "Agriculture"
 msgstr "Agricultura"
 
@@ -2956,7 +3229,7 @@ msgstr "Alimentos"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: The main area of a program
-#: tola/db_translations.js:68 tola/db_translations.js:144
+#: tola/db_translations.js:68 tola/db_translations.js:142
 msgid "Food Security"
 msgstr "Seguridad alimentaria"
 
@@ -3072,7 +3345,7 @@ msgstr "Cuestiones urbanas"
 
 #. Translators: One of several choices for what sector (i.e. development domain) a program is most closely associated with
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:114 tola/db_translations.js:176
+#: tola/db_translations.js:114 tola/db_translations.js:172
 msgid "WASH"
 msgstr "WASH"
 
@@ -3112,11 +3385,6 @@ msgid "DIG - Testing"
 msgstr "DIG - en prueba"
 
 #. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
-#: tola/db_translations.js:132
-msgid "Donor"
-msgstr "Donante"
-
-#. Translators: One of several choices for specifying what type of Indicator is being created.  An Indicator is a performance measure e.g. "We will distribute 1000 food packs over the next two months"
 #: tola/db_translations.js:134
 msgid "Key Performance Indicator (KPI)"
 msgstr "Indicador clave de rendimiento (KPI)"
@@ -3137,24 +3405,12 @@ msgid "Economic Opportunity"
 msgstr "Oportunidad económica"
 
 #. Translators: The main area of a program
-#: tola/db_translations.js:142
-msgid "Economic Opportunity / Opportunité économique / Oportunidad económica"
-msgstr ""
-
-#. Translators: The main area of a program
-#: tola/db_translations.js:146
+#: tola/db_translations.js:144
 msgid "Good Governance and Peace"
 msgstr "Buena gobernanza y paz"
 
 #. Translators: The main area of a program
-#: tola/db_translations.js:148
-msgid ""
-"Good Governance and Peace / Bonne gouvernance et paix / Buena gobernanza y "
-"paz"
-msgstr ""
-
-#. Translators: The main area of a program
-#: tola/db_translations.js:150
+#: tola/db_translations.js:146
 msgid ""
 "Resilience approach (tick this box if the program used a resilience approach)"
 msgstr ""
@@ -3162,59 +3418,73 @@ msgstr ""
 "enfoque de resiliencia)"
 
 #. Translators: The main area of a program
-#: tola/db_translations.js:152
+#: tola/db_translations.js:148
 msgid "Water Security"
 msgstr "Seguridad del agua"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:156
+#: tola/db_translations.js:152
 msgid "Cash and Voucher Assistance"
 msgstr "Asistencia en efectivo y vales"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:158
+#: tola/db_translations.js:154
 msgid "Direct"
 msgstr "Directo"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:160
+#: tola/db_translations.js:156
 msgid "Employment"
 msgstr "Empleo"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:162
+#: tola/db_translations.js:158
 msgid "Environment (DRR, Energy and Water)"
 msgstr "Medio ambiente (DRR, energía y agua)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:164
+#: tola/db_translations.js:160
 msgid "Financial Services"
 msgstr "Servicios financieros"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:166
+#: tola/db_translations.js:162
 msgid "Indirect"
 msgstr "Indirecto"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:168
+#: tola/db_translations.js:164
 msgid "Infrastructure (non - WASH, non - energy)"
 msgstr "Infraestructura (no WASH, no energía)"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:170
+#: tola/db_translations.js:166
 msgid "Nutrition"
 msgstr "Nutrición"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:172
+#: tola/db_translations.js:168
 msgid "Peace, Governance and Partnership"
 msgstr "Paz, gobernanza, y asociaciones"
 
 #. Translators: One of several choices for what label/sector (i.e. development domain) a program is most closely associated with
-#: tola/db_translations.js:174
+#: tola/db_translations.js:170
 msgid "Public Health (non - nutrition, non - WASH)"
 msgstr "Salud pública (no nutricional/no WASH)"
+
+#~ msgid "Donors"
+#~ msgstr "Donantes"
+
+#~ msgid ""
+#~ "Economic Opportunity / Opportunité économique / Oportunidad económica"
+#~ msgstr ""
+#~ "Economic Opportunity / Opportunité économique / Oportunidad económica"
+
+#~ msgid "Fund Code"
+#~ msgstr "Código del fondo"
+
+#~ msgid "There was a network or server connection error."
+#~ msgstr "Hubo un error de red o conectividad con el servidor."
 
 #, fuzzy
 #~| msgid "Description"
@@ -3386,9 +3656,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgid "Program Dates Changed"
 #~ msgstr "Fechas de Programa Cambiadas"
 
-#~ msgid "Number"
-#~ msgstr "Número"
-
 #~ msgid "Percentage"
 #~ msgstr "Porcentaje"
 
@@ -3430,9 +3697,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 
 #~ msgid "Code"
 #~ msgstr "Código"
-
-#~ msgid "Funded"
-#~ msgstr "Fundado"
 
 #~ msgid "Funding Status"
 #~ msgstr "Estado de financiamiento"
@@ -4201,9 +4465,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgid "Add a tri-annual period"
 #~ msgstr "Agregar un período trienal"
 
-#~ msgid "Add a month"
-#~ msgstr "Agregar un mes"
-
 #~ msgid "Add an event"
 #~ msgstr "Agregar un evento"
 
@@ -4291,9 +4552,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgstr ""
 #~ "Antes de agregar indicadores y resultados de rendimiento, necesitamos "
 #~ "saber las fechas de inicio y fin de reporte de su programa."
-
-#~ msgid "reporting start and end dates."
-#~ msgstr "las fechas de inicio y finalización de su programa."
 
 #~ msgid "No Indicators have been entered for this program."
 #~ msgstr "No se han ingresado indicadores para este programa."
@@ -4388,24 +4646,8 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgid "Back to Homepage"
 #~ msgstr "Volver a la página de inicio"
 
-#~ msgid ""
-#~ "Error. Could not retrieve data from server. Please report this to the "
-#~ "Tola team."
-#~ msgstr ""
-#~ "Error. No se pudieron recuperar los datos del servidor. Por favor informe "
-#~ "esto al equipo de Tola."
-
-#~ msgid ""
-#~ "You must enter values for the reporting start and end dates before saving."
-#~ msgstr ""
-#~ "Debe ingresar valores para las fechas de inicio y finalización del "
-#~ "informe antes de guardar."
-
 #~ msgid "Success. Reporting period changes were saved."
 #~ msgstr "Éxito. Se guardaron los cambios del período de informes."
-
-#~ msgid "There was a problem saving your changes."
-#~ msgstr "Hubo un problema al guardar sus cambios."
 
 #~ msgid "targets"
 #~ msgstr "objetivos"
@@ -4942,9 +5184,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 
 #~ msgid "Contact"
 #~ msgstr "Contacto"
-
-#~ msgid "Fund code"
-#~ msgstr "Código del fondo"
 
 #~ msgid "Program Description"
 #~ msgstr "Descripción del programa"
@@ -5868,9 +6107,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgid "Category"
 #~ msgstr "Categoría"
 
-#~ msgid "Program ID"
-#~ msgstr "Identificador de Programa"
-
 #~ msgid "Indicator ID"
 #~ msgstr "Identificador del indicador"
 
@@ -6356,12 +6592,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 
 #~ msgid "Quarter"
 #~ msgstr "Trimestre"
-
-#~ msgid "Start date"
-#~ msgstr "Fecha de inicio"
-
-#~ msgid "End date"
-#~ msgstr "Fecha final"
 
 #~ msgid "Customsort"
 #~ msgstr "Customsort"
@@ -6862,27 +7092,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgid "Save and add another"
 #~ msgstr "Guardar y agregar otro"
 
-#~ msgid "Program period"
-#~ msgstr "Período del programa"
-
-#~ msgid ""
-#~ "The program period is used in the setup of periodic targets and in "
-#~ "Indicator Performance Tracking Tables (IPTT). TolaData initially sets the "
-#~ "program period to include the program’s official start and end dates, as "
-#~ "recorded in the Grant and Award Information Tracker (GAIT) system. The "
-#~ "program period may be adjusted to align with the program’s indicator plan."
-#~ msgstr ""
-#~ "El período del programa se usa en la configuración de objetivos "
-#~ "periódicos y en las tablas de seguimiento del rendimiento del indicador "
-#~ "(IPTT). TolaData establece inicialmente el período del programa para "
-#~ "incluir las fechas de inicio y finalización oficiales del mismo, tal como "
-#~ "se registra en el sistema de rastreo de información de concesiones y "
-#~ "adjudicaciones (GAIT). El período del programa puede ajustarse para "
-#~ "alinearse con el plan de indicadores del programa."
-
-#~ msgid "GAIT program dates"
-#~ msgstr "Fechas del programa GAIT"
-
 #~ msgid "Program start and end dates"
 #~ msgstr "Fechas de inicio y finalización del programa"
 
@@ -6930,28 +7139,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ "este programa ya tiene configurados objetivos periódicos, solo la fecha "
 #~ "de finalización del programa se puede mover más tarde.\n"
 #~ "                                "
-
-#~ msgid "Unavailable"
-#~ msgstr "No disponible"
-
-#~ msgid ""
-#~ "This action may result in changes to your periodic targets. If you have "
-#~ "already set up periodic targets for your indicators, you may need to "
-#~ "enter additional target values to cover the entire reporting period. For "
-#~ "future reference, please provide a reason for modifying the reporting "
-#~ "period."
-#~ msgstr ""
-#~ "Esta acción puede generar cambios a sus objetivos periódicos. Si ya ha "
-#~ "configurado objetivos periódicos para sus indicadores, puede necesitar "
-#~ "agregar valores objetivo adicionales para cubrir el período de reporte "
-#~ "completo. Para referencia futura, indique la justificación para modificar "
-#~ "el período de reporte."
-
-#~ msgid "The end date must come after the start date."
-#~ msgstr "La fecha de finalización siempre va después de la de comienzo."
-
-#~ msgid "Reporting period updated"
-#~ msgstr "Período del informe actualizado"
 
 #~ msgid ""
 #~ "\n"
@@ -7697,9 +7884,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgid "Evidence record name"
 #~ msgstr "Nombre de registro de evidencia"
 
-#~ msgid "Indicator changed"
-#~ msgstr "Indicador modificado"
-
 #~ msgid "Result changed"
 #~ msgstr "Resultado modificado"
 
@@ -7714,9 +7898,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 
 #~ msgid "Result level changed"
 #~ msgstr "Nivel de resultados modificado"
-
-#~ msgid "Funding status"
-#~ msgstr "Estado de la financiación"
 
 #~ msgid "Cost center"
 #~ msgstr "Centro de costos"
@@ -7831,9 +8012,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgid "Places"
 #~ msgstr "Lugares"
 
-#~ msgid "Map"
-#~ msgstr "Mapa"
-
 #~ msgid "Demographic Information"
 #~ msgstr "Información Demográfica"
 
@@ -7884,12 +8062,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 
 #~ msgid "Program Name"
 #~ msgstr "Nombre del programa"
-
-#~ msgid "Program Start Date"
-#~ msgstr "Fecha de inicio del programa"
-
-#~ msgid "Program End Date"
-#~ msgstr "Fecha de finalización del programa"
 
 #~ msgid "Auto-number indicators according to the results framework"
 #~ msgstr "Indicadores de numeración automática según el sistema de resultados"
@@ -7990,9 +8162,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 #~ msgid "User programs updated"
 #~ msgstr "Programas de usuario actualizados"
 
-#~ msgid "This field must be unique"
-#~ msgstr "Este campo debe ser único"
-
 #~ msgid "Analyses and Reporting"
 #~ msgstr "Análisis e informes"
 
@@ -8058,9 +8227,6 @@ msgstr "Salud pública (no nutricional/no WASH)"
 
 #~ msgid "Risks and Assumptions"
 #~ msgstr "Riesgos y suposiciones"
-
-#~ msgid "Complete"
-#~ msgstr "Completar"
 
 #~ msgid "Contributor"
 #~ msgstr "Contribuyente"

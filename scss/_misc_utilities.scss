@@ -74,6 +74,10 @@
 .show {
     display: block;
 }
+.waiting {
+    pointer-events: none;
+    opacity: 0.5;
+}
 
 
 // Layout

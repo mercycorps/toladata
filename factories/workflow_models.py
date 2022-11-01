@@ -20,6 +20,7 @@ from factory import (
 from factories.django_models import UserFactory, UserOnlyFactory
 from workflow.models import (
     Country,
+    IDAASector,
     Organization,
     ProfileType,
     Sector,
@@ -28,6 +29,8 @@ from workflow.models import (
     Program,
     CountryAccess,
     ProgramAccess,
+    IDAASector,
+    GaitID,
     PROGRAM_ROLE_CHOICES,
     COUNTRY_ROLE_CHOICES
 )
@@ -123,10 +126,18 @@ class TolaUserFactory(DjangoModelFactory):
             obj.user.save()
 
 
+class GaitIDFactory(DjangoModelFactory):
+
+    class Meta:
+        model = GaitID
+        django_get_or_create = ('gaitid',)
+
+    gaitid = Sequence(lambda n: "%0030d" % n)
+
+
 class ProgramFactory(DjangoModelFactory):
     class Meta:
         model = Program
-        django_get_or_create = ('gaitid',)
 
     class Params:
         active = True
@@ -138,7 +149,7 @@ class ProgramFactory(DjangoModelFactory):
         )
 
     name = 'Health and Survival for Syrians in Affected Regions'
-    gaitid = Sequence(lambda n: "%0030d" % n)
+    gaitid = RelatedFactory(GaitIDFactory, factory_related_name='program')
     country = RelatedFactory(CountryFactory, country='United States', code='US')
     funding_status = LazyAttribute(lambda o: "funded" if o.active else "Inactive")
     _using_results_framework = Program.RF_ALWAYS
@@ -177,10 +188,15 @@ class RFProgramFactory(DjangoModelFactory):
         age = False
 
     name = Faker('company')
+    gaitid = RelatedFactory(GaitIDFactory, factory_related_name='program')
     funding_status = LazyAttribute(lambda o: "Funded" if o.active else "Inactive")
     _using_results_framework = LazyAttribute(
         lambda o: Program.RF_ALWAYS if o.migrated is None else Program.MIGRATED if o.migrated else Program.NOT_MIGRATED
     )
+
+    @post_generation
+    def gaitid(self, create, extracted, **kwargs):
+        GaitIDFactory(gaitid='123456', program=self)
 
     @lazy_attribute
     def reporting_period_start(self):
@@ -339,6 +355,13 @@ class SectorFactory(DjangoModelFactory):
         model = Sector
 
     sector = Sequence(lambda n: 'Sector {0}'.format(n))
+
+
+class IDAASectorFactory(DjangoModelFactory):
+    class Meta:
+        model = IDAASector
+
+    sector = Sequence(lambda n: f'Sector {n}')
 
 
 class ProfileType(DjangoModelFactory):

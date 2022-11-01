@@ -318,7 +318,7 @@ def indicator_detail_export_csv(request):
             direction_of_change_map[indicator.direction_of_change] if indicator.direction_of_change else 'None',
             indicator.lop_target_calculated if indicator.lop_target_calculated else indicator.lop_target,
             program.name,
-            program.gaitid if program.gaitid else "no gait_id, program id {}".format(program.id),
+            program.gaitids if program.gaitids else "no gait_id, program id {}".format(program.id),
             '/'.join([c.strip() for c in program.countries.split(',')]),
             '/'.join(set(regions)),
             'Active' if program.funding_status == 'Funded' else 'Inactive',

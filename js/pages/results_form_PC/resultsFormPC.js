@@ -82,7 +82,7 @@ const PCResultsForm = ({indicatorID="", resultID="", readOnly}) => {
         };
 
         if (!commonFieldsInput.periodic_target || Object.keys(commonFieldsInput.periodic_target).length === 0) {
-            detectedErrors = {...detectedErrors, fiscal_year: gettext("You cannot change the fiscal year during the current reporting period. ")};
+            detectedErrors = {...detectedErrors, fiscal_year: gettext("You cannot change the fiscal year during the current reporting period.")};
         } else { delete detectedErrors.periodic_target };
 
         if (!commonFieldsInput.outcome_theme || commonFieldsInput.outcome_theme.length === 0) {

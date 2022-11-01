@@ -2,7 +2,26 @@
 import '@babel/polyfill'
 import '../scss/tola.scss';
 import 'react-virtualized/styles.css'
+import React from 'react';
+import ReactDOM from 'react-dom';
 
+/*
+ * Allows the Django templated Country Page to render the React Program Period modals with 
+ * unique classnames that include the Program IDs.
+ */
+import { ProgramPeriod } from './pages/program_page/components/program_period';
+// Find all the program period modals buttons and render the program period modal compenent
+let programModalList = document.querySelectorAll('[class^="program-period__button"');
+programModalList.forEach(program => {
+    let programID = program.getAttribute('class').split("--")[1];
+    ReactDOM.render(<ProgramPeriod programPk={programID} heading={gettext("Program period")}/>, document.querySelector(`.program-period__button--${programID}`))
+})
+// Find all the program period modals links and render the program period modal compenent
+let programLinkList = document.querySelectorAll('[class^="program-period__link"');
+programLinkList.forEach(program => {
+    let programID = program.getAttribute('class').split("--")[1];
+    ReactDOM.render(<ProgramPeriod programPk={programID} heading={gettext("Set the indicator tracking start and end dates.")} headingClass="text-success"/>, document.querySelector(`.program-period__link--${programID}`))
+})
 
 /*
  * Moved legacy app.js code here - Contains global functions called by template code
@@ -492,6 +511,8 @@ const CONTROL_CHARACTER_KEYCODES = [
     46, //delete
 ]
 
+const NUMPAD_CHARACTER_KEYCODE = 110;
+
 const SPANISH = 'es';
 const FRENCH = 'fr';
 const ENGLISH = 'en';
@@ -521,6 +542,10 @@ function getValidatedNumericInput(selector) {
             (e.ctrlKey === true || e.metaKey === true)
            ) {
             // don't do anything (allow key to be used as normal)
+            return;
+        }
+        // allow the numpad decimal key
+        if(e.keyCode == NUMPAD_CHARACTER_KEYCODE){
             return;
         }
         // if decimal point/comma, and already 2 digits to the right of it, and cursor is to the right of it, prevent:

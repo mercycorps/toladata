@@ -19,9 +19,21 @@ from indicators.models import (
     DisaggregationType,
     DisaggregatedValue,
     LevelTier,
+    IDAAOutcomeTheme
 )
-from workflow.models import Program, Country, Organization, TolaUser, SiteProfile, Sector
+from workflow.models import (
+    Program,
+    Country,
+    Organization,
+    TolaUser,
+    SiteProfile,
+    Sector,
+    GaitID,
+    FundCode,
+    IDAASector,
+)
 from indicators.views.views_indicators import generate_periodic_targets
+from indicators.utils import create_participant_count_indicator
 
 
 class ProgramFactory:
@@ -35,6 +47,19 @@ class ProgramFactory:
         self.default_start_date = (date.today() + relativedelta(months=-18)).replace(day=1)
         self.default_end_date = (self.default_start_date + relativedelta(months=+32)).replace(day=1) - timedelta(days=1)
 
+    def create_gait_id(self, program_id):
+        # Create unique GAIT ID
+        gid_exists = True
+        while gid_exists:
+            gaitid = random.randint(1, 99999)
+            gid_exists = GaitID.objects.filter(gaitid=gaitid).exists()
+        gait_id = GaitID(gaitid=gaitid, program_id=program_id)
+        gait_id.donor = "QATestDonor"
+        gait_id.donor_dept = "QATestDonorDept"
+        gait_id.save()
+        fund_code = 77777
+        FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gait_id)
+
     def create_program(
             self, name, start_date=False, end_date=False, post_satsuma=True, multi_country=False, create_levels=True):
         if not start_date:
@@ -42,20 +67,35 @@ class ProgramFactory:
         if not end_date:
             end_date = self.default_end_date
 
+        external_program_id = random.randint(10000, 99999)
+
         program = Program.objects.create(**{
             'name': name,
+            'external_program_id': external_program_id,
             'start_date': start_date,
             'end_date': end_date,
             'reporting_period_start': start_date,
             'reporting_period_end': end_date,
             'funding_status': 'Funded',
-            'gaitid': 'fake_gait_id_{}'.format(random.randint(1, 9999)),
             '_using_results_framework': Program.RF_ALWAYS if post_satsuma else Program.NOT_MIGRATED,
         })
         program.country.add(self.country)
+
         if multi_country:
             country2 = Country.objects.get(country="United States - MCNW")
             program.country.add(country2)
+
+        self.create_gait_id(program.id)
+
+        idaa_sectors = IDAASector.objects.all()
+        idaa_sector_list = list(idaa_sectors.exclude(sector="(Empty)"))
+        idaa_sector = random.choice(idaa_sector_list)
+        program.idaa_sector.add(idaa_sector)
+
+        idaa_outcome_themes = IDAAOutcomeTheme.objects.all()
+        idaa_outcome_themes_list = list(idaa_outcome_themes.exclude(name="(Empty)"))
+        idaa_outcometheme = random.choice(idaa_outcome_themes_list)
+        program.idaa_outcome_theme.add(idaa_outcometheme)
 
         if create_levels:
             self.create_levels(program, deepcopy(self.sample_levels))
@@ -81,6 +121,14 @@ class ProgramFactory:
             level.program = program
             level.save()
             level_map[level_fix['pk']] = level
+            if not parent and program.reporting_period_end >= date(2021, 7, 1):
+                ProgramFactory.create_pc_indicator(program, level)
+
+    @staticmethod
+    def create_pc_indicator(program, level):
+        disaggregations = DisaggregationType.objects.filter(
+            global_type=DisaggregationType.DISAG_PARTICIPANT_COUNT)
+        create_participant_count_indicator(program, level, disaggregations)
 
 
 class IndicatorFactory:
@@ -578,14 +626,15 @@ class Cleaner:
                 print('\nPrograms not deleted')
 
 
-standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States - MCNW']
+# standard_countries = ['Afghanistan', 'Haiti', 'Jordan', 'Tolaland', 'United States - MCNW']
+all_countries = True
 TEST_ORG, created = Organization.objects.get_or_create(name='Test')
 MC_ORG = Organization.objects.get(name='Mercy Corps')
 user_profiles = {
     'mc-low': {
         'first_last': ['mc-low-first', 'mc-low-last'],
         'email': 'tolatestone@mercycorps.org',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'low',
         'home_country': 'United States - MCNW',
         'org': MC_ORG,
@@ -593,7 +642,7 @@ user_profiles = {
     'mc-medium': {
         'first_last': ['mc-med-first', 'mc-med-last'],
         'email': 'tolatesttwo@mercycorps.org',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'medium',
         'home_country': 'United States - MCNW',
         'org': MC_ORG,
@@ -601,7 +650,7 @@ user_profiles = {
     'mc-high': {
         'first_last': ['mc-high-first', 'mc-high-last'],
         'email': 'tolatestthree@mercycorps.org',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'high',
         'home_country': 'United States - MCNW',
         'org': MC_ORG,
@@ -609,16 +658,16 @@ user_profiles = {
     'mc-basicadmin': {
         'first_last': ['mc-basicadmin-first', 'mc-basicadmin-last'],
         'email': 'mcbasicadmin@example.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'high',
         'home_country': 'United States - MCNW',
         'org': MC_ORG,
-        'admin': 'all'
+        # 'admin': 'all'
     },
     'gmail-low': {
         'first_last': ['gmail-low-first', 'gmail-low-last'],
         'email': 'mctest.low@gmail.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'low',
         'home_country': None,
         'org': TEST_ORG,
@@ -626,7 +675,7 @@ user_profiles = {
     'gmail-medium': {
         'first_last': ['gmail-med-first', 'gmail-med-last'],
         'email': 'mctest.medium@gmail.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'medium',
         'home_country': None,
         'org': TEST_ORG,
@@ -634,7 +683,7 @@ user_profiles = {
     'gmail-high': {
         'first_last': ['gmail-high-first', 'gmail-high-last'],
         'email': 'mctest.high@gmail.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'high',
         'home_country': None,
         'org': TEST_ORG,
@@ -642,7 +691,7 @@ user_profiles = {
     'external-low': {
         'first_last': ['external-low-first', 'external-low-last'],
         'email': 'external-low@example.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'low',
         'home_country': None,
         'org': TEST_ORG,
@@ -650,7 +699,7 @@ user_profiles = {
     'external-medium': {
         'first_last': ['external-med-first', 'external-med-last'],
         'email': 'external-medium@example.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'medium',
         'home_country': None,
         'org': TEST_ORG,
@@ -658,7 +707,7 @@ user_profiles = {
     'external-high': {
         'first_last': ['external-high-first', 'external-high-last'],
         'email': 'external-high@example.com',
-        'accessible_countries': standard_countries,
+        'accessible_countries': all_countries,
         'permission_level': 'high',
         'home_country': None,
         'org': TEST_ORG,
@@ -668,8 +717,8 @@ user_profiles = {
         'email': 'demo1@example.com',
         'accessible_countries': ['Ethiopia'],
         'permission_level': 'low',
-        'home_country': 'Ethiopia',
-        'org': MC_ORG,
+        'home_country': None,
+        'org': TEST_ORG,
     },
     'demo2': {
         'first_last': ['demo', 'two'],
@@ -678,7 +727,7 @@ user_profiles = {
         'permission_level': 'medium',
         'home_country': None,
         'org': TEST_ORG,
-        'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'medium')]
+        'program_access': [('Ethiopia', 'DREAMS', 'medium')]
     },
     'demo3': {
         'first_last': ['demo', 'three'],
@@ -687,7 +736,7 @@ user_profiles = {
         'permission_level': 'high',
         'home_country': None,
         'org': TEST_ORG,
-        'program_access': [('Ethiopia', 'Collaboration in Cross-Border Areas', 'high')]
+        'program_access': [('Ethiopia', 'DREAMS', 'high')]
     },
 
 }

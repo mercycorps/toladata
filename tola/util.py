@@ -121,26 +121,6 @@ def formatFloat(value):
     return ("%.2f" % value).rstrip('0').rstrip('.')
 
 
-# Get GAIT data from mcapi
-def get_GAIT_data(gait_ids):
-    """
-    May throw requests.exceptions.RequestException
-    """
-    cleaned_ids = []
-    for gait_id in gait_ids:
-        try:
-            cleaned_ids.append(str(int(gait_id)))
-        except ValueError:
-            pass
-
-    base_url = settings.PROGRAM_API_BASE_URL
-    params = {'gaitid': ','.join(cleaned_ids)}
-    headers = {'Authorization': 'Token {}'.format(settings.PROGRAM_API_TOKEN)}
-    response = requests.get(base_url, params=params, headers=headers)
-
-    return json.loads(response.content)['results']
-
-
 def get_dates_from_gait_response(gait_response):
     """take a gait response (from get_GAIT_data) and parse out start and end dates, return dict"""
     try:
@@ -155,38 +135,6 @@ def get_dates_from_gait_response(gait_response):
         'start_date': start_date,
         'end_date': end_date
     }
-
-
-def append_GAIT_dates(program):
-    if not program.gaitid:
-        return _('Program does not have a GAIT id')
-
-    try:
-        gait_data = get_GAIT_data([program.gaitid])
-    except requests.exceptions.RequestException:
-        logger.exception('Error reaching GAIT service. ')
-        # Translators: There was a network or server error trying to reach the GAIT service
-        return _('There was a problem connecting to the GAIT server.')
-
-    if len(gait_data) != 1:
-        # Translators: A request for {gait_id} to the GAIT server returned no results
-        return _('The GAIT ID {gait_id} could not be found.').format(
-            gait_id=program.gaitid)
-
-    dates = get_dates_from_gait_response(gait_data[0])
-    if not program.start_date:
-        program.start_date = dates['start_date']
-
-    if not program.end_date:
-        program.end_date = dates['end_date']
-    reporting_dates = get_reporting_dates(program)
-    if not program.reporting_period_start:
-        program.reporting_period_start = reporting_dates['reporting_period_start']
-
-    if not program.reporting_period_end:
-        program.reporting_period_end = reporting_dates['reporting_period_end']
-
-    return None
 
 
 def get_reporting_dates(program):

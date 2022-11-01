@@ -18,7 +18,12 @@ class TestProgramFundingStatusUpdate(test.TestCase):
         IndicatorTypeFactory(indicator_type=IndicatorType.PC_INDICATOR_TYPE)
         ReportingFrequencyFactory(frequency=ReportingFrequency.PC_REPORTING_FREQUENCY)
         # Creating a program than spans three fiscal years
-        self.program = ProgramFactory(funding_status="Completed", reporting_period_start=date(2022, 1, 1), reporting_period_end=date(2024, 1, 1))
+        start_year = date.today().year if date.today().month < 7 else date.today().year + 1
+        end_year = start_year + 2
+        start_date = date(start_year, 1, 1)
+        end_date = date(end_year, 1, 1)
+        self.period_names = ['FY' + str(start_year), 'FY' + str(start_year + 1), 'FY' + str(end_year)]
+        self.program = ProgramFactory(funding_status="Completed", reporting_period_start=start_date, reporting_period_end=end_date)
 
     def has_rf(self):
         """
@@ -39,10 +44,12 @@ class TestProgramFundingStatusUpdate(test.TestCase):
         pc_indicator = self.program.indicator_set.filter(admin_type=Indicator.ADMIN_PARTICIPANT_COUNT).first()
         pts = pc_indicator.periodictargets.all()
         pts_count = pts.count()
-        periods = [pts_count]
+        values = [pts_count]
+        periods = []
         for pt in pts:
             periods.append(pt.period)
-        return periods
+        values.append(periods)
+        return values
 
     def create_disaggs(self):
         """
@@ -79,4 +86,4 @@ class TestProgramFundingStatusUpdate(test.TestCase):
 
         self.assertTrue(self.has_rf())
         self.assertTrue(self.has_pc())
-        self.assertTrue(self.has_periodic_targets() == [3, 'FY2022', 'FY2023', 'FY2024'])
+        self.assertTrue(self.has_periodic_targets() == [3, self.period_names])

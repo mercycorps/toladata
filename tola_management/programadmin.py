@@ -2,7 +2,6 @@
 from collections import OrderedDict
 import pytz
 from django.db import transaction
-#from django.db.models import Q, Count, Subquery, OuterRef
 from django.db import models
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
@@ -18,13 +17,18 @@ from rest_framework.serializers import (
     IntegerField,
     ValidationError,
     BooleanField,
+    DateField,
     DateTimeField,
-    SerializerMethodField
+    SerializerMethodField,
+    JSONField
 )
 
 from openpyxl import Workbook, utils
 from openpyxl.cell import Cell
 from openpyxl.styles import Alignment, Font, PatternFill
+
+from dateutil.relativedelta import relativedelta
+from datetime import date
 
 from workflow.models import (
     Program,
@@ -34,11 +38,15 @@ from workflow.models import (
     Sector,
     ProgramAccess,
     CountryAccess,
+    GaitID,
+    FundCode,
+    IDAASector
 )
 
 from indicators.models import (
     Indicator,
     Level,
+    IDAAOutcomeTheme
 )
 
 from tola_management.models import (
@@ -47,10 +55,6 @@ from tola_management.models import (
 )
 
 from tola_management.permissions import HasProgramAdminAccess
-
-from tola.util import append_GAIT_dates
-
-
 
 
 def get_audit_log_workbook(ws, program):
@@ -218,12 +222,12 @@ class Paginator(pagination.PageNumberPagination):
         return response
 
 
-class NestedSectorSerializer(Serializer):
+class NestedIDAASectorSerializer(Serializer):
     def to_representation(self, sector):
         return sector.id
 
     def to_internal_value(self, data):
-        sector = Sector.objects.get(pk=data)
+        sector = IDAASector.objects.get(pk=data)
         return sector
 
 
@@ -237,45 +241,125 @@ class NestedCountrySerializer(Serializer):
         return country
 
 
+class NestedFundCodeSerializer(ModelSerializer):
+    fund_code = IntegerField(max_value=99999)
+
+    class Meta:
+        model = FundCode
+        fields = ('fund_code',)
+
+    def to_representation(self, instance):
+        return instance.fund_code
+
+    def to_internal_value(self, data):
+        return data
+
+
+class NestedGaitIDSerializer(ModelSerializer):
+    gaitid = IntegerField(max_value=99999)
+    donor = CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
+    donor_dept = CharField(required=False, allow_blank=True, allow_null=True)
+    fund_code = NestedFundCodeSerializer(many=True, required=False)
+
+    class Meta:
+        model = GaitID
+        fields = ('gaitid', 'donor', 'donor_dept', 'fund_code')
+
+    def to_representation(self, instance):
+        return {
+            'gaitid': instance.gaitid,
+            'donor': instance.donor,
+            'donor_dept': instance.donor_dept,
+            'fund_code': [fc.fund_code for fc in instance.fundcode_set.all()]
+        }
+
+
+class NestedIDAAOutcomeThemeSerializer(Serializer):
+
+    def to_representation(self, outcome_theme):
+        return outcome_theme.id
+
+    def to_internal_value(self, data):
+        if type(data) is list:
+            pk = data[0]
+        else:
+            pk = data
+        idaa_outcome_theme = IDAAOutcomeTheme.objects.get(pk=pk)
+        return idaa_outcome_theme
+
+
 class ProgramAdminSerializer(ModelSerializer):
-    id = IntegerField(allow_null=True, required=False)
-    name = CharField(required=True, max_length=255)
-    funding_status = CharField(required=True)
-    gaitid = CharField(required=False, allow_blank=True, allow_null=True)
-    fundCode = CharField(required=False, allow_blank=True, allow_null=True, source='cost_center')
-    description = CharField(allow_null=True, allow_blank=True)
-    sector = NestedSectorSerializer(required=True, many=True)
+    id = IntegerField(read_only=True)
+    external_program_id = IntegerField(required=False, allow_null=True, max_value=99999)
+    gaitid = NestedGaitIDSerializer(required=False, many=True)
+    idaa_sector = NestedIDAASectorSerializer(required=False, many=True)
     country = NestedCountrySerializer(required=True, many=True)
     auto_number_indicators = BooleanField(required=False)
-    #organizations = IntegerField(source='organization_count', read_only=True)
-    #program_users = IntegerField(source='program_users_count', read_only=True)
-    #onlyOrganizationId = IntegerField(source='only_organization_id', read_only=True)
     organizations = SerializerMethodField()
     program_users = SerializerMethodField()
     onlyOrganizationId = SerializerMethodField()
     _using_results_framework = IntegerField(required=False, allow_null=True)
+    start_date = DateField(required=False, allow_null=True)
+    end_date = DateField(required=False, allow_null=True)
+    idaa_outcome_theme = NestedIDAAOutcomeThemeSerializer(many=True, required=False)
 
     def validate_country(self, values):
         if not values:
-            raise ValidationError("This field may not be blank.")
+            raise ValidationError(_("This field may not be blank."))
+        return values
+
+    def validate_dates(self, start_date, end_date):
+        if start_date and end_date:
+            if start_date > end_date:
+                raise ValidationError(_("The program start date may not be after the program end date."))
+            if end_date < start_date:
+                raise ValidationError(_("The program end date may not be before the program start date."))
+
+    def validate(self, data):
+        if data.get('start_date') and data.get('end_date'):
+            self.validate_dates(data['start_date'], data['end_date'])
+        return super().validate(data)
+
+    # def validate_start_date(self, value):
+    #     past_limit = date.today() - relativedelta(years=10)
+    #     if value and value < past_limit:
+    #         raise ValidationError(_("The program start date may not be more than 10 years in the past."))
+    #     return value
+    #
+    # def validate_end_date(self, value):
+    #     future_limit = date.today() + relativedelta(years=10)
+    #     if value and value > future_limit:
+    #         raise ValidationError(_("The program end date may not be more than 10 years in the future."))
+
+    def validate_gaitid(self, values):
+        checked_gaitids = []
+        for gid in values:
+            if gid['gaitid'] in checked_gaitids:
+                # error
+                raise ValidationError(_("Duplicate GAIT ID numbers are not allowed."))
+            else:
+                checked_gaitids.append(gid['gaitid'])
+
         return values
 
     class Meta:
         model = Program
         fields = (
             'id',
+            'external_program_id',
             'name',
             'funding_status',
             'gaitid',
-            'fundCode',
-            'description',
-            'sector',
+            'idaa_sector',
             'country',
             'organizations',
             'program_users',
             'onlyOrganizationId',
             'auto_number_indicators',
-            '_using_results_framework'
+            '_using_results_framework',
+            'start_date',
+            'end_date',
+            'idaa_outcome_theme'
         )
 
     @staticmethod
@@ -321,18 +405,35 @@ class ProgramAdminSerializer(ModelSerializer):
                 validated_data['_using_results_framework'] is None:
             validated_data.pop('_using_results_framework')
         country = validated_data.pop('country')
-        sector = validated_data.pop('sector')
-        if not validated_data['gaitid']:
-            validated_data.pop('gaitid')
+        sector = validated_data.pop('idaa_sector', [])
+        gaitid_data = validated_data.pop('gaitid', [])
+        idaa_outcome_theme = validated_data.pop('idaa_outcome_theme', [])
         program = super(ProgramAdminSerializer, self).create(validated_data)
         program.country.add(*country)
-        program.sector.add(*sector)
+        program.idaa_sector.add(*sector)
+        program.idaa_outcome_theme.add(*idaa_outcome_theme)
         program.save()
+
+        for gid in gaitid_data:
+            gaitid = GaitID.objects.create(gaitid=gid['gaitid'], program_id=program.id)
+            if gid.get('donor'):
+                gaitid.donor = gid['donor']
+            if gid.get('donor_dept'):
+                gaitid.donor_dept = gid['donor_dept']
+            gaitid.save()
+
+            if gid.get('fund_code'):
+                for fund_code in gid['fund_code']:
+                    if fund_code:
+                        new_fund_code = FundCode(fund_code=fund_code, gaitid=gaitid)
+                        new_fund_code.save()
+
         ProgramAdminAuditLog.created(
             program=program,
             created_by=self.context.get('request').user.tola_user,
             entry=program.admin_logged_fields,
         )
+
         return program
 
     @transaction.atomic
@@ -353,15 +454,46 @@ class ProgramAdminSerializer(ModelSerializer):
         added_countries = [x for x in incoming_countries if x not in original_countries]
         removed_countries = [x for x in original_countries if x not in incoming_countries]
 
-        original_sectors = instance.sector.all()
-        incoming_sectors = validated_data.pop('sector')
+        original_sectors = instance.idaa_sector.all()
+        incoming_sectors = validated_data.pop('idaa_sector', [])
         added_sectors = [x for x in incoming_sectors if x not in original_sectors]
         removed_sectors = [x for x in original_sectors if x not in incoming_sectors]
 
+        original_outcome_theme = instance.idaa_outcome_theme.all()
+        incoming_outcome_theme = validated_data.pop('idaa_outcome_theme', [])
+        added_outcome_theme = [x for x in incoming_outcome_theme if x not in original_outcome_theme]
+        removed_outcome_theme = [x for x in original_outcome_theme if x not in incoming_outcome_theme]
+
+        gaitid_data = validated_data.pop('gaitid', [])
+
+        for gid in gaitid_data:
+            gaitid_obj, created = GaitID.objects.get_or_create(gaitid=gid['gaitid'], program_id=instance.id)
+            if gid.get('donor'):
+                gaitid_obj.donor = gid['donor']
+            if gid.get('donor_dept'):
+                gaitid_obj.donor_dept = gid['donor_dept']
+            gaitid_obj.save()
+
+            if gid.get('fund_code'):
+                for fund_code in gid['fund_code']:
+                    _ = FundCode.objects.get_or_create(fund_code=fund_code, gaitid=gaitid_obj)
+
+            if not created:
+                for previous_fund_code in gaitid_obj.fundcode_set.all():
+                    if previous_fund_code.fund_code not in gid['fund_code']:
+                        previous_fund_code.delete()
+
+        for previous_gaitid in instance.gaitid.all():
+            if previous_gaitid.gaitid not in [gid['gaitid'] for gid in gaitid_data]:
+                previous_gaitid.delete()
+
+
         instance.country.remove(*removed_countries)
         instance.country.add(*added_countries)
-        instance.sector.remove(*removed_sectors)
-        instance.sector.add(*added_sectors)
+        instance.idaa_sector.remove(*removed_sectors)
+        instance.idaa_sector.add(*added_sectors)
+        instance.idaa_outcome_theme.remove(*removed_outcome_theme)
+        instance.idaa_outcome_theme.add(*added_outcome_theme)
 
         ProgramAccess.objects.filter(program=instance, country__in=removed_countries).delete()
 
@@ -475,6 +607,14 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                 queryset=Sector.objects.select_related(None).order_by().only('id')
             ),
             models.Prefetch(
+                'idaa_outcome_theme',
+                queryset=IDAAOutcomeTheme.objects.select_related(None).order_by().only('id', 'name')
+            ),
+            models.Prefetch(
+                'idaa_sector',
+                queryset=IDAASector.objects.select_related(None).order_by().only('id')
+            ),
+            models.Prefetch(
                 'country',
                 queryset=Country.objects.select_related(None).order_by().only('id')
             ),
@@ -497,6 +637,15 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                     ),
                 ),
                 to_attr='country_with_users'
+            ),
+            models.Prefetch(
+                'gaitid',
+                queryset=GaitID.objects.select_related(None).order_by().prefetch_related(
+                    models.Prefetch(
+                        'fundcode_set',
+                        queryset=FundCode.objects.order_by().only('fund_code')
+                    )
+                )
             )
         )
         return queryset
@@ -524,9 +673,9 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
         if countryFilter:
             queryset = queryset.filter(country__in=countryFilter)
 
-        sectorFilter = params.getlist('sectors[]')
+        sectorFilter = params.getlist('idaa_sectors[]')
         if sectorFilter:
-            queryset = queryset.filter(sector__in=sectorFilter)
+            queryset = queryset.filter(idaa_sector__in=sectorFilter)
 
         usersFilter = params.getlist('users[]')
         if usersFilter:
@@ -642,16 +791,3 @@ class ProgramAdminViewSet(viewsets.ModelViewSet):
                                          '&q=&kw=&GrantNumber=&CostCenter=&GrantID={0}&GrantMin=&SSD=&USD=&'
                                          'SED=&UED=&Emergency=').format(gaitid)
         return JsonResponse(response)
-
-    @action(detail=True, methods=['put'], url_path='sync_gait_dates')
-    def sync_gait_dates(self, request, pk):
-        program = Program.objects.get(pk=pk)
-
-        # TODO: do something better than strings here...
-        gait_error = append_GAIT_dates(program)
-
-        program.save()
-
-        return JsonResponse({
-            'gait_error': gait_error,
-        })

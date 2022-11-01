@@ -53,9 +53,9 @@ const SectorFilter = observer(({store, filterOptions}) => {
     return <div className="form-group react-multiselect-checkbox">
         <label htmlFor="sector-filter">{gettext("Sectors")}</label>
         <CheckboxedMultiSelect
-            value={store.filters.sectors}
+            value={store.filters.idaa_sectors}
             options={filterOptions}
-            onChange={(e) => store.changeFilter('sectors', e)}
+            onChange={(e) => store.changeFilter('idaa_sectors', e)}
             placeholder={gettext("None Selected")}
             id="sector-filter" />
     </div>
@@ -151,7 +151,9 @@ export const IndexView = observer(
         const allCountryOptions = sortObjectListByValue(Object.entries(store.allCountries).map(([id, country]) => ({value: country.id, label: country.name})))
         const countryFilterOptions = sortObjectListByValue(Object.entries(store.countries).map(([id, country]) => ({value: country.id, label: country.name})))
         const organizationFilterOptions = sortObjectListByValue(Object.entries(store.organizations).map(([id, org]) => ({value: org.id, label: org.name})))
-        const sectorFilterOptions = sortObjectListByValue(store.sectors.map(x => ({value: x.id, label: x.name})))
+        const idaaSectorFilterOptions = sortObjectListByValue(store.idaa_sectors.map(x => ({value: x.id, label: x.name})));
+        const idaaOutcomeThemesOptions = sortObjectListByValue(store.idaa_outcome_themes.map(x => ({value: x.id, label: x.name})));
+        const fundingStatusOptions = [{value: 0, label: gettext("Funded")}, {value: 1, label: gettext("Completed")}];
         const programFilterOptions = sortObjectListByValue(Object.entries(store.programFilterPrograms).map(([id, program]) => ({value: program.id, label: program.name})))
         const userFilterOptions = sortObjectListByValue(Object.entries(store.users).map(([id, user]) => ({value: user.id, label: user.name})))
         const bulkProgramStatusOptions = [
@@ -193,7 +195,7 @@ export const IndexView = observer(
                     <CountryFilter store={store} filterOptions={countryFilterOptions} />
                     <UserFilter store={store} filterOptions={userFilterOptions} />
                     <OrganizationFilter store={store} filterOptions={organizationFilterOptions} />
-                    <SectorFilter store={store} filterOptions={sectorFilterOptions} />
+                    <SectorFilter store={store} filterOptions={idaaSectorFilterOptions} />
                     <ProgramStatusFilter store={store} />
                 </div>
                 <div className="filter-section filter-buttons">
@@ -207,11 +209,16 @@ export const IndexView = observer(
                 </header>
                 <div className="admin-list__controls">
                     <BulkActions primaryOptions={bulk_actions.primary_options} secondaryOptions={bulk_actions.secondary_options}/>
-                    <div className="controls__buttons">
-                        <a href="#" className="btn btn-link btn-add" tabIndex="0" onClick={() => store.createProgram()}>
-                            <i className="fas fa-plus-circle"/>{gettext("Add Program")}
-                        </a>
-                    </div>
+                    {["demo", "dev", "local"].reduce((editable, env) => { 
+                        if(!editable) editable = window.location.href.includes(env)
+                        return editable;
+                    }, false) &&
+                        <div className="controls__buttons">
+                            <a href="#" className="btn btn-link btn-add" tabIndex="0" onClick={() => store.createProgram()}>
+                                <i className="fas fa-plus-circle"/>{gettext("Add Program")}
+                            </a>
+                        </div>
+                    }
                 </div>
                 <div className="admin-list__top-filter">
                     <ProgramFilter store={store} filterOptions={programFilterOptions} />
@@ -250,8 +257,11 @@ export const IndexView = observer(
                                                             program_data={data}
                                                             onUpdate={(id, data) => store.updateProgram(id, data)}
                                                             onCreate={(new_program_data) => store.saveNewProgram(new_program_data)}
-                                                            sectorOptions={sectorFilterOptions}
+                                                            idaaSectorOptions={idaaSectorFilterOptions}
+                                                            idaaOutcomeThemesOptions={idaaOutcomeThemesOptions}
                                                             countryOptions={allCountryOptions}
+                                                            fundingStatusOptions={fundingStatusOptions}
+                                                            isLoading={store.saving}
                                                             errors={store.editing_errors} />
                                                 </LoadingSpinner>
                                             )}

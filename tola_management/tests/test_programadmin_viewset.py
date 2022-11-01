@@ -11,6 +11,7 @@ from factories.workflow_models import (
     OrganizationFactory,
     CountryFactory,
     SectorFactory,
+    IDAASectorFactory,
     TolaUserFactory,
     grant_program_access,
     grant_country_access,
@@ -40,19 +41,18 @@ class TestProgramBaseFields(test.TestCase):
         data = ProgramAdminSerializer(queryset, many=True).data[0]
         self.assertEqual(data['name'], SPECIAL_CHARS)
         self.assertEqual(data['funding_status'], 'funded')
-        self.assertEqual(data['gaitid'], '123456')
-        self.assertEqual(data['description'], 'A description')
+        self.assertEqual(data['gaitid'][0]['gaitid'], 123456)
         self.assertEqual(data['id'], program.pk)
 
     def test_program_sector_info(self):
-        sector1 = SectorFactory()
-        sector2 = SectorFactory()
-        _ = SectorFactory()
+        sector1 = IDAASectorFactory()
+        sector2 = IDAASectorFactory()
+        _ = IDAASectorFactory()
         program = RFProgramFactory()
-        program.sector.set([sector1, sector2])
+        program.idaa_sector.set([sector1, sector2])
         queryset = ProgramAdminViewSet.base_queryset().all()
         data = ProgramAdminSerializer(queryset, many=True).data[0]
-        self.assertEqual(set(data['sector']), set([sector1.pk, sector2.pk]))
+        self.assertEqual(set(data['idaa_sector']), set([sector1.pk, sector2.pk]))
 
     def test_program_country_info(self):
         program = RFProgramFactory()
@@ -124,9 +124,9 @@ class TestProgramFieldsStressTest(test.TestCase):
     def setUpTestData(cls):
         CountryFactory.reset_sequence()
         cls.outcountry = CountryFactory(code="XX", country="No programs country")
-        cls.in_sector1 = SectorFactory()
-        cls.in_sector2 = SectorFactory()
-        cls.out_sector = SectorFactory()
+        cls.in_sector1 = IDAASectorFactory()
+        cls.in_sector2 = IDAASectorFactory()
+        cls.out_sector = IDAASectorFactory()
         cls.no_mc_country = CountryFactory(code="NM", country="No MC Users")
         cls.countries = [CountryFactory(code=f'T{x}', country=f'Country {x}') for x in range(20)]
         cls.superusers = [TolaUserFactory(mc_staff=True, superadmin=True) for x in range(8)]
@@ -155,15 +155,15 @@ class TestProgramFieldsStressTest(test.TestCase):
             cls.country_users[country.pk] = [user1, user2]
             bonus_program = RFProgramFactory()
             bonus_program.country.set([country])
-            bonus_program.sector.set([cls.out_sector])
+            bonus_program.idaa_sector.set([cls.out_sector])
         cls.partner_org1 = OrganizationFactory()
         cls.partner_org2 = OrganizationFactory()
         cls.only_mc_program = RFProgramFactory()
         cls.only_mc_program.country.set([cls.countries[0]])
-        cls.only_mc_program.sector.set([cls.in_sector1])
+        cls.only_mc_program.idaa_sector.set([cls.in_sector1])
         cls.only_partner_program = RFProgramFactory()
         cls.only_partner_program.country.set([cls.no_mc_country])
-        cls.only_partner_program.sector.set([cls.in_sector1, cls.in_sector2])
+        cls.only_partner_program.idaa_sector.set([cls.in_sector1, cls.in_sector2])
         cls.with_superuser_program = RFProgramFactory()
         cls.with_superuser_program.country.set([cls.countries[4]])
         cls.superuser_country_admin.country = cls.countries[4]
@@ -179,7 +179,7 @@ class TestProgramFieldsStressTest(test.TestCase):
             grant_program_access(user, cls.only_partner_program, cls.no_mc_country, PROGRAM_ROLE_CHOICES[0][0])
         cls.two_org_program = RFProgramFactory()
         cls.two_org_program.country.set([cls.countries[1]])
-        cls.two_org_program.sector.set([cls.in_sector2])
+        cls.two_org_program.idaa_sector.set([cls.in_sector2])
         for x in range(5):
             admin1 = TolaUserFactory(mc_staff=False, superadmin=False, organization=cls.partner_org1)
             grant_program_access(admin1, cls.two_org_program, cls.countries[1], PROGRAM_ROLE_CHOICES[1][0])
@@ -189,7 +189,7 @@ class TestProgramFieldsStressTest(test.TestCase):
             grant_program_access(user, cls.two_org_program, cls.countries[1], PROGRAM_ROLE_CHOICES[0][0])
         cls.two_country_program = RFProgramFactory()
         cls.two_country_program.country.set([cls.countries[2], cls.countries[3]])
-        cls.two_country_program.sector.set([cls.in_sector1])
+        cls.two_country_program.idaa_sector.set([cls.in_sector1])
         for x in range(5):
             admin1 = TolaUserFactory(mc_staff=False, superadmin=False, organization=cls.partner_org1)
             grant_program_access(admin1, cls.two_country_program, cls.countries[2], PROGRAM_ROLE_CHOICES[1][0])
@@ -207,7 +207,7 @@ class TestProgramFieldsStressTest(test.TestCase):
 
     def get_data(self, program_qs):
         # 3 queries: program with annotations, prefetched sectors, prefetched countries
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(9):
             return ProgramAdminSerializer(program_qs, many=True).data[0]
 
     def get_users_filtered_data(self, program_pk):
@@ -276,7 +276,7 @@ class TestProgramFieldsStressTest(test.TestCase):
         self.assertEqual(users_data['count'], 14)
 
     def test_query_count_on_multiple(self):
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(11):
             program_qs = ProgramAdminViewSet.base_queryset().all()
             data = ProgramAdminSerializer(program_qs, many=True).data
             self.assertEqual(len(data), 25)
@@ -285,7 +285,7 @@ class TestProgramFieldsStressTest(test.TestCase):
         client = test.Client()
         client.force_login(user=self.superusers[0].user)
         response = client.get(
-            f'/api/tola_management/program/?page=1&sectors[]={self.in_sector1.pk}&sectors[]={self.in_sector2.pk}')
+            f'/api/tola_management/program/?page=1&idaa_sectors[]={self.in_sector1.pk}&idaa_sectors[]={self.in_sector2.pk}')
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
         self.assertEqual(response_json['count'], 4)
@@ -304,7 +304,7 @@ class TestProgramFieldsStressTest(test.TestCase):
             self.assertEqual(results[pk]['organizations'], organizations)
             self.assertEqual(results[pk]['program_users'], program_users)
             self.assertEqual(results[pk]['onlyOrganizationId'], onlyOrganizationId)
-            self.assertEqual(results[pk]['sector'], sectors)
+            self.assertEqual(results[pk]['idaa_sector'], sectors)
             self.assertEqual(results[pk]['country'], countries)
 
 class TestProgramAdminFilters(test.TestCase):

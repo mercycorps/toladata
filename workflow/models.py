@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.contrib import admin
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth.models import User
 from decimal import Decimal
 import uuid
 
 from django.utils.translation import ugettext_lazy as _
-
+from workflow import validators
 from django.conf import settings
 from django.db.models import Count, Max, Min, Subquery, OuterRef, Q
 from django.db.models.signals import post_save
@@ -37,6 +36,7 @@ class Sector(models.Model):
 
     class Meta:
         verbose_name = _("Sector")
+        verbose_name_plural = _("Sectors")
         ordering = ('sector',)
 
     # on save add create date or update edit date
@@ -47,6 +47,20 @@ class Sector(models.Model):
         super(Sector, self).save()
 
     # displayed in admin templates
+    def __str__(self):
+        return self.sector
+
+
+class IDAASector(models.Model):
+    sector = models.CharField(_("Sector Name"), unique=True, max_length=255)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("IDAA Sector")
+        verbose_name_plural = _("IDAA Sectors")
+        ordering = ('sector',)
+
     def __str__(self):
         return self.sector
 
@@ -69,6 +83,7 @@ class Organization(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = _("Organization")
         verbose_name_plural = _("Organizations")
         app_label = 'workflow'
 
@@ -102,14 +117,13 @@ class Organization(models.Model):
         return cls.objects.get(pk=cls.MERCY_CORPS_ID)
 
 
-class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'create_date', 'edit_date')
-    display = 'Organization'
-
-
 class Region(models.Model):
     name = models.CharField(_("Region Name"), max_length=255)
     gait_region_id = models.PositiveIntegerField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = _("Region")
+        verbose_name_plural = _("Regions")
 
     def __str__(self):
         return self.name
@@ -130,6 +144,7 @@ class Country(models.Model):
 
     class Meta:
         ordering = ('country',)
+        verbose_name = _("Country")
         verbose_name_plural = _("Countries")
         app_label = 'workflow'
 
@@ -143,6 +158,13 @@ class Country(models.Model):
     # displayed in admin templates
     def __str__(self):
         return self.country
+
+    @property
+    def admin_logged_fields(self):
+        return {
+            "country_name": self.country,
+            "country_code": self.code
+        }
 
     @property
     def name(self):
@@ -187,6 +209,7 @@ class TolaUser(models.Model):
 
     class Meta:
         verbose_name = _("Tola User")
+        verbose_name_plural = _("Tola Users")
         ordering = ('name',)
 
     def __str__(self):
@@ -422,24 +445,6 @@ class TolaUserProxy(TolaUser):
         proxy = True
 
 
-class CountryAccessInline(admin.TabularInline):
-    model = CountryAccess
-    ordering = ('country',)
-
-class TolaUserAdmin(admin.ModelAdmin):
-
-    list_display = ('name', 'country')
-    display = 'Tola User'
-    list_filter = ('country', 'user__is_staff',)
-    search_fields = ('name', 'country__country', 'title')
-    inlines = (CountryAccessInline, )
-
-
-class SectorAdmin(admin.ModelAdmin):
-    list_display = ('sector', 'create_date', 'edit_date')
-    display = 'Sector'
-
-
 class ActiveProgramsMixin:
     """eliminates all non active programs"""
     qs_name = 'ActivePrograms'
@@ -516,13 +521,23 @@ class Program(models.Model):
     MIGRATED = 2 # programs created before satsuma which have switched to new RF levels
     RF_ALWAYS = 3 # programs created after satsuma release - on new RF levels with no option
 
-    gaitid = models.CharField(_("ID"), max_length=255, null=True, blank=True)
+    legacy_gaitid = models.CharField(_("Legacy GAIT ID"), max_length=255, null=True, blank=True)
     external_program_id = models.IntegerField(_('External program id'), null=True, blank=False)
-    name = models.CharField(_("Program Name"), max_length=255, blank=True)
-    funding_status = models.CharField(_("Funding Status"), max_length=255, blank=True)
-    cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)
+    name = models.CharField(_("Program Name"), max_length=255, blank=False)
+    funding_status = models.CharField(_("Funding Status"), max_length=255, blank=False)
+    cost_center = models.CharField(_("Fund Code"), max_length=255, blank=True, null=True)  # Deprecated use program.gaitid.fund_code
     description = models.TextField(_("Program Description"), max_length=765, null=True, blank=True)
     sector = models.ManyToManyField(Sector, blank=True, verbose_name=_("Sector"))
+    idaa_sector = models.ManyToManyField(
+            IDAASector,
+            blank=True,
+            verbose_name=_('IDAA Sector'))
+    # NOTE: Participant Count "sectors" do not refer to either of these sector fields, but are actually disaggregation categories (DisaggregationLabel)
+    idaa_outcome_theme = models.ManyToManyField(
+            'indicators.IDAAOutcomeTheme',
+            blank=True,
+            verbose_name=_('IDAA Outcome Theme')
+            )
     create_date = models.DateTimeField(null=True, blank=True)
     edit_date = models.DateTimeField(null=True, blank=True)
     budget_check = models.BooleanField(_("Enable Approval Authority"), default=False)
@@ -535,8 +550,8 @@ class Program(models.Model):
         through_fields=('program', 'tolauser')
     )
     public_dashboard = models.BooleanField(_("Enable Public Dashboard"), default=False)
-    start_date = models.DateField(_("Program Start Date"), null=True, blank=True)
-    end_date = models.DateField(_("Program End Date"), null=True, blank=True)
+    start_date = models.DateField(_("Program Start Date"), null=True, blank=False)
+    end_date = models.DateField(_("Program End Date"), null=True, blank=False)
     reporting_period_start = models.DateField(_("Reporting Period Start Date"), null=True, blank=True)
     reporting_period_end = models.DateField(_("Reporting Period End Date"), null=True, blank=True)
     auto_number_indicators = models.BooleanField(
@@ -560,6 +575,7 @@ class Program(models.Model):
 
     class Meta:
         verbose_name = _("Program")
+        verbose_name_plural = _("Programs")
         ordering = ('name',)
 
     # on save add create date or update edit date
@@ -613,28 +629,36 @@ class Program(models.Model):
         """
         return reverse('program_page', kwargs={'program': self.pk})
 
-    @property
-    def gait_url(self):
-        """if program has a gait ID, returns url https://gait.mercycorps.org/editgrant.vm?GrantID=####
-        otherwise returns false
-        """
-        if self.gaitid is None:
-            return None
-
-        try:
-            gaitid = int(self.gaitid)
-        except ValueError:
-            gaitid = False
-        if gaitid and gaitid != 0 and len(str(gaitid)) > 2 and len(str(gaitid)) < 5:
-            # gaitid exists, is numeric, is nonzero, and is a 3 or 4 digit number:
-            return 'https://gait.mercycorps.org/editgrant.vm?GrantID={gaitid}'.format(
-                gaitid=gaitid)
-        return None
-
     def get_sites(self):
         indicator_ids = Indicator.objects.filter(program__in=[self.id]).values_list('id')
         results = Result.objects.filter(indicator__id__in=indicator_ids)
         return SiteProfile.objects.filter(result__id__in=results).distinct()
+
+    @property
+    def gaitids(self):
+        """
+        Property to help with backwards compatibility with new GaitID table
+        """
+        return list(self.gaitid.values_list('gaitid', flat=True))
+
+    @property
+    def donors(self):
+        """
+        Returns a list of donors for the programs gaitid
+        If the gaitid has a donor_dept append the donor_dept to the donor
+        """
+        donors = []
+        for gaitid in self.gaitid.all():
+            if gaitid.donor:
+                if gaitid.donor_dept:
+                    donors.append(f'{gaitid.donor} - {gaitid.donor_dept}')
+                else:
+                    donors.append(gaitid.donor)
+        return donors
+
+    @property
+    def fund_codes(self):
+        return [fundcode.fund_code for gaitid in self.gaitid.all() for fundcode in gaitid.fundcode_set.all() if fundcode.fund_code]
 
     @property
     def collected_record_count(self):
@@ -686,6 +710,11 @@ class Program(models.Model):
             ).exists()
 
     @property
+    def has_indicators(self):
+        """returns true if this program has any indicators - used in program reporting period date validation"""
+        return self.indicator_set.all().exists()
+
+    @property
     def last_time_aware_indicator_start_date(self):
         """returns None if no time aware indicators, otherwise returns the most recent start date of all targets for
         indicators with a time-aware frequency - used in program reporting period date validation"""
@@ -707,13 +736,29 @@ class Program(models.Model):
     @property
     def admin_logged_fields(self):
         return {
-            'gaitid': self.gaitid,
+            'gaitid': self.gaitids,
             'name': self.name,
             'funding_status': self.funding_status,
             'cost_center': self.cost_center,
             'description': self.description,
-            'sectors': ','.join([s.sector for s in self.sector.all()]),
-            'countries': ','.join([c.country for c in self.country.all()])
+            'sectors': ','.join(sorted([s.sector for s in self.sector.all()])),
+            'countries': ','.join(sorted([c.country for c in self.country.all()]))
+        }
+
+    @property
+    def idaa_logged_fields(self):
+        return {
+            "gaitid": self.gaitids,
+            "donors": self.donors,
+            "name": self.name,
+            "funding_status": self.funding_status,
+            "fund_codes": self.fund_codes,
+            "external_program_id": self.external_program_id,
+            "start_date": str(self.start_date),
+            "end_date": str(self.end_date),
+            "sectors": ','.join(sorted([s.sector for s in self.idaa_sector.all()])),
+            'countries': ','.join(sorted([c.country for c in self.country.all()])),
+            'outcome_themes': ','.join(sorted([ot.name for ot in self.idaa_outcome_theme.all()]))
         }
 
     @property
@@ -767,6 +812,84 @@ class Program(models.Model):
         return not self.results_framework or not self.auto_number_indicators
 
 
+class ProgramDiscrepancy(models.Model):
+    DISCREPANCY_REASONS = {
+        "out_of_bounds_tracking_dates": "TolaData start and or end dates were updated. Please verify the indicator tracking dates.",
+        "countries": "TolaData program countries does not match IDAA Country",
+        "multiple_programs": "Multiple TolaData programs retrieved from IDAA program",
+        "gaitid": "IDAA program has invalid Gait ID",
+        "duplicate_gaitid": "IDAA program has a duplicated gaitid",
+        "ProgramName": "IDAA program is missing ProgramName",
+        "id": "IDAA program is missing ID",
+        "ProgramStartDate": "IDAA program is missing ProgramStartDate",
+        "ProgramEndDate": "IDAA program is missing ProgramEndDate",
+        "ProgramStatus": "IDAA program is missing ProgramStatus",
+        "Country": "IDAA program is missing Country or has an Invalid Country"
+    }
+
+    # Example idaa_json can be seen from workflow/tests/idaa_sample_data/idaa_sample.json
+    idaa_json = models.JSONField(default=dict)
+    program = models.ManyToManyField(Program, blank=True)
+    # Example discrepancy list is ['funding_status', 'gaitid']
+    discrepancies = models.JSONField(default=list)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Program Discrepancy')
+        verbose_name_plural = _('Program Discrepancies')
+
+    @property
+    def idaa_program_name(self):
+        result = self.idaa_json.get('ProgramName', None)
+        return result if result else _('(None)')
+
+    def __str__(self):
+        # Without str(_('')) this throws a TypeError when ProgramName is not found
+        return self.idaa_json.get('ProgramName', str(_('(None)')))
+
+
+class GaitID(models.Model):
+    gaitid = models.IntegerField()
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='gaitid')
+    donor = models.TextField(null=True, blank=True)
+    donor_dept = models.TextField(null=True, blank=True)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['gaitid', 'program']
+        verbose_name = _('GAIT ID')
+        verbose_name_plural = _('GAIT IDs')
+
+    def fund_codes(self):
+        """
+        Returns a list of fund_code fields for FundCodes related to this GAIT ID. Does not return a list of FundCode objects, or a Query object.
+        """
+        return list(FundCode.objects.filter(gaitid=self).values_list('fund_code', flat=True))
+
+    def __str__(self):
+        return str(self.gaitid)
+
+
+class FundCode(models.Model):
+    fund_code = models.IntegerField(validators=[validators.validate_fund_code])
+    gaitid = models.ForeignKey(GaitID, on_delete=models.CASCADE)
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+    @property
+    def program(self):
+        return self.gaitid.program
+
+    class Meta:
+        unique_together = ['fund_code', 'gaitid']
+        verbose_name = _("Fund Code")
+        verbose_name_plural = _("Fund Codes")
+
+    def __str__(self):
+        return str(self.fund_code)
+
 
 PROGRAM_ROLE_CHOICES = (
     # Translators: Refers to a user permission role with limited access to view data only
@@ -793,6 +916,8 @@ class ProgramAccess(models.Model):
     class Meta:
         db_table = 'workflow_program_user_access'
         unique_together = ('program', 'tolauser', 'country')
+        verbose_name = _('Program Access')
+        verbose_name_plural = _('Program Access') # Same as singular
 
 
 class ProfileType(models.Model):
@@ -802,6 +927,7 @@ class ProfileType(models.Model):
 
     class Meta:
         verbose_name = _("Profile Type")
+        verbose_name_plural = _("Profile Types")
         ordering = ('profile',)
 
     # on save add create date or update edit date
@@ -816,12 +942,8 @@ class ProfileType(models.Model):
         return self.profile
 
 
-class ProfileTypeAdmin(admin.ModelAdmin):
-    list_display = ('profile', 'create_date', 'edit_date')
-    display = 'ProfileType'
-
-
 # Add land classification - 'Rural', 'Urban', 'Peri-Urban', tola-help issue #162
+# TODO this may be unused? No data in the DB
 class LandType(models.Model):
     classify_land = models.CharField(_("Land Classification"), help_text=_("Rural, Urban, Peri-Urban"), max_length=100, blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
@@ -841,11 +963,6 @@ class LandType(models.Model):
     # displayed in admin templates
     def __str__(self):
         return self.classify_land
-
-
-class LandTypeAdmin(admin.ModelAdmin):
-    list_display = ('classify_land', 'create_date', 'edit_date')
-    display = 'Land Type'
 
 
 class SiteProfileManager(models.Manager):
@@ -928,7 +1045,8 @@ class SiteProfile(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name_plural = "Site Profiles"
+        verbose_name = _("Site Profile")
+        verbose_name_plural = _("Site Profiles")
 
     # on save add create date or update edit date
     def save(self, *args, **kwargs):
@@ -944,13 +1062,6 @@ class SiteProfile(models.Model):
     def __str__(self):
         new_name = self.name
         return new_name
-
-
-class SiteProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'country', 'cluster', 'longitude', 'latitude', 'create_date', 'edit_date')
-    list_filter = ('country__country')
-    search_fields = ('code', 'country__country')
-    display = 'SiteProfile'
 
 
 

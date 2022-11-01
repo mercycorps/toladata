@@ -108,6 +108,7 @@ DEFAULT_FROM_EMAIL = app_settings.get('DEFAULT_FROM_EMAIL', 'systems@mercycorps.
 SERVER_EMAIL = app_settings['SERVER_EMAIL']
 EMAIL_BACKEND = app_settings.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 
+SKIP_USER_EMAILS = app_settings.get('SKIP_USER_EMAILS', True)
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
@@ -122,6 +123,8 @@ SECRET_KEY = app_settings['SECRET_KEY']
 
 LOGGING['handlers']['file']['filename'] = app_settings['LOGFILE']
 LOGGING['handlers']['info_file']['filename'] = os.path.join(dirname(app_settings['LOGFILE']), 'django_info.log')
+LOGGING['handlers']['sharepoint_file']['filename'] = os.path.join(dirname(app_settings['LOGFILE']), 'sharepoint_info.log')
+LOGGING['handlers']['program_upload']['filename'] = os.path.join(dirname(app_settings['LOGFILE']), 'program_upload.log')
 
 # Sets the current year for participant count reporting
 REPORTING_YEAR_START_DATE = app_settings['REPORTING_YEAR_START_DATE']
@@ -140,6 +143,16 @@ WEBPACK_LOADER = {
 PROGRAM_API_BASE_URL = app_settings['PROGRAM_API_BASE_URL']
 MCAPI_BASE_URL = app_settings.get('MCAPI_BASE_URL', None)
 PROGRAM_API_TOKEN = app_settings['PROGRAM_API_TOKEN']
+
+MS_TENANT_ID = app_settings['MS_TENANT_ID']
+MS_TOLADATA_CLIENT_ID = app_settings['MS_TOLADATA_CLIENT_ID']
+MS_TOLADATA_CLIENT_SECRET = app_settings['MS_TOLADATA_CLIENT_SECRET']
+MSRCOMMS_ID = app_settings['MSRCOMMS_ID']
+PROGRAM_PROJECT_LIST_ID = app_settings['PROGRAM_PROJECT_LIST_ID']
+GAITID_LIST_ID = app_settings['GAITID_LIST_ID']
+COUNTRYCODES_LIST_ID = app_settings['COUNTRYCODES_LIST_ID']
+
+TOLA_DEVS_EMAIL = app_settings['TOLA_DEVS_EMAIL']
 
 SOCIAL_AUTH_SAML_SP_ENTITY_ID = app_settings['SOCIAL_AUTH_SAML_SP_ENTITY_ID']
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = app_settings['SOCIAL_AUTH_SAML_SP_PUBLIC_CERT']

@@ -16,6 +16,8 @@ from workflow.views import dated_target_info
 from workflow.models import Program
 from tola import util
 
+
+# TODO skip this test once program period react modal replaces this functionality
 class TestReportingPeriodDatesValidate(test.TestCase):
 
     @classmethod

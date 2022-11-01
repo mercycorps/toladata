@@ -46,7 +46,7 @@ $ mysql --version
 
 At the Terminal command line, run the following commands to install:
 ```bash
-$ brew install python@3
+$ brew install python@3.8
 $ brew install mysql@5.7
 ```
 
@@ -62,13 +62,32 @@ export LDFLAGS="-L/usr/local/opt/mysql@5.7/lib"
 export CPPFLAGS="-I/usr/local/opt/mysql@5.7/include"
 ```
 
+For __macOS with ARM chip__ add this instead:
+```text
+export PATH="/opt/homebrew/opt/openssl@1.1/bin:$PATH"
+export LIBRARY_PATH="/opt/homebrew/opt/openssl@1.1/lib/:$LIBRARY_PATH"
+export PATH="/opt/homebrew/opt/mysql@5.7/bin:$PATH"
+export PATH="/opt/homebrew/opt/mysql-client@5.7/bin:$PATH"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/mysql-client@5.7/lib/pkgconfig"
+
+export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
+export LDFLAGS="-L/opt/homebrew/opt/mysql@5.7/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/mysql@5.7/include"
+```
+
 Back at the command line:
 ```bash
 $ source ~/.bash_profile # if using bash, e.g on MacOS 10.14 or older
 $ source ~/.zshrc # if using zsh, e.g. on MacOS 10.15 or newer
-$ brew install mysql-client 
+$ brew install mysql-client
 $ brew install py2cairo pango
 $ pip3 install virtualenv
+```
+
+For __macOS ARM chip__ add this instead you might have to specify the mysql_client version:
+```bash
+$ brew install mysql-client@5.7
 ```
 
 You should now also start the mysql server:
