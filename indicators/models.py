@@ -1673,8 +1673,8 @@ class Indicator(SafeDeleteModel):
                 for t in s.periodictargets.all()
             },
             "level": str(s.level.display_number) if s.level is not None else '',
-            "definition": s.definition,
-            "means_of_verification": s.means_of_verification,
+            "definition": s.definition.strip(),
+            "means_of_verification": s.means_of_verification.strip(),
             "data_collection_method": s.data_collection_method,
             "method_of_analysis": s.method_of_analysis
         }
