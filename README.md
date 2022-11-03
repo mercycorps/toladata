@@ -1,3 +1,13 @@
+# This project is no longer publicly maintained
+
+As of Nov. 1, 2022, [Release 3.0.0](https://github.com/mercycorps/toladata/releases/tag/v3.0.0) is the last public release of this project.
+
+The TolaData team and Mercy Corps offer no warranty or support for this code. __Use at your own risk.__
+
+Mercy Corps team members should direct questions to the internal TolaData team.
+
+----
+
 # Tola Activity
 
 **The build status of the dev branch is: ![workflow](https://github.com/mercycorps/toladata/actions/workflows/run_tests.yml/badge.svg)**
