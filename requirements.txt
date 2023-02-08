@@ -27,7 +27,7 @@ chardet==4.0.0
     # via requests
 click==8.0.3
     # via pip-tools
-cryptography==3.4.7
+cryptography==39.0.1
     # via social-auth-core
 cssselect2==0.4.1
     # via
